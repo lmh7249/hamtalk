@@ -1,11 +1,22 @@
-import loginImage from "../../assets/images/hamtalk-logo.png";
+import loginImage from "../../assets/images/hamtalk-logo1.png";
+import styled from "styled-components";
+
+const LoginHeaderWrapper = styled.div ` 
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+`
 
 const LoginHeader = () => {
     return (
-        <div>
-            로그인창 header
-            <img src={loginImage}></img>
-        </div>
+        <LoginHeaderWrapper>
+            <img src={loginImage} alt="로그인 이미지" style={{
+                maxWidth: '50%',
+                height: 'auto',
+                objectFit: 'contain'
+            }}></img>
+        </LoginHeaderWrapper>
     )
 }
 

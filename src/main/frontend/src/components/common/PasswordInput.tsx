@@ -1,32 +1,35 @@
 import styled from "styled-components";
+import {InputProps} from "../../models/InputProps";
 
 // ({type, placeholder, value}) 중괄호 안넣으면
 // props.type 이런식으로 값 받아야 함.
 
-const StyledInput = styled.input`
-    padding: 10px;
+const StyledPasswordInput = styled.input`
+    padding: 15px;
     border: 1px solid #a6a6a6;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 18px;
+    width: 306.677px;
     &:focus {
         border-color: #ffb6c1;
         outline: none;
     }
     &::placeholder {
         color: #a6a6a6;
-        
     }
 `
 
-const Input = ({type, placeholder, value, onChange}) => {
+
+
+const PasswordInput = ({placeholder}: InputProps) => {
     return (
-        <StyledInput
-            type={type}
+        <StyledPasswordInput
+            type="password"
             placeholder={placeholder}
-            value={value}
-            onChange={onChange}
+            // value={value}
+            // onChange={onChange}
         />
     )
 }
 
-export default Input
+export default PasswordInput

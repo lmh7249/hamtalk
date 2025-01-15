@@ -1,13 +1,12 @@
+import LoginContainer from "../containers/LoginContainer";
 import {AuthPageLayouts} from "../styles/layouts/PageLayouts";
 
-
-const SignupPage = () => {
+const LoginPage = () => {
     return (
         <AuthPageLayouts>
-            회원가입 페이지
+            <LoginContainer/>
         </AuthPageLayouts>
-
     )
 }
 
-export default SignupPage
+export default LoginPage

@@ -1,6 +1,6 @@
-import LoginForm from "../login/LoginForm";
-import LoginFooter from "../login/LoginFooter";
-import LoginHeader from "../login/LoginHeader";
+import LoginForm from "../components/login/LoginForm";
+import LoginFooter from "../components/login/LoginFooter";
+import LoginHeader from "../components/login/LoginHeader";
 import styled from "styled-components";
 
 const LoginContainerWrapper = styled.div`

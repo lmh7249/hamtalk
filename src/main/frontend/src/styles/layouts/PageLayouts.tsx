@@ -4,6 +4,7 @@ export const AuthPageLayouts = styled.div`
     background-color: #F5F6F7;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 `

@@ -4,19 +4,19 @@ export const LOGIN: ButtonStyle = {
     BUTTON : {
         DEFAULT : {
             COLOR: '#FFFFFF',
-            BACKGROUND:'#ffb6c1'
+            BACKGROUND:'#ff527a'
         },
         HOVER: {
             COLOR: '#FFFFFF',
-            BACKGROUND:'#ff527a'
+            BACKGROUND:'#ff3366'
         },
         PRESSED: {
             COLOR: '#FFFFFF',
-            BACKGROUND:'#ff527a'
+            BACKGROUND:'#e6295c'
         },
         DISABLED : {
             COLOR: '#FFFFFF',
-            BACKGROUND:'#ff527a'
+            BACKGROUND:'#ffb6c1'
         },
     },
 };

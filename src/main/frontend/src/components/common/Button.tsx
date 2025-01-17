@@ -33,6 +33,7 @@ const Button = styled.button<ButtonProps>`
     
     &:disabled {
         background-color:  ${({type}) => colorMap[type].BUTTON.DISABLED.BACKGROUND};
+        cursor: default;
     }
 `
 export default Button;

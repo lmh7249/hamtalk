@@ -20,15 +20,17 @@ const StyledInput = styled.input`
 
 interface LoginInputProps{
     type: string;
+    id: string;
     placeholder: string;
     value: string;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-export const LoginInput = ({type, placeholder, value, onChange}: LoginInputProps) => {
+export const LoginInput = ({type, id, placeholder, value, onChange}: LoginInputProps) => {
     return (
         <StyledInput
             type={type}
+            id = {id}
             placeholder={placeholder}
             value={value}
             onChange={onChange}

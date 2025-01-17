@@ -3,6 +3,7 @@ import SignupGuide from "../components/signup/SignupGuide";
 import styled from "styled-components";
 import SignupButton from "../components/signup/SignupButton";
 import ProgressIndicator from "../components/signup/ProgressIndicator";
+import questions from '../data/signupQuestions.json'
 
 const SignupContainerWrapper = styled.div`
     position: relative;
@@ -24,23 +25,7 @@ interface SignupContainerProps {
 }
 
 const SignupContainer = ({step}: SignupContainerProps) => {
-    const questions = [{
-        title: "회원가입1",
-        desc: "이름, 성별, 생년월일을 입력해주세요.",
-    },
-        {
-            title: "회원가입2",
-            desc: "사용하실 이메일을 입력해주세요."
-        },
-        {
-            title: "이메일 주소 인증",
-            desc: "{이메일}님에게 전송된 인증번호를 입력하세요." +
-                "\n인증번호가 보이지 않으면 스팸 폴더를 확인하세요."
-        },
-        {
-            title: "회원가입3",
-            desc: "비밀번호를 입력해주세요. (가입버튼)"
-        }];
+
 
     return (
         <SignupContainerWrapper>

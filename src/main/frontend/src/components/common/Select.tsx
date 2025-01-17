@@ -25,9 +25,9 @@ const Select = ({placeholder} : SelectProps) => {
             <option value="" disabled hidden>
                 {placeholder}
             </option>
-            <option value="1">1월</option>
-            <option value="1">2월</option>
-            <option value="1">3월</option>
+            <option>남성</option>
+            <option>여성</option>
+            <option>기타</option>
         </StyledSelect>
     )
 }

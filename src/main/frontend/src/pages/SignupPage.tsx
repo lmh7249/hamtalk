@@ -3,6 +3,7 @@ import SignupContainer from "../containers/SignupContainer";
 import ProgressIndicator from "../components/signup/ProgressIndicator";
 import {useParams} from "react-router-dom";
 import exp from "node:constants";
+import questions from '../data/signupQuestions.json'
 
 const SignupPage = () => {
 
@@ -13,12 +14,14 @@ const SignupPage = () => {
     const stepParam = params.step;
     const step: number = stepParam ? parseInt(stepParam, 10) : 0;
     const isValidStep = !isNaN(step);
+    const lastStep = questions.length;
+    console.log("마지막 페이지는?", lastStep);
 
     console.log("params:", params, "step:", step, "isValidStep:", isValidStep);
 
     return (
         <AuthPageLayouts>
-            <ProgressIndicator/>
+            <ProgressIndicator step={step} lastStep = {lastStep}/>
             <SignupContainer step={step}/>
         </AuthPageLayouts>
 

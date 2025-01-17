@@ -14,9 +14,21 @@ interface SignupFormProps {
     step: number;
     questionLength: number;
 }
-
+const signupForm = {
+    name: "",
+    birth : {
+        year: "",
+        month: "",
+        day: "",
+        sex: ""
+    },
+    email: "",
+    VerificationNumber: "",
+    password:"",
+}
 
 const SignupForm = ({step, questionLength} : SignupFormProps) => {
+
 
     return (
         <StyledSignupForm>

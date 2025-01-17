@@ -25,8 +25,6 @@ const TextInput = ({placeholder}: InputProps) => {
         <StyledTextInput
             type="text"
             placeholder={placeholder}
-            // value={value}
-            // onChange={onChange}
         />
     )
 }

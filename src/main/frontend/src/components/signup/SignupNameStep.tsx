@@ -24,14 +24,23 @@ const StyledBirthday = styled.div`
         min-width: 70px; /* 최소 크기 */
     }
 `
+const InputHint = styled.p<{ isFocused: boolean, hasValue: boolean }>`
+  font-size: 12px;
+  color: red;
+  position: absolute;
+  top: ${(props) => (props.isFocused || props.hasValue ? '-20px' : '10px')};
+  left: 0;
+  transition: top 0.2s ease;
+`;
+
+
 const SignupNameStep = () => {
-    const maxYear = 2000;
-    const [month, setMonth] = useState("");
+
     return (
         <SignupNameWrapper>
             <TextInput placeholder="이름"></TextInput>
             <StyledBirthday>
-                <NumberInput placeholder="연"  ></NumberInput>
+                <NumberInput placeholder="연" ></NumberInput>
                 <Select placeholder="월" ></Select>
                 <NumberInput placeholder="일" ></NumberInput>
             </StyledBirthday>

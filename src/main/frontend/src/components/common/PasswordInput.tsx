@@ -21,11 +21,12 @@ const StyledPasswordInput = styled.input`
 
 
 
-const PasswordInput = ({placeholder}: InputProps) => {
+const PasswordInput = ({placeholder, onChange}: InputProps) => {
     return (
         <StyledPasswordInput
             type="password"
             placeholder={placeholder}
+            onChange={onChange}
             // value={value}
             // onChange={onChange}
         />

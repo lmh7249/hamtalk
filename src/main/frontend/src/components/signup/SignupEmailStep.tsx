@@ -1,16 +1,20 @@
 import EmailInput from "../common/EmailInput";
 import styled from "styled-components";
+import FloatingInput from "./FloatingInput";
 
 const SignupEmailWrapper = styled.div`
     display: flex;
-    position: absolute;      // 절대 위치
-    right: 40px;
+    flex-direction: column;
+    position: absolute; // 절대 위치
+    gap: 30px;
+    width: 350px;
+    
 `
 
 const SignupEmailStep = () => {
     return (
         <SignupEmailWrapper>
-            <EmailInput placeholder="이메일 입력"></EmailInput>
+            <FloatingInput type="email" placeholder="이메일 주소"></FloatingInput>
         </SignupEmailWrapper>
     )
 }

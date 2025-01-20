@@ -1,19 +1,20 @@
-import PasswordInput from "../common/PasswordInput";
 import styled from "styled-components";
+import FloatingInput from "./FloatingInput";
 
 const PasswordInputWrapper = styled.div`
     display: flex;
-    flex-direction: column;  // 입력창들을 세로로 배치
-    gap: 20px;              // 입력창 사이 간격
-    position: absolute;      // 절대 위치
-    right: 40px;
+    flex-direction: column;
+    position: absolute; // 절대 위치
+    gap: 30px;
+    box-sizing: border-box;
+    width: 350px;
 `;
 
 const SignupPasswordStep = () => {
     return (
         <PasswordInputWrapper>
-            <PasswordInput placeholder="비밀번호 입력"></PasswordInput>
-            <PasswordInput placeholder="비밀번호 확인"></PasswordInput>
+            <FloatingInput type="password" placeholder="비밀번호 생성"></FloatingInput>
+            <FloatingInput type="password" placeholder="확인"></FloatingInput>
         </PasswordInputWrapper>
     )
 }

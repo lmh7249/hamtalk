@@ -11,7 +11,7 @@ const SignupContainerWrapper = styled.div`
     justify-content: flex-start;
     align-items: flex-start;
     gap: 100px;
-    padding: 30px 40px;
+    padding: 30px 40px 100px 40px;
     width: 750px;
     height: 300px;
     background-color: #ffffff; /* 흰색 배경 */

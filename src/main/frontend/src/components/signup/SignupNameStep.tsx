@@ -1,50 +1,70 @@
-import TextInput from "../common/TextInput";
-import NumberInput from "../common/NumberInput";
-import Select from "../common/Select";
 import styled from "styled-components";
-import {useState} from "react";
+import React, {useState} from "react";
+import FloatingInput from "./FloatingInput";
+import FloatingSelect from "./FloatingSelect";
 
 const SignupNameWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    position: absolute;      // 절대 위치
-    right: 40px;
+    position: absolute; // 절대 위치
     gap: 30px;
     max-width: 350px; /* 폼 최대 크기 제한 */
-    width: 100%; /* 부모에 맞게 반응형으로 */
+    box-sizing: border-box; 
+    
 `
-
 const StyledBirthday = styled.div`
     display: flex;
     gap: 15px;
-    width: 100%;  // 부모 컨테이너에 맞추기
-    justify-content: space-between;
-    & > * { /* 자식 요소 크기 제한 */
-        flex: 1; /* 모든 요소가 동일한 비율로 크기 조정 */
-        min-width: 70px; /* 최소 크기 */
-    }
 `
-const InputHint = styled.p<{ isFocused: boolean, hasValue: boolean }>`
-  font-size: 12px;
-  color: red;
-  position: absolute;
-  top: ${(props) => (props.isFocused || props.hasValue ? '-20px' : '10px')};
-  left: 0;
-  transition: top 0.2s ease;
-`;
-
+const genderOptions = ["남성", "여성", "기타"];
+const monthOptions = [
+    {value: '01', label: '1월'},
+    {value: '02', label: '2월'},
+    {value: '03', label: '3월'},
+    {value: '04', label: '4월'},
+    {value: '05', label: '5월'},
+    {value: '06', label: '6월'},
+    {value: '07', label: '7월'},
+    {value: '08', label: '8월'},
+    {value: '09', label: '9월'},
+    {value: '10', label: '10월'},
+    {value: '11', label: '11월'},
+    {value: '12', label: '12월'}
+];
 
 const SignupNameStep = () => {
+    const [formData, setFormData] = useState({
+        name: '',
+        birthYear: '',
+        birthMonth: '',
+        birthDay: '',
+        gender: ''
+    });
+
+    // 입력 필드 업데이트를 위한 공통 핸들러
+    const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+
+        const newValue = e.target.value; //TODO: 현재 입력된 값, 디버깅용 -> 삭제하기
+        setFormData(prevState => ({
+            ...prevState,
+            [field]: e.target.value
+        }));
+        console.log("Updated formData:", {...formData, [field]: newValue}); // 업데이트된 상태 출력
+    };
 
     return (
         <SignupNameWrapper>
-            <TextInput placeholder="이름"></TextInput>
+            <FloatingInput type="text" placeholder="이름" value={formData.name} onChange={handleChange('name')}/>
             <StyledBirthday>
-                <NumberInput placeholder="연" ></NumberInput>
-                <Select placeholder="월" ></Select>
-                <NumberInput placeholder="일" ></NumberInput>
+                <FloatingInput type="number" placeholder="년(4자)" value={formData.birthYear}
+                               onChange={handleChange('birthYear')}/>
+                <FloatingSelect placeholder="월" value={formData.birthMonth} options={monthOptions}
+                                onChange={handleChange('birthMonth')}/>
+                <FloatingInput type="number" placeholder="일" value={formData.birthDay}
+                               onChange={handleChange('birthDay')}/>
             </StyledBirthday>
-            <Select placeholder="성별"></Select>
+            <FloatingSelect placeholder="성별" value={formData.gender} options={genderOptions}
+                            onChange={handleChange('gender')}/>
         </SignupNameWrapper>
     )
 }

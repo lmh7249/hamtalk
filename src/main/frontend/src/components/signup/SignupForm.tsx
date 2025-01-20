@@ -9,6 +9,7 @@ const StyledSignupForm = styled.form`
     display: flex;
     flex-direction: column;
     gap: 30px;
+    margin-top: 20px;
 `
 interface SignupFormProps {
     step: number;
@@ -20,7 +21,7 @@ const signupForm = {
         year: "",
         month: "",
         day: "",
-        sex: ""
+        gender: ""
     },
     email: "",
     VerificationNumber: "",

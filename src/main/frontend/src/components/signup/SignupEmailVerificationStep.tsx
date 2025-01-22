@@ -10,10 +10,10 @@ const SignupEmailVerificationWrapper = styled.div`
     width: 350px;
 `
 
-const SignupEmailVerificationStep = () => {
+const SignupEmailVerificationStep = ({formData, handleInputChange}: {formData : any, handleInputChange: any}) => {
     return (
         <SignupEmailVerificationWrapper>
-            <FloatingInput type="number" placeholder="인증번호"></FloatingInput>
+            <FloatingInput type="number" placeholder="인증번호" name="verificationCode" value={formData.value} onChange={handleInputChange}></FloatingInput>
         </SignupEmailVerificationWrapper>
     )
 }

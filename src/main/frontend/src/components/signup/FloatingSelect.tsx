@@ -8,8 +8,8 @@ const SelectContainer = styled.div`
     min-width: 0; // 추가
 `;
 
-const StyledSelect = styled.select<{ isFocused: boolean, value: string }>`
-    padding: ${({isFocused}) => (isFocused ? '25px 15px 5px' : '15px')}; /* 라벨이 보이거나 포커스 되면 padding 변경 */
+const StyledSelect = styled.select<{ $isFocused: boolean, value: string }>`
+    padding: ${({$isFocused}) => ($isFocused ? '25px 15px 5px' : '15px')}; /* 라벨이 보이거나 포커스 되면 padding 변경 */
     border: 1px solid #a6a6a6;
     border-radius: 5px;
     font-size: 18px;
@@ -26,7 +26,7 @@ const StyledSelect = styled.select<{ isFocused: boolean, value: string }>`
     }
 `;
 
-const FloatingLabel = styled.label<{ isFocus: boolean }>`
+const FloatingLabel = styled.label<{ $isFocus: boolean }>`
     position: absolute;
     left: 15px;
     top: 50%;
@@ -35,9 +35,9 @@ const FloatingLabel = styled.label<{ isFocus: boolean }>`
     color: #a6a6a6;
     pointer-events: none;
     transition: 0.2s ease all;
-    visibility: ${({isFocus}) => (isFocus ? "visible" : "hidden")}; /* 라벨이 없을 때는 숨김 */
-    ${({isFocus}) =>
-            isFocus &&
+    visibility: ${({$isFocus}) => ($isFocus ? "visible" : "hidden")}; /* 라벨이 없을 때는 숨김 */
+    ${({$isFocus}) =>
+            $isFocus &&
             `
         top: 8px;
         left: 15px;
@@ -49,12 +49,13 @@ const FloatingLabel = styled.label<{ isFocus: boolean }>`
 interface SelectProps {
     placeholder: string;
     value: string;
+    name: string;
     options: Array<{ value: string; label: string }> | string[];
     onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; //TODO : input 아니고 select 메모.
     onFocus?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-const FloatingSelect = ({placeholder, value, options, onChange, onFocus}: SelectProps) => {
+const FloatingSelect = ({placeholder, value, name, options, onChange, onFocus}: SelectProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const handleFocus = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setIsFocused(true);
@@ -71,13 +72,14 @@ const FloatingSelect = ({placeholder, value, options, onChange, onFocus}: Select
         <SelectContainer>
             <StyledSelect
                 value={value || ""}
+                name={name}
                 onChange={onChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                isFocused={isFocused}
+                $isFocused={isFocused}
                 className={(!value || value === "default") ? "placeholder" : ""}>
                 {!isFocused ?
-                    <option value="default" hidden selected>{placeholder}</option>
+                    <option value="default" hidden>{placeholder}</option>
                     :
                     <option value="default" hidden>{""}</option>
                 }
@@ -94,7 +96,7 @@ const FloatingSelect = ({placeholder, value, options, onChange, onFocus}: Select
                     )
                 ))}
             </StyledSelect>
-            <FloatingLabel isFocus={isFocused}>{placeholder}</FloatingLabel>
+            <FloatingLabel $isFocus={isFocused}>{placeholder}</FloatingLabel>
         </SelectContainer>
     );
 }

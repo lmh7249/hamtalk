@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import Button from "../common/Button";
 import styled from "styled-components";
+import {FormData} from "./SignupForm";
 
 const ButtonWrapper = styled.div`
     position: absolute;
@@ -10,12 +11,13 @@ const ButtonWrapper = styled.div`
     gap: 30px;
 `;
 
-interface SignupButtonProps {
+interface SignupButtonProps{
     step: number;
     questionLength: number;
+    formData: FormData;
 }
 
-const SignupButton = ({step, questionLength}: SignupButtonProps) => {
+const SignupButton = ({step, questionLength, formData}: SignupButtonProps) => {
     const isLast = (questionLength - 1 === step);
     const navigate = useNavigate();
 
@@ -26,11 +28,11 @@ const SignupButton = ({step, questionLength}: SignupButtonProps) => {
                 navigate(`${step-1}`)}}>이전</Button> : null}
             {isLast ? <Button type="COMPLETE">가입하기</Button> :
                 <Button type="NEXT" onClick={(e) => {
-                e.preventDefault();
-                console.log("다음");
-                console.log(step);
-                navigate(`${step+1}`)}}>다음</Button>}
-        {/*  navigate(`${step+1}`) -> url은 문자열이라 숫자에서 문자로 바꿔줘야 정상 작동.  */}
+                    e.preventDefault();
+                    console.log("다음");
+                    console.log(step);
+                    navigate(`${step+1}`)}}>다음</Button>}
+            {/*  navigate(`${step+1}`) -> url은 문자열이라 숫자에서 문자로 바꿔줘야 정상 작동.  */}
         </ButtonWrapper>
     )
 }

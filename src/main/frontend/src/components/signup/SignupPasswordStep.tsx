@@ -10,11 +10,11 @@ const PasswordInputWrapper = styled.div`
     width: 350px;
 `;
 
-const SignupPasswordStep = () => {
+const SignupPasswordStep = ({formData, handleInputChange}: {formData : any, handleInputChange: any}) => {
     return (
         <PasswordInputWrapper>
-            <FloatingInput type="password" placeholder="비밀번호 생성"></FloatingInput>
-            <FloatingInput type="password" placeholder="확인"></FloatingInput>
+            <FloatingInput type="password" placeholder="비밀번호 생성" name="password" value={formData.value} onChange={handleInputChange}></FloatingInput>
+            <FloatingInput type="password" placeholder="확인" name="confirmPassword" value={formData.value} onChange={handleInputChange}></FloatingInput>
         </PasswordInputWrapper>
     )
 }

@@ -1,4 +1,3 @@
-import EmailInput from "../common/EmailInput";
 import styled from "styled-components";
 import FloatingInput from "./FloatingInput";
 
@@ -11,10 +10,10 @@ const SignupEmailWrapper = styled.div`
     
 `
 
-const SignupEmailStep = () => {
+const SignupEmailStep = ({formData, handleInputChange}: {formData : any, handleInputChange: any}) => {
     return (
         <SignupEmailWrapper>
-            <FloatingInput type="email" placeholder="이메일 주소"></FloatingInput>
+            <FloatingInput type="email" placeholder="이메일 주소" name="email" value={formData.value} onChange={handleInputChange}></FloatingInput>
         </SignupEmailWrapper>
     )
 }

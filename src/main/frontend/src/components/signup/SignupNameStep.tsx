@@ -16,7 +16,11 @@ const StyledBirthday = styled.div`
     display: flex;
     gap: 15px;
 `
-const genderOptions = ["남성", "여성", "기타"];
+const genderOptions = [
+    {value: "M", label: "남성"},
+    {value: "F", label: "여성"},
+    {value: "O", label: "기타"}];
+
 const monthOptions = [
     {value: '01', label: '1월'},
     {value: '02', label: '2월'},
@@ -32,39 +36,20 @@ const monthOptions = [
     {value: '12', label: '12월'}
 ];
 
-const SignupNameStep = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        birthYear: '',
-        birthMonth: '',
-        birthDay: '',
-        gender: ''
-    });
-
-    // 입력 필드 업데이트를 위한 공통 핸들러
-    const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-
-        const newValue = e.target.value; //TODO: 현재 입력된 값, 디버깅용 -> 삭제하기
-        setFormData(prevState => ({
-            ...prevState,
-            [field]: e.target.value
-        }));
-        console.log("Updated formData:", {...formData, [field]: newValue}); // 업데이트된 상태 출력
-    };
-
+const SignupNameStep = ({formData, handleInputChange}: {formData : any, handleInputChange: any}) => {
     return (
         <SignupNameWrapper>
-            <FloatingInput type="text" placeholder="이름" value={formData.name} onChange={handleChange('name')}/>
+            <FloatingInput type="text" placeholder="이름" name="name" value={formData.name} onChange={handleInputChange}/>
             <StyledBirthday>
-                <FloatingInput type="number" placeholder="년(4자)" value={formData.birthYear}
-                               onChange={handleChange('birthYear')}/>
-                <FloatingSelect placeholder="월" value={formData.birthMonth} options={monthOptions}
-                                onChange={handleChange('birthMonth')}/>
-                <FloatingInput type="number" placeholder="일" value={formData.birthDay}
-                               onChange={handleChange('birthDay')}/>
+                <FloatingInput type="number" placeholder="년(4자)" name="birthYear" value={formData.birthYear}
+                               onChange={handleInputChange}/>
+                <FloatingSelect placeholder="월" value={formData.birthMonth} name="birthMonth" options={monthOptions}
+                                onChange={handleInputChange}/>
+                <FloatingInput type="number" placeholder="일" value={formData.birthDay} name ="birthDay"
+                               onChange={handleInputChange}/>
             </StyledBirthday>
-            <FloatingSelect placeholder="성별" value={formData.gender} options={genderOptions}
-                            onChange={handleChange('gender')}/>
+            <FloatingSelect placeholder="성별" value={formData.gender} options={genderOptions} name="gender"
+                            onChange={handleInputChange}/>
         </SignupNameWrapper>
     )
 }

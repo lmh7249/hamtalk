@@ -24,7 +24,6 @@ const SignupPage = () => {
             <ProgressIndicator step={step} lastStep = {lastStep}/>
             <SignupContainer step={step}/>
         </AuthPageLayouts>
-
     )
 }
 

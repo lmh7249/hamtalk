@@ -1,8 +1,6 @@
 import SignupForm from "../components/signup/SignupForm";
 import SignupGuide from "../components/signup/SignupGuide";
 import styled from "styled-components";
-import SignupButton from "../components/signup/SignupButton";
-import ProgressIndicator from "../components/signup/ProgressIndicator";
 import questions from '../data/signupQuestions.json'
 
 const SignupContainerWrapper = styled.div`
@@ -25,8 +23,6 @@ interface SignupContainerProps {
 }
 
 const SignupContainer = ({step}: SignupContainerProps) => {
-
-
     return (
         <SignupContainerWrapper>
             <SignupGuide title={questions[step].title} desc={questions[step].desc}/>
@@ -34,5 +30,4 @@ const SignupContainer = ({step}: SignupContainerProps) => {
         </SignupContainerWrapper>
     )
 }
-
 export default SignupContainer

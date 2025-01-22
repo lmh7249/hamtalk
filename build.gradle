@@ -31,48 +31,58 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-def frontendDir = "$projectDir/src/main/frontend"
+// 이 코드는 사용하지 않고 나중에 배포할때만 한번에 합치자.
 
-sourceSets {
-    main {
-        resources { srcDirs = ["$projectDir/src/main/resources"] }
-    }
-}
-
-processResources { dependsOn "copyReactBuildFiles" }
-
-task installReact(type: Exec) {
-    workingDir "$frontendDir"
-    inputs.dir "$frontendDir"
-    group = BasePlugin.BUILD_GROUP
-    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine "yarn.cmd", "install"  // npm 대신 yarn 사용
-    } else {
-        commandLine "yarn", "install"  // npm 대신 yarn 사용
-    }
-}
-
-task buildReact(type: Exec) {
-    dependsOn "installReact"
-    workingDir "$frontendDir"
-    inputs.dir "$frontendDir"
-    group = BasePlugin.BUILD_GROUP
-    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine "yarn.cmd", "build"  // npm 대신 yarn 사용
-    } else {
-        commandLine "yarn", "build"  // npm 대신 yarn 사용
-    }
-}
-
-task copyReactBuildFiles(type: Copy) {
-    dependsOn "buildReact"
-    from "$frontendDir/build"
-    into "$projectDir/src/main/resources/static"
-}
+//def frontendDir = "$projectDir/src/main/frontend"
+//
+//sourceSets {
+//    main {
+//        resources { srcDirs = ["$projectDir/src/main/resources"] }
+//    }
+//}
+//
+//processResources { dependsOn "copyReactBuildFiles" }
+//
+//task installReact(type: Exec) {
+//    workingDir "$frontendDir"
+//    inputs.dir "$frontendDir"
+//    group = BasePlugin.BUILD_GROUP
+//    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+//        commandLine "yarn.cmd", "install"  // npm 대신 yarn 사용
+//    } else {
+//        commandLine "yarn", "install"  // npm 대신 yarn 사용
+//    }
+//}
+//
+//task buildReact(type: Exec) {
+//    dependsOn "installReact"
+//    workingDir "$frontendDir"
+//    inputs.dir "$frontendDir"
+//    group = BasePlugin.BUILD_GROUP
+//    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+//        commandLine "yarn.cmd", "build"  // npm 대신 yarn 사용
+//    } else {
+//        commandLine "yarn", "build"  // npm 대신 yarn 사용
+//    }
+//}
+//
+//task copyReactBuildFiles(type: Copy) {
+//    dependsOn "buildReact"
+//    from "$frontendDir/build"
+//    into "$projectDir/src/main/resources/static"
+//}
 

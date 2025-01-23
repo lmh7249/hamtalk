@@ -22,8 +22,8 @@ const PageCount = styled.div `
 
 
 interface ProgressIndicatorProps {
-    step: number;
-    lastStep: number;
+    currentStep: number;
+    totalSteps: number;
 }
 
 const getStatus = (index:number, currentStep:number) : "done" | "in-progress" | "pending"  => {
@@ -33,15 +33,15 @@ const getStatus = (index:number, currentStep:number) : "done" | "in-progress" | 
 }
 
 
-const ProgressIndicator = ({step, lastStep}: ProgressIndicatorProps) => {
-    const pageCount = step+1;
+const ProgressIndicator = ({currentStep, totalSteps}: ProgressIndicatorProps) => {
+    const pageCount = currentStep+1;
 
     return (
         <ProgressIndicatorWrapper>
-            {Array.from({length: lastStep}).map((_, index)=>(
-                <Bar key={index} status={getStatus(index, step)}/>
+            {Array.from({length: totalSteps}).map((_, index)=>(
+                <Bar key={index} status={getStatus(index, currentStep)}/>
             ))}
-            <PageCount><span>{pageCount}</span>/{lastStep}</PageCount>
+            <PageCount><span>{pageCount}</span>/{totalSteps}</PageCount>
         </ProgressIndicatorWrapper>
     )
 }

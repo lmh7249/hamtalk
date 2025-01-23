@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, {useState} from "react";
+import React from "react";
 import FloatingInput from "./FloatingInput";
 import FloatingSelect from "./FloatingSelect";
 
@@ -16,6 +16,20 @@ const StyledBirthday = styled.div`
     display: flex;
     gap: 15px;
 `
+
+interface SignupNameStepProps {
+    formData: FormData;
+    handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+}
+
+interface FormData {
+    name: string;
+    birthYear: string;
+    birthMonth: string;
+    birthDay: string;
+    gender: string;
+}
+
 const genderOptions = [
     {value: "M", label: "남성"},
     {value: "F", label: "여성"},
@@ -36,21 +50,23 @@ const monthOptions = [
     {value: '12', label: '12월'}
 ];
 
-const SignupNameStep = ({formData, handleInputChange}: {formData : any, handleInputChange: any}) => {
+const SignupNameStep = ({formData, handleInputChange}: SignupNameStepProps) => {
+
     return (
         <SignupNameWrapper>
             <FloatingInput type="text" placeholder="이름" name="name" value={formData.name} onChange={handleInputChange}/>
-            <StyledBirthday>
-                <FloatingInput type="number" placeholder="년(4자)" name="birthYear" value={formData.birthYear}
+                    <StyledBirthday>
+                <FloatingInput type="number" placeholder="년(4자)" name="birthYear" value={formData.birthYear} min={1900} max={new Date().getFullYear()}
                                onChange={handleInputChange}/>
                 <FloatingSelect placeholder="월" value={formData.birthMonth} name="birthMonth" options={monthOptions}
                                 onChange={handleInputChange}/>
-                <FloatingInput type="number" placeholder="일" value={formData.birthDay} name ="birthDay"
+                <FloatingInput type="number" placeholder="일" value={formData.birthDay} name ="birthDay" min={1} max={31}
                                onChange={handleInputChange}/>
             </StyledBirthday>
             <FloatingSelect placeholder="성별" value={formData.gender} options={genderOptions} name="gender"
                             onChange={handleInputChange}/>
         </SignupNameWrapper>
+
     )
 }
 

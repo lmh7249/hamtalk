@@ -9,7 +9,6 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/login" element={<LoginPage/>}/>
             <Route path="/signup" element={<SignupPage/>}>
-                <Route path={":step"} element={<SignupPage/>}/>
             </Route>
             {/* 채팅 관련 라우트 */}
             <Route path="/chat" element={<ChatMainPage/>}>

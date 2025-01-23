@@ -53,7 +53,7 @@ const FloatingLabel = styled.label`
     }
 `;
 
-const FloatingInput = ({type, placeholder, name, value, onChange, onFocus }: InputProps) => {
+const FloatingInput = ({type, placeholder, name, value, min, max, onChange, onFocus }: InputProps) => {
     return (
         <InputContainer>
             <StyledTextInput
@@ -61,6 +61,8 @@ const FloatingInput = ({type, placeholder, name, value, onChange, onFocus }: Inp
                 name={name}
                 placeholder={placeholder}
                 value={value}
+                min ={min}
+                max = {max}
                 onChange={onChange}
                 onFocus={onFocus}
             />

@@ -12,29 +12,37 @@ const ButtonWrapper = styled.div`
 `;
 
 interface SignupButtonProps{
-    step: number;
+    currentStep: number;
     questionLength: number;
     formData: FormData;
+    onNextStep: () => void;
+    onPrevStep: () => void;
+    isStepValid: boolean;
 }
 
-const SignupButton = ({step, questionLength, formData}: SignupButtonProps) => {
-    const isLast = (questionLength - 1 === step);
-    const navigate = useNavigate();
+const SignupButton = ({currentStep, questionLength, formData, onNextStep, onPrevStep, isStepValid}: SignupButtonProps) => {
+    const isLast = (questionLength - 1 === currentStep);
+    const handleNext = (e: React.MouseEvent) => {
+        e.preventDefault(); // 폼 제출 방지
+        if (isStepValid) {
+            onNextStep(); // 유효성 검사를 통과하면 다음 스텝으로 이동
+        } else {
+            // 유효성 검사 실패 시 처리
+            alert("유효성 검사를 통과하지 못했습니다. 다시 확인해주세요.");
+        }
+    };
+
+    const handlePrev = (e: React.MouseEvent) => {
+        e.preventDefault(); // 폼 제출 방지
+        onPrevStep(); // 이전 스텝으로 이동
+    };
 
     return (
         <ButtonWrapper>
-            {step !== 0 ? <Button type="PREV" onClick={(e) => {
-                e.preventDefault();
-                navigate(`${step-1}`)}}>이전</Button> : null}
+            {currentStep !== 0 && <Button type="PREV" onClick={handlePrev}>이전</Button>}
             {isLast ? <Button type="COMPLETE">가입하기</Button> :
-                <Button type="NEXT" onClick={(e) => {
-                    e.preventDefault();
-                    console.log("다음");
-                    console.log(step);
-                    navigate(`${step+1}`)}}>다음</Button>}
-            {/*  navigate(`${step+1}`) -> url은 문자열이라 숫자에서 문자로 바꿔줘야 정상 작동.  */}
+                <Button type="NEXT" onClick={handleNext}>다음</Button>}
         </ButtonWrapper>
     )
 }
-
 export default SignupButton

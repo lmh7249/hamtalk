@@ -24,4 +24,9 @@ public class UserService {
         return "회원가입 성공";
     }
 
+    @Transactional(readOnly = true)
+    public boolean emailCheck(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
 }

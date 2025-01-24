@@ -4,16 +4,14 @@ import SignupNameStep from "./SignupNameStep";
 import SignupEmailStep from "./SignupEmailStep";
 import SignupPasswordStep from "./SignupPasswordStep";
 import SignupEmailVerificationStep from "./SignupEmailVerificationStep";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
-    isValidDay,
+    isValidBirthDate,
     isValidEmail,
     isValidGender,
-    isValidMonth,
     isValidName,
     isValidPassword,
     isValidVerificationCode,
-    isValidYear
 } from "../../utils/signupValidation";
 
 const StyledSignupForm = styled.form`
@@ -42,7 +40,6 @@ export interface FormData {
     confirmPassword: string;
 }
 
-
 const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: SignupFormProps) => {
     // 1~4단계 모든 데이터 관리
     const [formData, setFormData] = useState<FormData>({
@@ -62,33 +59,70 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
     });
 
     const [isStepValid, setIsStepValid] = useState(false);
+    const [errorMessages, setErrorMessages] = useState<{[key:string]: string}>({});
+    const handleErrorMessages = (messages: { [key: string]: string }) => {
+        setErrorMessages(messages);
+    };
+
+
 
     const validateStep = (step: number) => {
+        const errorMessages : {[key: string]: string} = {};
+
         switch (step) {
             case 0: {
-                return (
-                    isValidName(formData.name) &&
-                    isValidYear(formData.birthYear) &&
-                    isValidMonth(formData.birthMonth) &&
-                    isValidDay(formData.birthDay, formData.birthMonth, formData.birthYear) &&
-                    isValidGender(formData.gender)
+                // 이름 유효성 검사
+                const nameValidation = isValidName(formData.name);
+                if (!nameValidation.isValid) {
+                    errorMessages.name = nameValidation.errorMessage;
+                }
+
+                // 생년월일 유효성 검사
+                const birthDateValidation = isValidBirthDate(
+                    formData.birthYear,
+                    formData.birthMonth,
+                    formData.birthDay
                 );
+                if (!birthDateValidation.isValid) {
+                    errorMessages.birthDate = birthDateValidation.errorMessage;
+                }
+
+                // 성별 유효성 검사
+                const isGenderValid = isValidGender(formData.gender);
+                if (!isGenderValid.isValid) {
+                    errorMessages.gender = isGenderValid.errorMessage;
+                }
+                break;
             }
             case 1: {
-                return isValidEmail(formData.email);
-
+                // 이메일 유효성 검사
+                const emailValidation = isValidEmail(formData.email);
+                if (!emailValidation.isValid) {
+                    errorMessages.email = emailValidation.errorMessage;
+                }
+                break;
             }
             case 2: {
-                return isValidVerificationCode(formData.verificationCode);
-
+                // 인증 코드 유효성 검사
+                const verificationCodeValidation = isValidVerificationCode(formData.verificationCode);
+                if (!verificationCodeValidation.isValid) {
+                    errorMessages.verificationCode = verificationCodeValidation.errorMessage;
+                }
+                break;
             }
             case 3: {
-                return isValidPassword(formData.password, formData.confirmPassword);
-
+                // 비밀번호 유효성 검사
+                const passwordValidation = isValidPassword(formData.password, formData.confirmPassword);
+                if (!passwordValidation.isValid) {
+                    errorMessages.password = passwordValidation.errorMessage;
+                }
+                break;
             }
             default:
-                return true;
+                return { isValid: true, errorMessages: {} }; // 유효성 검사 통과
         }
+        // 유효성 검사 후 errorMessages가 비어 있으면 isValid는 true, 아니면 false
+        return { isValid: Object.keys(errorMessages).length === 0, errorMessages };
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -102,17 +136,41 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
 
     useEffect(() => {
         const validationResult = validateStep(currentStep);
-        setIsStepValid(validationResult);
+        setIsStepValid(validationResult.isValid);
         console.log(formData); // 최신 formData를 출력
+        console.log("useEffect 유효성 검사중 ...", validationResult.isValid);
+        console.log("에러 메시지:", validationResult.errorMessages);
     }, [formData, currentStep]);  // formData가 변경될 때마다 실행
 
+    const handleSubmit = (e :React.FormEvent) : void => {
+        e.preventDefault();
+        const passwordValidation = isValidPassword(formData.password, formData.confirmPassword);
+        if(!passwordValidation.isValid) {
+            alert(passwordValidation.errorMessage);
+            console.log("핸들서브밋 함수 호출");
+            handleErrorMessages({ password: passwordValidation.errorMessage });
+        } else {
+            fetch("api/users", {
+                method:"post",
+
+            })
+        }
+    }
+
     return (
-        <StyledSignupForm method="post">
-            {currentStep === 0 && <SignupNameStep formData={formData} handleInputChange = {handleInputChange}/>}
-            {currentStep === 1 && <SignupEmailStep formData={formData} handleInputChange = {handleInputChange} />}
-            {currentStep === 2 && <SignupEmailVerificationStep formData={formData} handleInputChange = {handleInputChange}/>}
-            {currentStep === 3 && <SignupPasswordStep formData={formData} handleInputChange = {handleInputChange}/>}
-            <SignupButton currentStep={currentStep} questionLength={questionLength} formData={formData} onNextStep={onNextStep} onPrevStep={onPrevStep}  isStepValid={isStepValid}/>
+        <StyledSignupForm method="post" onSubmit={handleSubmit}>
+            {currentStep === 0 && <SignupNameStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
+            {currentStep === 1 && <SignupEmailStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
+            {currentStep === 2 && <SignupEmailVerificationStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
+            {currentStep === 3 && <SignupPasswordStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
+            <SignupButton currentStep={currentStep}
+                          questionLength={questionLength}
+                          formData={formData}
+                          onNextStep={onNextStep}
+                          onPrevStep={onPrevStep}
+                          isStepValid={isStepValid}
+                          handleErrorMessages = {handleErrorMessages}
+                          validateStep={validateStep}/>
         </StyledSignupForm>
     )
 }

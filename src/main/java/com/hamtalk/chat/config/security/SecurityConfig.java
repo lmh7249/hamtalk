@@ -39,7 +39,7 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/static/**"
                         ).permitAll()
-                        .requestMatchers("/api/user/signup", "/api/login").permitAll()
+                        .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/**").authenticated()
                                 // 나머지 모든 요청은 React 라우팅으로 처리되도록 허용

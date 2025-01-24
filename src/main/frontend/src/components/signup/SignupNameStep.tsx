@@ -2,14 +2,15 @@ import styled from "styled-components";
 import React from "react";
 import FloatingInput from "./FloatingInput";
 import FloatingSelect from "./FloatingSelect";
+import {StyledErrorText} from "../common/ErrorText";
 
 const SignupNameWrapper = styled.div`
     display: flex;
     flex-direction: column;
     position: absolute; // 절대 위치
-    gap: 30px;
     max-width: 350px; /* 폼 최대 크기 제한 */
     box-sizing: border-box; 
+    gap:30px;
     
 `
 const StyledBirthday = styled.div`
@@ -20,6 +21,7 @@ const StyledBirthday = styled.div`
 interface SignupNameStepProps {
     formData: FormData;
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    errorMessage: {[key:string]: string};
 }
 
 interface FormData {
@@ -50,23 +52,25 @@ const monthOptions = [
     {value: '12', label: '12월'}
 ];
 
-const SignupNameStep = ({formData, handleInputChange}: SignupNameStepProps) => {
+const SignupNameStep = ({formData, handleInputChange, errorMessage}: SignupNameStepProps) => {
 
     return (
         <SignupNameWrapper>
             <FloatingInput type="text" placeholder="이름" name="name" value={formData.name} onChange={handleInputChange}/>
+            {errorMessage && errorMessage.name && <StyledErrorText>{errorMessage.name}</StyledErrorText>}
                     <StyledBirthday>
                 <FloatingInput type="number" placeholder="년(4자)" name="birthYear" value={formData.birthYear} min={1900} max={new Date().getFullYear()}
                                onChange={handleInputChange}/>
                 <FloatingSelect placeholder="월" value={formData.birthMonth} name="birthMonth" options={monthOptions}
                                 onChange={handleInputChange}/>
-                <FloatingInput type="number" placeholder="일" value={formData.birthDay} name ="birthDay" min={1} max={31}
+                        <FloatingInput type="number" placeholder="일" value={formData.birthDay} name ="birthDay" min={1} max={31}
                                onChange={handleInputChange}/>
-            </StyledBirthday>
+                    </StyledBirthday>
+            {errorMessage && errorMessage.birthDate && <StyledErrorText>{errorMessage.birthDate}</StyledErrorText>}
             <FloatingSelect placeholder="성별" value={formData.gender} options={genderOptions} name="gender"
                             onChange={handleInputChange}/>
+            {errorMessage && errorMessage.gender && <StyledErrorText>{errorMessage.gender}</StyledErrorText>}
         </SignupNameWrapper>
-
     )
 }
 

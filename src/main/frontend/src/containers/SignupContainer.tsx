@@ -2,6 +2,8 @@ import SignupForm from "../components/signup/SignupForm";
 import SignupGuide from "../components/signup/SignupGuide";
 import styled from "styled-components";
 import questions from '../data/signupQuestions.json'
+import React from "react";
+import {isValidPassword} from "../utils/signupValidation";
 
 const SignupContainerWrapper = styled.div`
     position: relative;
@@ -23,6 +25,8 @@ interface SignupContainerProps {
     onNextStep: () => void;  // 단계 변경 함수
     onPrevStep: () => void;
 }
+
+
 
 const SignupContainer = ({currentStep, onNextStep, onPrevStep}: SignupContainerProps) => {
     return (

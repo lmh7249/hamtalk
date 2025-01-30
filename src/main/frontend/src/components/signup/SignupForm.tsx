@@ -13,6 +13,7 @@ import {
     isValidPassword,
     isValidVerificationCode,
 } from "../../utils/signupValidation";
+import {useNavigate} from "react-router-dom";
 
 const StyledSignupForm = styled.form`
     display: flex;
@@ -57,17 +58,16 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
         confirmPassword: ''
         // 4단계
     });
-
+    const navigate = useNavigate();
     const [isStepValid, setIsStepValid] = useState(false);
-    const [errorMessages, setErrorMessages] = useState<{[key:string]: string}>({});
+    const [errorMessages, setErrorMessages] = useState<{ [key: string]: string }>({});
     const handleErrorMessages = (messages: { [key: string]: string }) => {
         setErrorMessages(messages);
     };
 
 
-
     const validateStep = (step: number) => {
-        const errorMessages : {[key: string]: string} = {};
+        const errorMessages: { [key: string]: string } = {};
 
         switch (step) {
             case 0: {
@@ -119,14 +119,14 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
                 break;
             }
             default:
-                return { isValid: true, errorMessages: {} }; // 유효성 검사 통과
+                return {isValid: true, errorMessages: {}}; // 유효성 검사 통과
         }
         // 유효성 검사 후 errorMessages가 비어 있으면 isValid는 true, 아니면 false
-        return { isValid: Object.keys(errorMessages).length === 0, errorMessages };
+        return {isValid: Object.keys(errorMessages).length === 0, errorMessages};
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         // e.target의 타입을 명확히 처리
         setFormData((prevData) => ({
             ...prevData,
@@ -142,34 +142,69 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
         console.log("에러 메시지:", validationResult.errorMessages);
     }, [formData, currentStep]);  // formData가 변경될 때마다 실행
 
-    const handleSubmit = (e :React.FormEvent) : void => {
+    const handleSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
         const passwordValidation = isValidPassword(formData.password, formData.confirmPassword);
-        if(!passwordValidation.isValid) {
+        if (!passwordValidation.isValid) {
             alert(passwordValidation.errorMessage);
             console.log("핸들서브밋 함수 호출");
-            handleErrorMessages({ password: passwordValidation.errorMessage });
+            handleErrorMessages({password: passwordValidation.errorMessage});
         } else {
+            const birthDate = new Date(
+                Number(formData.birthYear),
+                Number(formData.birthMonth) - 1, // 월은 0부터 시작 (0 = 1월)
+                Number(formData.birthDay)
+            ).toISOString().split("T")[0]; // ISO 8601 형식 중 날짜 부분만 추출 (YYYY-MM-DD)
+            const signupData = {
+                email: formData.email,
+                password: formData.password,
+                name: formData.name,
+                birthDate: birthDate,
+                gender: formData.gender
+            }
             fetch("api/users", {
-                method:"post",
-
+                method: "post",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(signupData)
+                // json 문자열로 변환해서 body에 전송할 데이터 포함.
+            }).then((response) => {
+                if (!response.ok) {
+                    throw new Error("회원가입 요청 실패");
+                }
+                return response.json();
+                // 다음 then 블록으로 결과 전달.
             })
+                .then((data) => {
+                    console.log("회원가입 성공: ", data);
+                    // 성공페이지로 이동 예정.
+                    navigate("/signup-success", {state: {name: data.data}});
+
+                })
+                .catch((error) =>{
+                    console.error("에러 발생: ", error);
+                })
         }
     }
 
     return (
         <StyledSignupForm method="post" onSubmit={handleSubmit}>
-            {currentStep === 0 && <SignupNameStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
-            {currentStep === 1 && <SignupEmailStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
-            {currentStep === 2 && <SignupEmailVerificationStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
-            {currentStep === 3 && <SignupPasswordStep formData={formData} handleInputChange = {handleInputChange} errorMessage = {errorMessages}/>}
+            {currentStep === 0 && <SignupNameStep formData={formData} handleInputChange={handleInputChange}
+                                                  errorMessage={errorMessages}/>}
+            {currentStep === 1 && <SignupEmailStep formData={formData} handleInputChange={handleInputChange}
+                                                   errorMessage={errorMessages}/>}
+            {currentStep === 2 && <SignupEmailVerificationStep formData={formData} handleInputChange={handleInputChange}
+                                                               errorMessage={errorMessages}/>}
+            {currentStep === 3 && <SignupPasswordStep formData={formData} handleInputChange={handleInputChange}
+                                                      errorMessage={errorMessages}/>}
             <SignupButton currentStep={currentStep}
                           questionLength={questionLength}
                           formData={formData}
                           onNextStep={onNextStep}
                           onPrevStep={onPrevStep}
                           isStepValid={isStepValid}
-                          handleErrorMessages = {handleErrorMessages}
+                          handleErrorMessages={handleErrorMessages}
                           validateStep={validateStep}/>
         </StyledSignupForm>
     )

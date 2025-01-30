@@ -26,8 +26,6 @@ interface SignupContainerProps {
     onPrevStep: () => void;
 }
 
-
-
 const SignupContainer = ({currentStep, onNextStep, onPrevStep}: SignupContainerProps) => {
     return (
         <SignupContainerWrapper>

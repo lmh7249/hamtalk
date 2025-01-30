@@ -1,6 +1,7 @@
 package com.hamtalk.chat.service;
 
 
+import com.hamtalk.chat.controller.api.UserController;
 import com.hamtalk.chat.model.request.UserSignupRequest;
 import com.hamtalk.chat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,7 @@
 package com.hamtalk.chat.config.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,8 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        log.info("BCryptPasswordEncoder bCryptPasswordEncoder 메서드 실행");
         return new BCryptPasswordEncoder();
         // 회원가입 비밀번호 암호화
     }
@@ -39,7 +44,7 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/static/**"
                         ).permitAll()
-                        .requestMatchers("/api/user/signup", "/api/login").permitAll()
+                        .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check", "/api/users", "/api/auth/email-verification/code", "/api/auth/email-verification/code/verify").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/**").authenticated()
                                 // 나머지 모든 요청은 React 라우팅으로 처리되도록 허용

@@ -1,9 +1,8 @@
 import SignupForm from "../components/signup/SignupForm";
 import SignupGuide from "../components/signup/SignupGuide";
 import styled from "styled-components";
-import SignupButton from "../components/signup/SignupButton";
-import ProgressIndicator from "../components/signup/ProgressIndicator";
 import questions from '../data/signupQuestions.json'
+import React from "react";
 
 const SignupContainerWrapper = styled.div`
     position: relative;
@@ -21,18 +20,17 @@ const SignupContainerWrapper = styled.div`
 `
 
 interface SignupContainerProps {
-    step: number;
+    currentStep: number;
+    onNextStep: () => void;  // 단계 변경 함수
+    onPrevStep: () => void;
 }
 
-const SignupContainer = ({step}: SignupContainerProps) => {
-
-
+const SignupContainer = ({currentStep, onNextStep, onPrevStep}: SignupContainerProps) => {
     return (
         <SignupContainerWrapper>
-            <SignupGuide title={questions[step].title} desc={questions[step].desc}/>
-            <SignupForm step={step} questionLength={questions.length}/>
+            <SignupGuide title={questions[currentStep].title} desc={questions[currentStep].desc}/>
+            <SignupForm currentStep={currentStep} questionLength={questions.length} onNextStep={onNextStep} onPrevStep={onPrevStep}/>
         </SignupContainerWrapper>
     )
 }
-
 export default SignupContainer

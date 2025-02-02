@@ -1,6 +1,8 @@
 import NumberInput from "../common/NumberInput";
 import styled from "styled-components";
 import FloatingInput from "./FloatingInput";
+import {StyledErrorText} from "../common/ErrorText";
+import React from "react";
 
 const SignupEmailVerificationWrapper = styled.div`
     display: flex;
@@ -10,10 +12,11 @@ const SignupEmailVerificationWrapper = styled.div`
     width: 350px;
 `
 
-const SignupEmailVerificationStep = () => {
+const SignupEmailVerificationStep = ({formData, handleInputChange, errorMessage}: {formData : any, handleInputChange: any, errorMessage: {[key:string]: string}}) => {
     return (
         <SignupEmailVerificationWrapper>
-            <FloatingInput type="number" placeholder="인증번호"></FloatingInput>
+            <FloatingInput type="number" placeholder="인증번호" name="verificationCode" value={formData.value} onChange={handleInputChange}></FloatingInput>
+            {errorMessage && errorMessage.verificationCode && <StyledErrorText>{errorMessage.verificationCode}</StyledErrorText>}
         </SignupEmailVerificationWrapper>
     )
 }

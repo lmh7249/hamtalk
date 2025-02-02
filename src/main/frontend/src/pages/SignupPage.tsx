@@ -1,30 +1,40 @@
 import {AuthPageLayouts} from "../styles/layouts/PageLayouts";
 import SignupContainer from "../containers/SignupContainer";
 import ProgressIndicator from "../components/signup/ProgressIndicator";
-import {useParams} from "react-router-dom";
-import exp from "node:constants";
 import questions from '../data/signupQuestions.json'
+import {useState} from "react";
 
 const SignupPage = () => {
+    const [currentStep, setCurrentStep]= useState(0);
+    const maxSteps = questions.length;
 
-    const params = useParams();
-    // 라우터에 url에 넘어온 변수를 확인하는 함수
-    // 아래에 params.요소로 값을 받음.
-    // step에 값을 대입해서 url 변경시 화면이 동적으로 변경되게 함.
-    const stepParam = params.step;
-    const step: number = stepParam ? parseInt(stepParam, 10) : 0;
-    const isValidStep = !isNaN(step);
-    const lastStep = questions.length;
-    console.log("마지막 페이지는?", lastStep);
+    // 현재 step이 유효하지 않으면 0 리셋
+    if(currentStep < 0 || currentStep > maxSteps) {
+        setCurrentStep(0);
+    }
 
-    console.log("params:", params, "step:", step, "isValidStep:", isValidStep);
+    // 단계를 변경하는 함수
+    const handleNextStep = () => {
+        if (currentStep < maxSteps - 1) {
+            setCurrentStep(prevStep => prevStep + 1);
+        }
+    };
+
+    const handlePrevStep = () => {
+        if (currentStep > 0) {
+            setCurrentStep(prevStep => prevStep - 1);
+        }
+    };
+
 
     return (
         <AuthPageLayouts>
-            <ProgressIndicator step={step} lastStep = {lastStep}/>
-            <SignupContainer step={step}/>
+            <ProgressIndicator currentStep={currentStep} totalSteps = {maxSteps}/>
+            <SignupContainer currentStep={currentStep}
+                             onNextStep={handleNextStep}
+                             onPrevStep={handlePrevStep}
+            />
         </AuthPageLayouts>
-
     )
 }
 

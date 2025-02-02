@@ -1,4 +1,4 @@
-package com.hamtalk.common.model.request;
+package com.hamtalk.chat.model.request;
 
 import lombok.Getter;
 

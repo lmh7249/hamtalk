@@ -3,7 +3,6 @@ import SignupGuide from "../components/signup/SignupGuide";
 import styled from "styled-components";
 import questions from '../data/signupQuestions.json'
 import React from "react";
-import {isValidPassword} from "../utils/signupValidation";
 
 const SignupContainerWrapper = styled.div`
     position: relative;

@@ -11,7 +11,6 @@ import {
     isValidGender,
     isValidName,
     isValidPassword,
-    isValidVerificationCode,
 } from "../../utils/signupValidation";
 import {useNavigate} from "react-router-dom";
 
@@ -99,14 +98,6 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
                 const emailValidation = isValidEmail(formData.email);
                 if (!emailValidation.isValid) {
                     errorMessages.email = emailValidation.errorMessage;
-                }
-                break;
-            }
-            case 2: {
-                // 인증 코드 유효성 검사
-                const verificationCodeValidation = isValidVerificationCode(formData.verificationCode);
-                if (!verificationCodeValidation.isValid) {
-                    errorMessages.verificationCode = verificationCodeValidation.errorMessage;
                 }
                 break;
             }

@@ -1,13 +1,13 @@
 package com.hamtalk.chat.service;
 
+import com.hamtalk.chat.model.request.EmailVerificationCodeRequest;
 import com.hamtalk.common.constant.EmailConstants;
-import com.hamtalk.common.model.request.EmailAuthRequest;
+import com.hamtalk.chat.model.request.EmailAuthRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -18,17 +18,24 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final RedisService redisService;
 
-    @Transactional
-    public void sendAuthEmail(EmailAuthRequest request) {
+    public void sendEmailVerificationCode(EmailAuthRequest request) {
         String email = request.getEmail();
         String authCode = createAuthCode();
-
-        SimpleMailMessage emailForm = createAuthEmailForm(email, authCode);
-        javaMailSender.send(emailForm);
-
         // 레디스에 authCode를 저장, TTL 3분
-        redisService.saveAuthCode(email, authCode);
+        try {
+            redisService.saveAuthCode(email, authCode);
+            SimpleMailMessage emailForm = createAuthEmailForm(email, authCode);
+            javaMailSender.send(emailForm);
+        } catch (Exception e) {
+            log.error("이메일 전송 실패: {}", email, e);
+        }
     }
+
+    public Boolean verifyAuthCode(EmailVerificationCodeRequest request) {
+        return redisService.verifyAuthCode(request.getEmail(), request.getVerificationCode());
+    }
+
+
 
     private SimpleMailMessage createAuthEmailForm(String email, String authCode) {
         SimpleMailMessage message = new SimpleMailMessage();

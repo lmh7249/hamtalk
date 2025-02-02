@@ -54,14 +54,6 @@ export const isValidEmail = (email: string): { isValid: boolean; errorMessage: s
     };
 };
 
-export const isValidVerificationCode = (verificationCode: string): { isValid: boolean; errorMessage: string } => {
-    const isValid = verificationCode === "123456";
-    return {
-        isValid,
-        errorMessage: isValid ? '' : '인증 코드를 정확히 입력해주세요.',
-    };
-};
-
 export const isValidPassword = (password: string, confirmPassword: string): { isValid: boolean; errorMessage: string } => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/;
     // 비밀번호 형식 검증
@@ -78,7 +70,6 @@ export const isValidPassword = (password: string, confirmPassword: string): { is
             errorMessage: '비밀번호와 확인 비밀번호가 일치하지 않습니다.',
         };
     }
-
     // 모든 조건 통과
     return {
         isValid: true,

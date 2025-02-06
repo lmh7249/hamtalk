@@ -1,8 +1,11 @@
 import styled from "styled-components";
-import FriendPlus from "../../assets/icons/friend-plus.svg";
+import FriendPlusIcon from "../../assets/icons/friend-plus.svg";
 import FriendList from "../friends/FriendList";
 import SearchIcon from "../../assets/icons/search.svg"
 import ChattingRoomList from "../chattingroom/ChattingRoomList";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
+import {MenuState} from "../../store/menuSlice";
 
 const StyledContentList = styled.div`
     min-width: 350px;
@@ -18,6 +21,15 @@ const StyledContentListTopState = styled.div`
     justify-content: space-between;
     align-items: center;
 `
+const ContentListTopState = ({selectedMenu}:MenuState) => {
+    return (
+        <StyledContentListTopState>
+            <h3>{selectedMenu.label}</h3>
+            <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
+        </StyledContentListTopState>
+    )
+}
+
 
 const SearchInput = styled.input`
     background-color: #DFDFDF;
@@ -31,16 +43,17 @@ const SearchInput = styled.input`
 `
 
 const ContentList = () => {
+    const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
+
     return (
         <StyledContentList>
-            <StyledContentListTopState>
-                <h3>친구 목록</h3>
-                <img src={FriendPlus} alt="친구 추가" width={30} height={30}/>
-            </StyledContentListTopState>
+
+            <ContentListTopState selectedMenu={selectedMenu}/>
             <SearchInput type="text" placeholder="이름 또는 이메일을 입력하세요."></SearchInput>
             <div> 친구 200</div>
-                {/*<FriendList/>*/}
-                <ChattingRoomList/>
+            {selectedMenu.key === "friends" && <FriendList/>}
+            {selectedMenu.key === "chats" && <ChattingRoomList/>}
+            {/*{selectedMenu === "settings" && <ChattingRoomList/>}*/}
         </StyledContentList>
     )
 }

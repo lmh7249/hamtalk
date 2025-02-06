@@ -13,7 +13,6 @@ const MainContent = () => {
             <ContentList></ContentList>
             <ContentDetail></ContentDetail>
        </StyledMainContent>
-
    )
 }
 

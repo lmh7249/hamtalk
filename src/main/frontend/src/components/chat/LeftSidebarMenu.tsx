@@ -3,6 +3,10 @@ import FriendsIcon from "../../assets/icons/friends.svg";
 import ChatIcon from "../../assets/icons/chatting-room.svg";
 import SettingIcon from "../../assets/icons/setting.svg";
 import LogoutIcon from "../../assets/icons/logout.svg";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../store";
+import {setMenu} from "../../store/menuSlice";
+import {useEffect, useState} from "react";
 
 const StyledLeftSidebarMenu = styled.div`
     flex-grow: 1;
@@ -12,9 +16,9 @@ const StyledLeftSidebarMenu = styled.div`
     width: 100%;
 `
 const leftSidebarMenu = [
-    {icon: FriendsIcon, label: "친구 목록"},
-    {icon: ChatIcon, label: "채팅방 목록"},
-    {icon: SettingIcon, label: "설정"},
+    {key: "friends", icon: FriendsIcon, label: "친구 목록"},
+    {key: "chats", icon: ChatIcon, label: "채팅방 목록"},
+    {key: "settings", icon: SettingIcon, label: "설정"},
 ]
 
 const StyledMenuList = styled.ul`
@@ -39,26 +43,32 @@ const StyledMenuButton = styled.button`
         margin: 0;
         font-size: 16px;
     }
-
     &:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
-
 `
 const LeftSidebarMenu = () => {
+    const dispatch = useDispatch();
+    const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
+
+    useEffect(() => {
+        console.log("현재 선택된 메뉴:", selectedMenu.key);
+        console.log("현재 선택된 메뉴:", selectedMenu.label);
+    }, [selectedMenu]);
     return (
         <StyledLeftSidebarMenu>
             <StyledMenuList>
                 {leftSidebarMenu.map((item, index) => (
                     <li>
-                        <StyledMenuButton>
+                        <StyledMenuButton
+                            onClick={() => dispatch(setMenu({ key: item.key, label: item.label }))}
+                        >
                             <img src={item.icon} alt={item.label} width={30} height={30}/>
                             <p>{item.label}</p>
                         </StyledMenuButton>
                     </li>
                 ))}
             </StyledMenuList>
-
             <StyledMenuButton>
                 <img src={LogoutIcon} alt="로그아웃" width={30} height={30}/>
                 <p>로그아웃</p>

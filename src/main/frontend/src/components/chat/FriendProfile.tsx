@@ -1,36 +1,38 @@
 import UserDefaultImage from "../../assets/images/UserDefaultImage.png";
 import styled from "styled-components";
+import UserInfoText from "./UserInfoText";
 
-
-const StyledUserProfileDetail = styled.div`
+const StyledFriendProfile = styled.div`
     display: flex;
     gap: 10px;
+    padding: 10px;
+    &:hover {
+        cursor: pointer;
+        background-color: #f1f1f1;
+    }
 `
 
 const StyledImage = styled.img`
     object-fit: cover; /* 이미지 비율을 유지하면서 부모 요소에 맞게 조정 */
     border: 1px black solid;
     border-radius: 50%;
-    max-width: 50px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
-    max-height: 50px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
+    width: 60px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
+    max-height: 60px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
     padding: 3px;
 `
 
-const StyledUserInfo = styled.div`
+interface FriendProfileProps {
+    nickName: string;
+    statusMessage: string;
+    email: string;
+}
 
-`
-
-const FriendProfile = () => {
+const FriendProfile = ({nickName, statusMessage, email}: FriendProfileProps) => {
     return (
-        <StyledUserProfileDetail>
+        <StyledFriendProfile>
             <StyledImage src={UserDefaultImage} alt="유저이미지"/>
-            <StyledUserInfo>
-                <div>임성규</div>
-                <div>좋은 하루 ㅎㅎ</div>
-                <div>lmh7249@naver.com</div>
-            </StyledUserInfo>
-        </StyledUserProfileDetail>
-
+            <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} isMe={false}/>
+        </StyledFriendProfile>
     )
 }
 

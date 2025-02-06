@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import UserProfile from "./UserProfile";
 import LeftSidebarMenu from "./LeftSidebarMenu";
+import LoginUserProfile from "./LoginUserProfile";
 
 const SideBar = styled.div`
-    width: 300px;
+    width: 250px;
     display: flex;
     flex-direction: column;
     background-color: #2C2D31;
@@ -14,8 +14,8 @@ const SideBar = styled.div`
 const LeftSideBar = () => {
     return (
         <SideBar>
-            <UserProfile>
-            </UserProfile>
+            <LoginUserProfile>
+            </LoginUserProfile>
             <LeftSidebarMenu>
             </LeftSidebarMenu>
         </SideBar>

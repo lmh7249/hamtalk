@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import FriendPlusIcon from "../../assets/icons/friend-plus.svg";
+import ChattingRoomPlusIcon from "../../assets/icons/chatting-room-plus.svg";
 import FriendList from "../friends/FriendList";
 import SearchIcon from "../../assets/icons/search.svg"
 import ChattingRoomList from "../chattingroom/ChattingRoomList";
@@ -25,11 +26,11 @@ const ContentListTopState = ({selectedMenu}:MenuState) => {
     return (
         <StyledContentListTopState>
             <h3>{selectedMenu.label}</h3>
-            <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
+            {selectedMenu.key === "friends" && <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>}
+            {selectedMenu.key === "chats" && <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>}
         </StyledContentListTopState>
     )
 }
-
 
 const SearchInput = styled.input`
     background-color: #DFDFDF;
@@ -47,10 +48,11 @@ const ContentList = () => {
 
     return (
         <StyledContentList>
-
             <ContentListTopState selectedMenu={selectedMenu}/>
-            <SearchInput type="text" placeholder="이름 또는 이메일을 입력하세요."></SearchInput>
-            <div> 친구 200</div>
+            {selectedMenu.key === "friends" && <SearchInput type="text" placeholder="이름 또는 이메일을 입력하세요."/>}
+            {selectedMenu.key === "chats" && <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요."/>}
+            {selectedMenu.key === "friends" && <div> 친구 200</div>}
+            {selectedMenu.key === "chats" && <div> 채팅방 200</div>}
             {selectedMenu.key === "friends" && <FriendList/>}
             {selectedMenu.key === "chats" && <ChattingRoomList/>}
             {/*{selectedMenu === "settings" && <ChattingRoomList/>}*/}

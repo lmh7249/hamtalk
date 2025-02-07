@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 
-type MenuType = "friends" | "chats" | "settings";
+export type MenuType = "friends" | "chats" | "settings";
 
 export interface MenuState {
     selectedMenu: {

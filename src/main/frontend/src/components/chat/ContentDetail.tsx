@@ -2,7 +2,6 @@ import styled from "styled-components";
 import EmptyContentDetail from "./EmptyContentDetail";
 
 const StyledContentDetail = styled.div`
-    border: solid 1px black;
     flex-grow: 1;
     background-color: #F5F6F7;
     display: flex;

@@ -9,7 +9,7 @@ const StyledEmptyContentDetail = styled.div`
 `
 
 const EmptyContentDetailDesc = styled.span`
-    font-size: 18px;
+    font-size: 16px;
     color: #555;
 `
 
@@ -17,7 +17,7 @@ const EmptyContentDetailDesc = styled.span`
 const EmptyContentDetail = () => {
     return (
         <StyledEmptyContentDetail>
-            <img src={EmptyChattingRoomIcon} alt={"채팅을 시작해보세요."} width={200} height={200}/>
+            <img src={EmptyChattingRoomIcon} alt={"채팅을 시작해보세요."} width={150} height={150}/>
             <EmptyContentDetailDesc>채팅을 시작해보세요🐹</EmptyContentDetailDesc>
         </StyledEmptyContentDetail>
     )

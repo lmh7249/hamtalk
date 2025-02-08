@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import BaseModal from "../common/BaseModal";
+import FloatingLabelInput from "../common/FloatingLabelInput";
+import FloatingLabelSelect from "../common/FloatingLabelSelect";
 
 const Title = styled.h3`
     margin-top: 0;
@@ -25,7 +27,6 @@ const SearchInput = styled.input`
     outline: none;
 `
 
-
 const FriendAddModal = () => {
     return (
         <BaseModal width="300px" height="400px">
@@ -34,6 +35,9 @@ const FriendAddModal = () => {
                 <SearchOptionText>이메일로 추가</SearchOptionText>
             </SearchOptionWrapper>
             <SearchInput type="email" placeholder={"이메일이 정확히 일치해야 검색 가능합니다."}/>
+            <div>zz</div>
+            <FloatingLabelInput/>
+            <FloatingLabelSelect/>
         </BaseModal>
     )
 }

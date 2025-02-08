@@ -14,6 +14,10 @@ const ChatMainContainer = () => {
     const modalOpen = () => {
         setIsModalOpen(true);
     }
+
+    const modalClose = () => {
+        setIsModalOpen(false);
+    };
     return (
         <>
             <LeftSideBar>
@@ -22,7 +26,7 @@ const ChatMainContainer = () => {
                 <MainContent modalOpen = {modalOpen}>
                 </MainContent>
             </MainContentWrapper>
-            {isModalOpen && <FriendAddModal/>}
+            {isModalOpen && <FriendAddModal modalClose ={modalClose}/>}
         </>
     )
 }

@@ -46,7 +46,6 @@ const ContentListTopState = ({
         <StyledContentListTopState>
             <h3>{selectedMenu.label}</h3>
             <IconButton onClick={() => {
-                alert("테스트!");
                 modalOpen();
             }}>
                 {selectedMenu.key === "friends" && <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>}

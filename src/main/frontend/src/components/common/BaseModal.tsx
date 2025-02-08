@@ -11,7 +11,6 @@ const Overlay = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 5px solid red;
 `
 
 const ModalContainer = styled.div<{width: string, height: string}>`
@@ -39,14 +38,15 @@ interface BaseModalProps {
     children: React.ReactNode;
     width?: string;
     height?: string;
+    modalClose: ()=>void;
 }
 
-const BaseModal = ({children, width = "300px", height = "auto"}:BaseModalProps) => {
+const BaseModal = ({children, width = "300px", height = "auto", modalClose}:BaseModalProps) => {
     return (
         <Overlay>
             <ModalContainer width={width} height={height}>
                 <CloseButton>
-                    <img src={CloseIcon} alt="닫기" width={20} height={20}/>
+                    <img src={CloseIcon} alt="닫기" width={20} height={20} onClick={modalClose}/>
                 </CloseButton>
                 {children}
             </ModalContainer>

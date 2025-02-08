@@ -99,9 +99,13 @@ const SearchResult = () => {
     )
 }
 
-const FriendAddModal = () => {
+type FriendAddModalProps = {
+    modalClose: ()=> void;
+}
+
+const FriendAddModal = ({modalClose}: FriendAddModalProps) => {
     return (
-        <BaseModal width="350px" height="350px">
+        <BaseModal width="350px" height="350px" modalClose ={modalClose}>
             <Title>친구 추가</Title>
             <SearchOptionWrapper>
                 <SearchOptionText>이메일로 추가</SearchOptionText>

@@ -3,6 +3,7 @@ import MainContent from "../components/chat/MainContent";
 import styled from "styled-components";
 import FriendAddModal from "../components/friends/FriendAddModal";
 import {useState} from "react";
+import ChattingRoomAddModal from "../components/chattingroom/ChattingRoomAddModal";
 
 const MainContentWrapper = styled.div`
     display: flex;
@@ -26,7 +27,8 @@ const ChatMainContainer = () => {
                 <MainContent modalOpen = {modalOpen}>
                 </MainContent>
             </MainContentWrapper>
-            {isModalOpen && <FriendAddModal modalClose ={modalClose}/>}
+            {/*{isModalOpen && <FriendAddModal modalClose ={modalClose}/>}*/}
+            {isModalOpen && <ChattingRoomAddModal modalClose ={modalClose}/>}
         </>
     )
 }

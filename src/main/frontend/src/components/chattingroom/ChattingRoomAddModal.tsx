@@ -103,7 +103,7 @@ const ChattingRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
     return (
         <BaseModal width={"400px"} height={"600px"} modalClose={modalClose}>
             <Title>채팅방 생성</Title>
-            <SearchInput type={"text"} placeholder={"채팅을 함께할 상대를 선택 해주세요."}/>
+            <SearchInput type={"text"} placeholder={"이름 또는 이메일을 입력하세요."}/>
             <FriendListContainer>
                 <FriendCount>
                     친구

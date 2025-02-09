@@ -6,13 +6,14 @@ const StyledEmptyContentDetail = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 10px;
-`
+    height: 100%;
+    justify-content: center;
+`;
 
 const EmptyContentDetailDesc = styled.span`
     font-size: 16px;
     color: #555;
-`
-
+`;
 
 const EmptyContentDetail = () => {
     return (

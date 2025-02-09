@@ -76,7 +76,7 @@ interface ChattingRoomItemProps {
     unreadCount: number;
 }
 
-const ChattingRoomItem = ({
+const ChatRoomItem = ({
                               participants,
                               profileImage,
                               lastMessage,
@@ -101,4 +101,4 @@ const ChattingRoomItem = ({
 }
 
 
-export default ChattingRoomItem
+export default ChatRoomItem

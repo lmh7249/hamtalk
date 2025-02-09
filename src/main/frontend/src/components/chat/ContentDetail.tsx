@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import EmptyContentDetail from "./EmptyContentDetail";
 import UserProfileDetail from "../profile/UserProfileDetail";
+import ChatRoomItem from "../chatroom/ChatRoomItem";
+import ChatRoomDetail from "../chatroom/ChatRoomDetail";
 
 const StyledContentDetail = styled.div`
     flex-grow: 1;
@@ -12,11 +14,9 @@ const ContentDetail = () => {
     return (
         <StyledContentDetail>
             {/*<EmptyContentDetail/>*/}
-            <UserProfileDetail/>
-            {/*(메뉴1에 있는 내용, 채팅창 클릭 등을하면 여기서 화면을 보여줌, 사용자는 주로 여기서*/}
-            {/*채팅을 치거나 수정, 다른 유저의 프로필을 보거나 등등.*/}
+            {/*<UserProfileDetail/>*/}
+            <ChatRoomDetail/>
         </StyledContentDetail>
-
     )
 }
 

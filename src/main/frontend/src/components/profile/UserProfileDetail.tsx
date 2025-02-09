@@ -17,7 +17,6 @@ const StyledBackGroundImageWrapper = styled.div`
 `;
 
 const BackGroundImage = styled.img`
-    width: 100%;
     height: 150px;
 `;
 const StyledUserProfileWrapper = styled.div`

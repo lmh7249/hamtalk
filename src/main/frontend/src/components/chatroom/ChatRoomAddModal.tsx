@@ -99,7 +99,7 @@ type ChattingRoomAddModalProps = {
     modalClose: () => void;
 };
 
-const ChattingRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
+const ChatRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
     return (
         <BaseModal width={"400px"} height={"600px"} modalClose={modalClose}>
             <Title>채팅방 생성</Title>
@@ -129,4 +129,4 @@ const ChattingRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
     )
 }
 
-export default ChattingRoomAddModal
+export default ChatRoomAddModal

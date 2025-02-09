@@ -3,7 +3,7 @@ import FriendPlusIcon from "../../assets/icons/friend-plus.svg";
 import ChattingRoomPlusIcon from "../../assets/icons/chatting-room-plus.svg";
 import FriendList from "../friends/FriendList";
 import SearchIcon from "../../assets/icons/search.svg"
-import ChattingRoomList from "../chattingroom/ChattingRoomList";
+import ChattingRoomList from "../chatroom/ChatRoomList";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {MenuState, MenuType} from "../../store/menuSlice";

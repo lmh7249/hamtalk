@@ -35,4 +35,11 @@ public class UserController {
         }
         return ResponseEntity.ok(ApiResponse.ok(true));
     }
+
+
+//
+//    유저 정보 조회 (GET /api/users/{id})
+//    회원가입 (POST /api/users)
+//    회원정보 수정 (PUT /api/users/{id})
+//    회원탈퇴 (DELETE /api/users/{id})
 }

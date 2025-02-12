@@ -41,9 +41,13 @@ public class AuthController {
 
 
 //    @PostMapping("/login")
-//    public ResponseEntity<String> login() {
+//    public ResponseEntity<ApiResponse<>> login() {
 //
 //    }
 
+//
+//    로그인 (POST /api/auth/login)
+//    로그아웃 (POST /api/auth/logout)
+//    액세스 토큰 재발급 (POST /api/auth/refresh)
 
 }

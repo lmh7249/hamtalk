@@ -1,5 +1,6 @@
 package com.hamtalk.chat.config.security;
 
+import com.hamtalk.chat.jwt.JWTFilter;
 import com.hamtalk.chat.jwt.JWTUtil;
 import com.hamtalk.chat.jwt.LoginFilter;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +67,8 @@ public class SecurityConfig {
                                 // 나머지 모든 요청은 React 라우팅으로 처리되도록 허용
                                 .anyRequest().permitAll()
                 );
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hamtalk.chat.model.request.LoginRequest;
 import com.hamtalk.chat.security.CustomUserDetails;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.Servlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -53,11 +54,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         log.info("로그인 성공 !!!!!!!!!!!!!!!!!!!!!");
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         String email = customUserDetails.getUsername();
-        Collection<? extends GrantedAuthority>  authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
-        String token = jwtUtil.createJwt(email, role);
+        // 권한 ID 가져오기 (1, 2, 3 중 하나)
+        int authorityId = customUserDetails.getAuthorityId();
+        // JWT 생성 (role 대신 authorityId 사용)
+        String token = jwtUtil.createJwt(email, authorityId);
         response.addHeader("Authorization", "Bearer " + token);
     }
 

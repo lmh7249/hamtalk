@@ -60,9 +60,9 @@ public class SecurityConfig {
                         CorsConfiguration configuration = new CorsConfiguration();
 
                         configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        configuration.setAllowedMethods(Collections.singletonList("*"));
-                        configuration.setAllowCredentials(true);
-                        configuration.setAllowedHeaders(Collections.singletonList("*"));
+                        configuration.setAllowedMethods(Collections.singletonList("*")); // 모든 HTTP 메서드 허용
+                        configuration.setAllowCredentials(true); // 자격증명 허용
+                        configuration.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더값 허용
                         configuration.setMaxAge(3600L);
 
                         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
@@ -78,7 +78,7 @@ public class SecurityConfig {
         //From 로그인 방식 disable
         http
                 .formLogin((auth) -> auth.disable());
-        //http basic 인증 방식 disable
+        //http basic 인증 방식 disable -> 일반적으로 잘 안쓰기에 설정 끄기.
         http
                 .httpBasic((auth) -> auth.disable());
 
@@ -92,8 +92,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check", "/api/users", "/api/auth/email-verification/code", "/api/auth/email-verification/code/verify").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/reissue").permitAll()
-                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/api/auth/reissue").permitAll()
                         // 나머지 모든 요청은 React 라우팅으로 처리되도록 허용
                         .anyRequest().permitAll()
                 );
@@ -102,7 +101,9 @@ public class SecurityConfig {
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, jwtProperties, redisService), UsernamePasswordAuthenticationFilter.class);
 
-        //세션 설정, JWT를 통한 인증/인가를 위해서 세션을 STATELESS 상태로 설정하는 것이 중요하다.
+        //세션 방식을 사용하지 않음. 토큰 방식 사용.
+        // 로그인 방식은 세션, 토큰 방식 2가지.
+        // JWT를 통한 인증/인가를 위해서 세션을 STATELESS 상태로 설정하는 것이 중요하다.
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

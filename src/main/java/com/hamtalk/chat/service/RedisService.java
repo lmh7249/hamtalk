@@ -29,7 +29,6 @@ public class RedisService {
         return savedCode != null && savedCode.equals(inputCode);
     }
 
-
     private String getAuthCode(String email) {
         String key = "emailAuth: " + email;
         return (String) redisTemplate.opsForHash().get(key, "code");
@@ -38,6 +37,11 @@ public class RedisService {
     public void saveRefreshToken(String email, String refreshToken) {
         String key = "auth:refresh-token:" + email;
         redisTemplate.opsForValue().set(key, refreshToken, jwtProperties.getRefreshTtl(), TimeUnit.MILLISECONDS);
+    }
+
+    public String getRefreshToken(String email) {
+        String key = "auth:refresh-token:" + email;
+        return redisTemplate.opsForValue().get(key);
     }
 
 

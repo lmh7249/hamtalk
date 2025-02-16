@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
+    // Authentication 객체를 만드는 필터
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -49,10 +50,8 @@ public class JwtFilter extends OncePerRequestFilter {
         // 토큰이 access인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getCategory(accessToken);
         if (!category.equals("access")) {
-            //response body
             PrintWriter writer = response.getWriter();
             writer.print("invalid access token");
-            //response status code
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

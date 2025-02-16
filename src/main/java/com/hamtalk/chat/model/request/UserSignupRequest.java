@@ -1,6 +1,6 @@
 package com.hamtalk.chat.model.request;
 
-import com.hamtalk.chat.entity.User;
+import com.hamtalk.chat.domain.entity.User;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

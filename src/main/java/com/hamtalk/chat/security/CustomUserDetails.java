@@ -1,6 +1,6 @@
 package com.hamtalk.chat.security;
 
-import com.hamtalk.chat.entity.User;
+import com.hamtalk.chat.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -1,30 +1,31 @@
 package com.hamtalk.chat.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hamtalk.chat.config.jwt.JwtProperties;
 import com.hamtalk.chat.model.request.LoginRequest;
 import com.hamtalk.chat.security.CustomUserDetails;
+import com.hamtalk.chat.service.RedisService;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.Servlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
 
 @RequiredArgsConstructor
 @Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final JwtProperties jwtProperties;
+    private final RedisService redisService;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -51,14 +52,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-        log.info("로그인 성공 !!!!!!!!!!!!!!!!!!!!!");
+        log.info("로그인 성공! JWT 토큰 생성 중 ......... ");
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         String email = customUserDetails.getUsername();
-        // 권한 ID 가져오기 (1, 2, 3 중 하나)
         int authorityId = customUserDetails.getAuthorityId();
-        // JWT 생성 (role 대신 authorityId 사용)
-        String token = jwtUtil.createJwt(email, authorityId);
-        response.addHeader("Authorization", "Bearer " + token);
+        //토큰 생성
+        String accessToken = jwtUtil.createJwt("access", email, authorityId, jwtProperties.getAccessTtl());
+        String refreshToken = jwtUtil.createJwt("refresh", email, authorityId, jwtProperties.getRefreshTtl());
+        // 레디스에 리프레쉬 토큰 저장
+        redisService.saveRefreshToken(email, refreshToken);
+        //응답 설정
+        response.setHeader("access", accessToken);
+        response.addCookie(createCookie("refresh", refreshToken));
+        response.setStatus(HttpStatus.OK.value());
     }
 
     //로그인 실패시 실행할 메소드
@@ -67,4 +73,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         log.error("로그인 실패 !!!????????");
         response.setStatus(401);
     }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24*60*60);
+        //cookie.setSecure(true); // https 적용시 주석 풀기.
+        //cookie.setPath("/"); // 적용 패스
+        cookie.setHttpOnly(true);
+        return cookie;
+    }
+
 }

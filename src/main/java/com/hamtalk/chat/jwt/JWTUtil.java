@@ -10,24 +10,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JWTUtil {
+public class JwtUtil {
     private final SecretKey secretKey;
-    private final long expirationTime;
 
-
-    public JWTUtil(@Value("${spring.jwt.secret}")String secret,
-                   @Value("${spring.jwt.expiration}") long expiration) {
+    public JwtUtil(@Value("${spring.jwt.secret}")String secret) {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
-        this.expirationTime = expiration;
     }
 
     // JWT 생성 (페이로드: 이메일 + 권한 + 생성, 만료 시간)
-    public String createJwt(String email, int authorityId) {
+    public String createJwt(String category, String email, int authorityId, Long expiredMs) {
         return Jwts.builder()
+                .claim("category", category)
                 .claim("email", email)
                 .claim("authorityId", authorityId)
                 .issuedAt(new Date(System.currentTimeMillis())) // 발급 시간
-                .expiration(new Date(System.currentTimeMillis() + expirationTime)) // 만료 시간
+                .expiration(new Date(System.currentTimeMillis() + expiredMs)) // 만료 시간
                 .signWith(secretKey)
                 .compact();
     }
@@ -38,6 +35,10 @@ public class JWTUtil {
     // JWT에서 사용자 역할(Role id) 가져오기
     public int getAuthorityId(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("authorityId", Integer.class);
+    }
+
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
     //  JWT 만료 여부 확인

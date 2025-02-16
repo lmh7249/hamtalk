@@ -1,6 +1,6 @@
 package com.hamtalk.chat.repository;
 
-import com.hamtalk.chat.entity.User;
+import com.hamtalk.chat.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

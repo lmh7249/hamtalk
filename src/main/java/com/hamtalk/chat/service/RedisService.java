@@ -44,6 +44,11 @@ public class RedisService {
         return redisTemplate.opsForValue().get(key);
     }
 
+    public void deleteByRefresh(String email) {
+        String key = "auth:refresh-token:" + email;
+        redisTemplate.delete(key);
+    }
+
 
 
 }

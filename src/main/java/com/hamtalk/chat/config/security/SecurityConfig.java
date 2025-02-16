@@ -1,6 +1,7 @@
 package com.hamtalk.chat.config.security;
 
 import com.hamtalk.chat.config.jwt.JwtProperties;
+import com.hamtalk.chat.jwt.CustomLogoutFilter;
 import com.hamtalk.chat.jwt.JwtFilter;
 import com.hamtalk.chat.jwt.JwtUtil;
 import com.hamtalk.chat.jwt.LoginFilter;
@@ -19,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -100,6 +102,8 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, jwtProperties, redisService), UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisService), LogoutFilter.class);
 
         //세션 방식을 사용하지 않음. 토큰 방식 사용.
         // 로그인 방식은 세션, 토큰 방식 2가지.

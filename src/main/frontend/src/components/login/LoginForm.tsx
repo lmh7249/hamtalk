@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import Button from "../common/Button";
 import styled from "styled-components";
 import {LoginInput} from "../common/LoginInput";
+import {userLogin} from "../../services/auth-service";
+import {useNavigate} from "react-router-dom";
 
 const StyledLoginForm = styled.form`
     display: flex;
@@ -44,7 +46,7 @@ const LoginForm = () => {
     const [passwordError, setPasswordError] =useState<string|null>("");
     const isFormValid = !emailError && !passwordError && email && password;
     // 이메일, 비밀번호 에러가 없고 둘 다 입력되어 있을 경우 true
-
+    const navigate = useNavigate();
     const handleEmailChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const newEmail = e.target.value;
         setEmail(newEmail);
@@ -59,10 +61,14 @@ const LoginForm = () => {
 
     // 타입스크립트는 이벤트 객체의 정확한 타입을 알아야함.
     // FormEvent는 form 제출 시 발생하는 이벤트 타입
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log("아이디: ", email);
         console.log("비밀번호: ", password);
+        const isLoggedIn = await userLogin(email, password);
+        if(isLoggedIn) {
+            navigate("/chat");
+        }
     }
 
     return (

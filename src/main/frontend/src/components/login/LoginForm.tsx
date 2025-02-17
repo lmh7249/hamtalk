@@ -4,6 +4,8 @@ import styled from "styled-components";
 import {LoginInput} from "../common/LoginInput";
 import {userLogin} from "../../services/auth-service";
 import {useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";
+
 
 const StyledLoginForm = styled.form`
     display: flex;
@@ -63,11 +65,27 @@ const LoginForm = () => {
     // FormEvent는 form 제출 시 발생하는 이벤트 타입
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("아이디: ", email);
-        console.log("비밀번호: ", password);
+        const loadingToast = toast.loading('로그인 중...');
+
+        try {
         const isLoggedIn = await userLogin(email, password);
-        if(isLoggedIn) {
-            navigate("/chat");
+            if(isLoggedIn) {
+                toast.success('로그인 성공!', {
+                    id: loadingToast,
+                    duration: 2000
+                });
+                navigate("/chat");
+            } else {
+                toast.error('이메일 또는 비밀번호를 다시 확인해주세요.', {
+                    id: loadingToast,
+                    duration: 3000
+                });
+            }
+        } catch (error) {
+            toast.error('로그인 중 오류가 발생했습니다.', {
+                id: loadingToast,
+                duration: 3000
+            });
         }
     }
 

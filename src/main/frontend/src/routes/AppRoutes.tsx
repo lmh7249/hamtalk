@@ -5,18 +5,22 @@ import React from "react";
 import ChatMainPage from "../pages/ChatMainPage";
 import SignupSuccessPage from "../pages/SignupSuccessPage";
 import PrivateRoute from "../auth/PrivateRoute";
+import {Toaster} from "react-hot-toast";
 
 const AppRoutes = () => {
 
     return (
-        <Routes>
-            <Route path="/login" element={<LoginPage/>}/>
-            <Route path="/signup" element={<SignupPage/>}/>
-            <Route path="/signup-success" element={<SignupSuccessPage/>}/>
-            <Route element={<PrivateRoute/>}>
-                <Route path="/chat" element={<ChatMainPage/>}/>
-            </Route>
-        </Routes>
+        <>
+            <Toaster position={"top-center"}/>
+            <Routes>
+                <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/signup" element={<SignupPage/>}/>
+                <Route path="/signup-success" element={<SignupSuccessPage/>}/>
+                <Route element={<PrivateRoute/>}>
+                    <Route path="/chat" element={<ChatMainPage/>}/>
+                </Route>
+            </Routes>
+        </>
     )
 }
 

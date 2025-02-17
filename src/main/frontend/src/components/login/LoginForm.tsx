@@ -8,7 +8,7 @@ import {useNavigate} from "react-router-dom";
 const StyledLoginForm = styled.form`
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     width: 100%;
 `
 const StyledEmailLabel = styled.label<{error?:boolean}>`
@@ -22,7 +22,7 @@ const StyledPasswordLabel = styled.label<{error?:boolean}>`
 const StyledErrorText = styled.p`
     font-size: 13px;
     color: #f15746;
-    margin: 0 0 5px 0;
+    margin: 5px 0 5px 0;
     line-height: 1px;
 `
 const validateEmail = (email: string): string | null => {
@@ -75,13 +75,12 @@ const LoginForm = () => {
         <StyledLoginForm onSubmit={handleSubmit}>
             <StyledEmailLabel htmlFor="email" error = {!!emailError}>이메일 주소</StyledEmailLabel>
             <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} onChange={handleEmailChange}/>
-            {emailError && <StyledErrorText>{emailError}</StyledErrorText>
-            }
+            <StyledErrorText>{emailError || "\u00A0"}</StyledErrorText>
 
             <StyledPasswordLabel htmlFor="password"  error = {!!passwordError}>비밀번호</StyledPasswordLabel>
             <LoginInput id="password" type="password" placeholder="비밀번호를 입력해주세요." value={password}
                         onChange={handlePasswordChange}/>
-            {passwordError && <StyledErrorText>{passwordError}</StyledErrorText>}
+            <StyledErrorText>{passwordError || "\u00A0"}</StyledErrorText>
             <Button type="LOGIN" disabled={!isFormValid}>로그인</Button>
         </StyledLoginForm>
     )

@@ -96,6 +96,5 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
         return null;
     }
-
 }
 

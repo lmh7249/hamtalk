@@ -73,12 +73,12 @@ const LoginForm = () => {
 
     return (
         <StyledLoginForm onSubmit={handleSubmit}>
-            <StyledEmailLabel htmlFor="email" error = {!!emailError}>이메일 주소</StyledEmailLabel>
-            <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} onChange={handleEmailChange}/>
+            <StyledEmailLabel htmlFor="email">이메일 주소</StyledEmailLabel>
+            <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} maxLength={255} onChange={handleEmailChange}/>
             <StyledErrorText>{emailError || "\u00A0"}</StyledErrorText>
 
-            <StyledPasswordLabel htmlFor="password"  error = {!!passwordError}>비밀번호</StyledPasswordLabel>
-            <LoginInput id="password" type="password" placeholder="비밀번호를 입력해주세요." value={password}
+            <StyledPasswordLabel htmlFor="password">비밀번호</StyledPasswordLabel>
+            <LoginInput id="password" type="password" placeholder="비밀번호를 입력해주세요." value={password} maxLength={16}
                         onChange={handlePasswordChange}/>
             <StyledErrorText>{passwordError || "\u00A0"}</StyledErrorText>
             <Button type="LOGIN" disabled={!isFormValid}>로그인</Button>

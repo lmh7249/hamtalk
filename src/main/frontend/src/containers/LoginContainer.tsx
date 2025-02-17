@@ -22,7 +22,6 @@ const LoginContainerWrapper = styled.div`
 `
 
 const LoginContainer = () => {
-
     return (
         <LoginContainerWrapper>
             <LoginHeader/>

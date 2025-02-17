@@ -1,4 +1,4 @@
-package com.hamtalk.chat.entity;
+package com.hamtalk.chat.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

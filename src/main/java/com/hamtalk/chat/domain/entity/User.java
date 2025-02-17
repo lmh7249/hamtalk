@@ -1,17 +1,15 @@
-package com.hamtalk.chat.entity;
+package com.hamtalk.chat.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @Table(name = "user")
 @NoArgsConstructor

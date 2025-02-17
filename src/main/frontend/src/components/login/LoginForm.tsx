@@ -72,19 +72,34 @@ const LoginForm = () => {
             if(isLoggedIn) {
                 toast.success('로그인 성공!', {
                     id: loadingToast,
-                    duration: 2000
+                    duration: 2000,
+                    style: {
+                        borderRadius: '10px',
+                        background: '#333',
+                        color: '#fff',
+                    },
                 });
                 navigate("/chat");
             } else {
                 toast.error('이메일 또는 비밀번호를 다시 확인해주세요.', {
                     id: loadingToast,
-                    duration: 3000
+                    duration: 3000,
+                    style: {
+                        borderRadius: '10px',
+                        background: '#333',
+                        color: '#fff',
+                    },
                 });
             }
         } catch (error) {
             toast.error('로그인 중 오류가 발생했습니다.', {
                 id: loadingToast,
-                duration: 3000
+                duration: 3000,
+                style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                },
             });
         }
     }

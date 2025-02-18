@@ -7,6 +7,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {setMenu} from "../../store/menuSlice";
 import {useEffect, useState} from "react";
+import {userLogout} from "../../services/auth-service";
+import {useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";
 
 const StyledLeftSidebarMenu = styled.div`
     flex-grow: 1;
@@ -46,15 +49,34 @@ const StyledMenuButton = styled.button`
     &:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
-`
+`;
+
 const LeftSidebarMenu = () => {
     const dispatch = useDispatch();
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
+    const navigate = useNavigate();
 
     useEffect(() => {
         console.log("현재 선택된 메뉴:", selectedMenu.key);
         console.log("현재 선택된 메뉴:", selectedMenu.label);
     }, [selectedMenu]);
+
+    const handleLogout = async () => {
+        let isSuccess = await userLogout();
+        const loadingToast = toast.loading("로그아웃 중...");
+
+        if(isSuccess) {
+            toast.success("정상적으로 로그아웃 되었습니다.", {
+                id: loadingToast,
+                position:"bottom-left",
+                duration: 2000
+            })
+            navigate("/login");
+        }
+
+
+    };
+
     return (
         <StyledLeftSidebarMenu>
             <StyledMenuList>
@@ -69,7 +91,7 @@ const LeftSidebarMenu = () => {
                     </li>
                 ))}
             </StyledMenuList>
-            <StyledMenuButton>
+            <StyledMenuButton onClick={handleLogout}>
                 <img src={LogoutIcon} alt="로그아웃" width={30} height={30}/>
                 <p>로그아웃</p>
             </StyledMenuButton>

@@ -12,8 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -70,8 +69,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //로그인 실패시 실행할 메소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        log.error("로그인 실패 !!!????????");
-        response.setStatus(401);
+        log.error("로그인 실패 !");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 에러
+//        response.setContentType("application/json;charset=UTF-8");
+//        String errorMessage = "이메일 또는 비밀번호를 다시 확인해주세요.";
+//        if (failed instanceof BadCredentialsException) {
+//            errorMessage = "이메일 또는 비밀번호가 일치하지 않습니다.";
+//        } else if (failed instanceof DisabledException) {
+//            errorMessage = "이 계정은 비활성화되었습니다. 관리자에게 문의하세요.";
+//        } else if (failed instanceof LockedException) {
+//            errorMessage = "이 계정은 잠겼습니다. 관리자에게 문의하세요.";
+//        }
+//
+//        try {
+//            response.getWriter().write("{\"error\": \"" + errorMessage + "\"}");
+//        } catch (IOException e) {
+//            log.error("에러 응답을 작성하는 중 오류 발생", e);
+//        }
+
     }
 
     private Cookie createCookie(String key, String value) {

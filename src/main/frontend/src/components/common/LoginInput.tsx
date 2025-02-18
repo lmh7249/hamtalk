@@ -23,16 +23,18 @@ interface LoginInputProps{
     id: string;
     placeholder: string;
     value: string;
+    maxLength: number;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-export const LoginInput = ({type, id, placeholder, value, onChange}: LoginInputProps) => {
+export const LoginInput = ({type, id, placeholder, value, maxLength, onChange}: LoginInputProps) => {
     return (
         <StyledInput
             type={type}
             id = {id}
             placeholder={placeholder}
             value={value}
+            maxLength={maxLength}
             onChange={onChange}
         />
     );

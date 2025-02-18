@@ -2,11 +2,15 @@ import React, {useEffect, useState} from "react";
 import Button from "../common/Button";
 import styled from "styled-components";
 import {LoginInput} from "../common/LoginInput";
+import {userLogin} from "../../services/auth-service";
+import {useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";
+
 
 const StyledLoginForm = styled.form`
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     width: 100%;
 `
 const StyledEmailLabel = styled.label<{error?:boolean}>`
@@ -20,7 +24,7 @@ const StyledPasswordLabel = styled.label<{error?:boolean}>`
 const StyledErrorText = styled.p`
     font-size: 13px;
     color: #f15746;
-    margin: 0 0 5px 0;
+    margin: 5px 0 5px 0;
     line-height: 1px;
 `
 const validateEmail = (email: string): string | null => {
@@ -44,7 +48,7 @@ const LoginForm = () => {
     const [passwordError, setPasswordError] =useState<string|null>("");
     const isFormValid = !emailError && !passwordError && email && password;
     // 이메일, 비밀번호 에러가 없고 둘 다 입력되어 있을 경우 true
-
+    const navigate = useNavigate();
     const handleEmailChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const newEmail = e.target.value;
         setEmail(newEmail);
@@ -59,23 +63,57 @@ const LoginForm = () => {
 
     // 타입스크립트는 이벤트 객체의 정확한 타입을 알아야함.
     // FormEvent는 form 제출 시 발생하는 이벤트 타입
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("아이디: ", email);
-        console.log("비밀번호: ", password);
+        const loadingToast = toast.loading('로그인 중...');
+
+        try {
+        const isLoggedIn = await userLogin(email, password);
+            if(isLoggedIn) {
+                toast.success('로그인 성공!', {
+                    id: loadingToast,
+                    duration: 2000,
+                    style: {
+                        borderRadius: '10px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                });
+                navigate("/chat");
+            } else {
+                toast.error('이메일 또는 비밀번호를 다시 확인해주세요.', {
+                    id: loadingToast,
+                    duration: 3000,
+                    style: {
+                        borderRadius: '10px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                });
+            }
+        } catch (error) {
+            toast.error('로그인 중 오류가 발생했습니다.', {
+                id: loadingToast,
+                duration: 3000,
+                style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                },
+            });
+        }
     }
 
     return (
         <StyledLoginForm onSubmit={handleSubmit}>
-            <StyledEmailLabel htmlFor="email" error = {!!emailError}>이메일 주소</StyledEmailLabel>
-            <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} onChange={handleEmailChange}/>
-            {emailError && <StyledErrorText>{emailError}</StyledErrorText>
-            }
+            <StyledEmailLabel htmlFor="email">이메일 주소</StyledEmailLabel>
+            <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} maxLength={255} onChange={handleEmailChange}/>
+            <StyledErrorText>{emailError || "\u00A0"}</StyledErrorText>
 
-            <StyledPasswordLabel htmlFor="password"  error = {!!passwordError}>비밀번호</StyledPasswordLabel>
-            <LoginInput id="password" type="password" placeholder="비밀번호를 입력해주세요." value={password}
+            <StyledPasswordLabel htmlFor="password">비밀번호</StyledPasswordLabel>
+            <LoginInput id="password" type="password" placeholder="비밀번호를 입력해주세요." value={password} maxLength={16}
                         onChange={handlePasswordChange}/>
-            {passwordError && <StyledErrorText>{passwordError}</StyledErrorText>}
+            <StyledErrorText>{passwordError || "\u00A0"}</StyledErrorText>
             <Button type="LOGIN" disabled={!isFormValid}>로그인</Button>
         </StyledLoginForm>
     )

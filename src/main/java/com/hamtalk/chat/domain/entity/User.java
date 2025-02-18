@@ -1,5 +1,6 @@
 package com.hamtalk.chat.domain.entity;
 
+import com.hamtalk.chat.domain.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

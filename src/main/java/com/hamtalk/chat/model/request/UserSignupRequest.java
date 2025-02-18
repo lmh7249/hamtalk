@@ -1,6 +1,8 @@
 package com.hamtalk.chat.model.request;
 
 import com.hamtalk.chat.domain.entity.User;
+import com.hamtalk.chat.domain.enums.Role;
+import com.hamtalk.chat.domain.enums.UserStatus;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,8 +44,8 @@ public class UserSignupRequest {
                 .name(name)
                 .birthDate(birthDate)
                 .gender(gender)
-                .roleId(3)
-                .userStatusId(1)
+                .roleId(Role.USER.getRoleCode())
+                .userStatusId(UserStatus.ACTIVE.getUserStatusCode())
                 .build();
     }
 }

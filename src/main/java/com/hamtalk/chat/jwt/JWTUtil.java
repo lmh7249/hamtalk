@@ -33,8 +33,8 @@ public class JwtUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
     }
     // JWT에서 사용자 역할(Role id) 가져오기
-    public int getAuthorityId(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("authorityId", Integer.class);
+    public int getRoleId(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("roleId", Integer.class);
     }
 
     public String getCategory(String token) {

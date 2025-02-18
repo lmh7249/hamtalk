@@ -94,7 +94,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check", "/api/users", "/api/auth/email-verification/code", "/api/auth/email-verification/code/verify").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/auth/reissue").permitAll()
+                        .requestMatchers("/api/auth/refresh").permitAll()
                         // 나머지 모든 요청은 React 라우팅으로 처리되도록 허용
                         .anyRequest().permitAll()
                 );

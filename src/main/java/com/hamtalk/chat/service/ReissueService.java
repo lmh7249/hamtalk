@@ -50,7 +50,7 @@ public class ReissueService {
         }
 
         // 5. 새 토큰 발급
-        int authorityId = jwtUtil.getAuthorityId(refreshToken);
+        int authorityId = jwtUtil.getRoleId(refreshToken);
         String newAccessToken = jwtUtil.createJwt("access", email, authorityId, jwtProperties.getAccessTtl());
         String newRefreshToken = jwtUtil.createJwt("refresh", email, authorityId, jwtProperties.getRefreshTtl());
 

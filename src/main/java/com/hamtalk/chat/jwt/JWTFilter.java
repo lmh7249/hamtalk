@@ -61,7 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         User userEntity = new User();
         userEntity.setEmail(email);
-        userEntity.setAuthorityId(authorityId);
+        userEntity.setRoleId(authorityId);
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
 
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

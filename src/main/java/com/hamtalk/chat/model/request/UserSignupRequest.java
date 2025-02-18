@@ -42,8 +42,8 @@ public class UserSignupRequest {
                 .name(name)
                 .birthDate(birthDate)
                 .gender(gender)
-                .authorityId(3)
-                .userStateId(1)
+                .roleId(3)
+                .userStatusId(1)
                 .build();
     }
 }

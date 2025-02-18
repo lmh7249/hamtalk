@@ -54,7 +54,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         log.info("로그인 성공! JWT 토큰 생성 중 ......... ");
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         String email = customUserDetails.getUsername();
-        int authorityId = customUserDetails.getAuthorityId();
+        int authorityId = customUserDetails.getRoleId();
         //토큰 생성
         String accessToken = jwtUtil.createJwt("access", email, authorityId, jwtProperties.getAccessTtl());
         String refreshToken = jwtUtil.createJwt("refresh", email, authorityId, jwtProperties.getRefreshTtl());

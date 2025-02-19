@@ -56,7 +56,7 @@ public class ReissueService {
 
         // 6. Redis 업데이트 및 응답 설정
         redisService.saveRefreshToken(email, newRefreshToken);
-        response.setHeader("access", newAccessToken);
+        response.setHeader("access", "Bearer " + newAccessToken);
         addRefreshTokenCookie(response, newRefreshToken);
 
     }

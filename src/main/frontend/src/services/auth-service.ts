@@ -12,7 +12,8 @@ export const userLogin = async (email: string, password: string) => {
    try {
      const accessToken = await userLoginApi(email, password);
       if(accessToken) {
-         localStorage.setItem("accessToken", accessToken);
+          //Todo Bearer 접두사는 HTTP 요청을 보낼 때만 필요, 로컬 스토리지는 순수한 jwt 토큰 값만 저장"
+         localStorage.setItem("accessToken", accessToken.replace("Bearer ", ""));
          console.log("로그인 성공, 토큰 저장 완료.");
          return true; // 로그인 성공 여부 반환
       }
@@ -20,7 +21,6 @@ export const userLogin = async (email: string, password: string) => {
       console.error("로그인 실패:", error);
       return false;
    }
-
 }
 
 export const userLogout = async () => {

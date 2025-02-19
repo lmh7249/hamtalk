@@ -3,6 +3,7 @@ package com.hamtalk.chat.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hamtalk.chat.config.jwt.JwtProperties;
 import com.hamtalk.chat.model.request.LoginRequest;
+import com.hamtalk.chat.model.response.LoginResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.RedisService;
 import jakarta.servlet.FilterChain;
@@ -50,20 +51,27 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
         log.info("로그인 성공! JWT 토큰 생성 중 ......... ");
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long id = customUserDetails.getId();
         String email = customUserDetails.getUsername();
-        int authorityId = customUserDetails.getRoleId();
+        int roleId = customUserDetails.getRoleId();
         //토큰 생성
-        String accessToken = jwtUtil.createJwt("access", email, authorityId, jwtProperties.getAccessTtl());
-        String refreshToken = jwtUtil.createJwt("refresh", email, authorityId, jwtProperties.getRefreshTtl());
+
+        String accessToken = jwtUtil.createJwt("access", email, roleId, jwtProperties.getAccessTtl());
+        String refreshToken = jwtUtil.createJwt("refresh", email, roleId, jwtProperties.getRefreshTtl());
         // 레디스에 리프레쉬 토큰 저장
         redisService.saveRefreshToken(email, refreshToken);
+
         //응답 설정
-        response.setHeader("access", accessToken);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("access", "Bearer " +accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
         response.setStatus(HttpStatus.OK.value());
+        new ObjectMapper().writeValue(response.getOutputStream(), new LoginResponse(id, email, roleId));
+
     }
 
     //로그인 실패시 실행할 메소드

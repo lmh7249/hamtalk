@@ -62,6 +62,9 @@ export const userLoginApi = async (email:string, password:string) => {
             })
         })
         console.log("response 값은?:  ", response);
+        const data = await response.json();
+        console.log("유저의 정보는?: {} ㅎ", data);
+
         if (!response.ok) {  // 응답 상태가 200-299 범위가 아닐 때
             throw new Error("로그인에 실패했습니다.");
         }

@@ -18,11 +18,11 @@ public class JwtUtil {
     }
 
     // JWT 생성 (페이로드: 이메일 + 권한 + 생성, 만료 시간)
-    public String createJwt(String category, String email, int authorityId, Long expiredMs) {
+    public String createJwt(String category, String email, int roleId, Long expiredMs) {
         return Jwts.builder()
                 .claim("category", category)
                 .claim("email", email)
-                .claim("authorityId", authorityId)
+                .claim("roleId", roleId)
                 .issuedAt(new Date(System.currentTimeMillis())) // 발급 시간
                 .expiration(new Date(System.currentTimeMillis() + expiredMs)) // 만료 시간
                 .signWith(secretKey)

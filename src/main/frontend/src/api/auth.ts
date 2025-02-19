@@ -51,7 +51,7 @@ export const verifyEmailVerificationCodeApi = async (email : string, verificatio
 
 export const userLoginApi = async (email:string, password:string) => {
     try {
-        const response =await fetch("/login", {
+        const response =await fetch("/api/auth/login", {
             method:"post",
             headers: {
                "Content-Type": "application/json"

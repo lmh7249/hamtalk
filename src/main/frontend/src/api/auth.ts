@@ -78,7 +78,7 @@ export const userLoginApi = async (email:string, password:string) => {
 
 export const userLogoutApi = async () => {
     try {
-        const response = await fetch("/logout", {
+        const response = await fetch("/api/auth/logout", {
             method: "post",
             credentials: "include",
         })

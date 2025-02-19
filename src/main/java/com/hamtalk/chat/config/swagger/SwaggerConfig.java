@@ -1,10 +1,8 @@
 package com.hamtalk.chat.config.swagger;
 
 import com.hamtalk.chat.jwt.LoginFilter;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
+import com.hamtalk.chat.jwt.CustomLogoutFilter;
+import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.RequestBody;
@@ -30,71 +28,87 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-            .components(new Components())
-            .info(apiInfo());
+                .components(new Components())
+                .info(apiInfo());
     }
 
     private Info apiInfo() {
         return new Info()
-            .title("HamTalk API")
-            .description("채팅 웹사이트 API")
-            .version("2.6.0");
+                .title("HamTalk API")
+                .description("채팅 웹사이트 API")
+                .version("2.6.0");
     }
 
-    // 🔹 ① OpenApiCustomiser: 로그인 API 문서를 Swagger에 등록
     @Bean
-    public OpenApiCustomizer springSecurityLoginEndpointCustomiser() {
+    public OpenApiCustomizer springSecurityEndpointCustomiser() {
         FilterChainProxy filterChainProxy = applicationContext.getBean(
                 AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME, FilterChainProxy.class);
 
         return openAPI -> {
             for (SecurityFilterChain filterChain : filterChainProxy.getFilterChains()) {
-                Optional<LoginFilter> optionalFilter =
-                        filterChain.getFilters().stream()
-                                .filter(LoginFilter.class::isInstance) // 🔹 LoginFilter 찾기
-                                .map(LoginFilter.class::cast)
-                                .findAny();
+                // 로그인 필터 문서화
+                Optional<LoginFilter> loginFilter = filterChain.getFilters().stream()
+                        .filter(LoginFilter.class::isInstance)
+                        .map(LoginFilter.class::cast)
+                        .findAny();
 
-                if (optionalFilter.isPresent()) {
-                    LoginFilter loginFilter = optionalFilter.get();
-                    Operation operation = new Operation();
+                if (loginFilter.isPresent()) {
+                    Operation loginOperation = new Operation()
+                            .summary("사용자 로그인")
+                            .description("성공 시, AccessToken(헤더/지속시간 10분), RefreshToken(쿠키/지속시간 1일)를 발급합니다.");
 
-                    // 🔹 요청 JSON 데이터 구조 정의 (email, password)
-                    Schema<?> schema = new ObjectSchema()
+                    Schema<?> loginSchema = new ObjectSchema()
                             .addProperties("email", new StringSchema())
                             .addProperties("password", new StringSchema());
 
-                    RequestBody requestBody = new RequestBody().content(
+                    RequestBody loginRequestBody = new RequestBody().content(
                             new Content().addMediaType(org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
-                                    new MediaType().schema(schema))
+                                    new MediaType().schema(loginSchema))
                     );
-                    operation.requestBody(requestBody);
+                    loginOperation.requestBody(loginRequestBody);
 
-                    // 🔹 응답 코드 정의
-                    ApiResponses apiResponses = new ApiResponses();
-                    apiResponses.addApiResponse("200", new ApiResponse().description("로그인 성공"));
-                    apiResponses.addApiResponse("400", new ApiResponse().description("잘못된 요청"));
+                    ApiResponses loginResponses = new ApiResponses();
+                    loginResponses.addApiResponse("200", new ApiResponse().description("로그인 성공"));
+                    loginResponses.addApiResponse("401", new ApiResponse().description("로그인 실패"));
 
-                    operation.responses(apiResponses);
-                    operation.addTagsItem("Auth"); // 🔹 Swagger 태그 지정
+                    loginOperation.responses(loginResponses);
+                    loginOperation.addTagsItem("AuthController");
 
-                    // 🔹 로그인 API 엔드포인트 문서화
-                    PathItem pathItem = new PathItem().post(operation);
-                    openAPI.getPaths().addPathItem("/api/auth/login", pathItem);
+                    PathItem loginPathItem = new PathItem().post(loginOperation);
+                    openAPI.getPaths().addPathItem("/api/auth/login", loginPathItem);
+                }
+
+                // 로그아웃 필터 문서화
+                Optional<CustomLogoutFilter> logoutFilter = filterChain.getFilters().stream()
+                        .filter(CustomLogoutFilter.class::isInstance)
+                        .map(CustomLogoutFilter.class::cast)
+                        .findAny();
+
+                if (logoutFilter.isPresent()) {
+                    Operation logoutOperation = new Operation()
+                            .summary("사용자 로그아웃")
+                            .description("AccessToken(localStorage), RefreshToken(Cookie, redis)을 삭제합니다.");
+
+                    ApiResponses logoutResponses = new ApiResponses();
+                    logoutResponses.addApiResponse("200", new ApiResponse().description("로그아웃 성공"));
+                    logoutResponses.addApiResponse("400", new ApiResponse().description("유효하지 않은 리프레시 토큰"));
+
+                    logoutOperation.responses(logoutResponses);
+                    logoutOperation.addTagsItem("AuthController");
+
+                    PathItem logoutPathItem = new PathItem().post(logoutOperation);
+                    openAPI.getPaths().addPathItem("/api/auth/logout", logoutPathItem);
                 }
             }
         };
     }
 
-    // 🔹 ② OpenApiCustomiser를 Swagger 문서 생성에 적용
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("HamTalk API")
-                .pathsToMatch("/api/**") // 🔹 문서화할 API 경로
-                .addOpenApiCustomizer(springSecurityLoginEndpointCustomiser()) // 🔹 로그인 API 적용
+                .pathsToMatch("/api/**")
+                .addOpenApiCustomizer(springSecurityEndpointCustomiser())
                 .build();
     }
-
-
 }

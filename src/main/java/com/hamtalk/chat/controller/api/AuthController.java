@@ -7,6 +7,7 @@ import com.hamtalk.chat.model.request.EmailAuthRequest;
 import com.hamtalk.chat.service.ReissueService;
 import com.hamtalk.common.model.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "AuthController", description = "인증 관련 API")
 @RequestMapping("/api/auth")
 public class AuthController {
     private final EmailService emailService;

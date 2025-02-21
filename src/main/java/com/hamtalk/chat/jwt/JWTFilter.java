@@ -1,6 +1,7 @@
 package com.hamtalk.chat.jwt;
 
 import com.hamtalk.chat.domain.entity.User;
+import com.hamtalk.chat.model.response.UserAuthenticationResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -26,9 +27,13 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 헤더에서 access키에 담긴 토큰을 꺼냄
-        String accessToken = request.getHeader("access");
-
+        String bearerToken  = request.getHeader("Authorization");
+        String accessToken = null;
         // 토큰이 없다면 다음 필터로 넘김
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            accessToken = bearerToken.substring(7);  // "Bearer " 이후의 토큰값만 추출
+        }
+        log.info("액세스 토큰 유무 확인: {}", accessToken);
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
@@ -55,14 +60,16 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-        // username, role 값을 획득
+        // userId, username, role 값을 획득
+        Long userId = jwtUtil.getUserId(accessToken);
         String email = jwtUtil.getEmail(accessToken);
         int roleId = jwtUtil.getRoleId(accessToken);
+        UserAuthenticationResponse userAuthenticationResponse = new UserAuthenticationResponse();
 
-        User userEntity = new User();
-        userEntity.setEmail(email);
-        userEntity.setRoleId(roleId);
-        CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
+        userAuthenticationResponse.setId(userId);
+        userAuthenticationResponse.setEmail(email);
+        userAuthenticationResponse.setRoleId(roleId);
+        CustomUserDetails customUserDetails = new CustomUserDetails(userAuthenticationResponse);
 
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);

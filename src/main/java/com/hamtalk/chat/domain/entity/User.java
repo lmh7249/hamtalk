@@ -1,6 +1,5 @@
 package com.hamtalk.chat.domain.entity;
 
-import com.hamtalk.chat.domain.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -8,13 +7,13 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Entity
 @Getter
 @Setter
 @Builder
-@Table(name = "user")
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "user")
 public class User extends BaseEntity{
 
     @Column(name ="email")

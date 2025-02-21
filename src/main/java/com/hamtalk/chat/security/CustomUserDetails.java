@@ -1,7 +1,8 @@
 package com.hamtalk.chat.security;
 
-import com.hamtalk.chat.domain.entity.User;
+import com.hamtalk.chat.model.response.UserAuthenticationResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,12 +11,13 @@ import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@ToString
 public class CustomUserDetails implements UserDetails {
-    private final User user;
+    private final UserAuthenticationResponse userAuthenticationResponse;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        int roleId = user.getRoleId();
+        int roleId = userAuthenticationResponse.getRoleId();
         if(roleId == 1) {
             return List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"));
         } else if (roleId == 2) {
@@ -28,21 +30,21 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public Long getId() {
-        return user.getId();
+        return userAuthenticationResponse.getId();
     }
 
     public int getRoleId() {
-        return user.getRoleId();
+        return userAuthenticationResponse.getRoleId();
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return userAuthenticationResponse.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return userAuthenticationResponse.getEmail();
     }
 
     // 계정이 만료되었는지? 만료되었으면 false
@@ -55,7 +57,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
         // userStateId가 'BANNED(3)'이면 계정 잠금, 그 외는 잠금 해제
-        return user.getUserStatusId() != 3; // 'BANNED' 상태가 아니면 true, 그 외에는 false
+        return userAuthenticationResponse.getUserStatusId() != 3; // 'BANNED' 상태가 아니면 true, 그 외에는 false
     }
 
     // 비밀번호가 만료되었는지? 만료 -> false
@@ -67,6 +69,6 @@ public class CustomUserDetails implements UserDetails {
     // 활성화된 계정인지? true만 사용 가능.
     @Override
     public boolean isEnabled() {
-        return  user.getUserStatusId() == 1;
+        return  userAuthenticationResponse.getUserStatusId() == 1;
     }
 }

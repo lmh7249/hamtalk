@@ -65,15 +65,17 @@ export const userLoginApi = async (email:string, password:string) => {
         const data = await response.json();
         console.log("유저의 정보는?: {} ㅎ", data);
 
-        if (!response.ok) {  // 응답 상태가 200-299 범위가 아닐 때
-            throw new Error("로그인에 실패했습니다.");
-        }
         // 헤더에서 access 토큰 가져오기
-        const accessToken = response.headers.get("access");
-        if (!accessToken) {
+        const bearerToken = response.headers.get("Authorization"); // 대소문자 주의
+
+        if (!bearerToken || !bearerToken.toLowerCase().startsWith("bearer ")) {
             throw new Error("Access Token이 응답 헤더에 포함되지 않았습니다.");
         }
-        return accessToken
+
+        // "Bearer " 부분 제거 후 순수한 토큰만 추출
+        const accessToken = bearerToken.split(" ")[1];
+
+        return accessToken;
     } catch(error) {
         console.log("아이디 혹은 비밀번호를 확인해주세요.");
     }

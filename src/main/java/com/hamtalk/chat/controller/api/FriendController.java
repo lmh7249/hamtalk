@@ -24,14 +24,14 @@ import java.util.List;
 @Tag(name = "FriendController", description = "친구 관련 API")
 public class FriendController {
     private final FriendService friendService;
+//  TODO: @AuthenticationPrincipal == SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
     @GetMapping
     @Operation(summary = "친구 목록 조회", description = "friendStatusIds 값에 따른 친구 목록 조회(1,2: 내 친구, 3: 삭제한 친구, 4: 차단한 친구")
     public ResponseEntity<ApiResponse<List<FriendResponse>>> getFriendList(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestParam(value = "friendStatusIds", required = true) List<Integer> friendStatusIds) {
-        log.info("커스텀유저디테일 객체 생성 완료? : {}", customUserDetails.toString().toString());
+        log.info("커스텀유저디테일 객체 생성 완료? : {}", customUserDetails.toString());
         log.info("유저 id : {}", customUserDetails.getId());
         log.info("유저 이메일 : {}", customUserDetails.getUsername());
-//        log.info("유저 데이터가 있는지? :{}", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         log.info("상태값은? : {}", friendStatusIds);
         return ResponseEntity.ok(friendService.getFriendList(customUserDetails.getId(), friendStatusIds));
     }

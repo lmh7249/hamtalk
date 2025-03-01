@@ -27,8 +27,8 @@ const ChatMainContainer = () => {
                 <MainContent modalOpen = {modalOpen}>
                 </MainContent>
             </MainContentWrapper>
-            {/*{isModalOpen && <FriendAddModal modalClose ={modalClose}/>}*/}
-            {isModalOpen && <ChatRoomAddModal modalClose ={modalClose}/>}
+            {isModalOpen && <FriendAddModal modalClose ={modalClose}/>}
+            {/*{isModalOpen && <ChatRoomAddModal modalClose ={modalClose}/>}*/}
         </>
     )
 }

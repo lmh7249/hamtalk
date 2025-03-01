@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import UserDefaultImage from "../../assets/images/UserDefaultImage.png";
 import UserInfoText from "./UserInfoText";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
 
 const StyledUserProfile = styled.div`
     height: 200px;
@@ -50,6 +52,8 @@ const StyledUserEmail = styled.div`
 `;
 
 const LoginUserProfile = () => {
+    const user = useSelector((state: RootState) => state.user);
+
     return (
         <StyledUserProfile>
             <ProfileTitle>
@@ -57,7 +61,7 @@ const LoginUserProfile = () => {
             </ProfileTitle>
             <StyledUserProfileDetail>
                 <StyledImage src={UserDefaultImage} alt="유저이미지"/>
-                <UserInfoText nickName={"임성규"} statusMessage={"연락하지마세요."} email={"lmh7249@naver.com"} isMe={true}/>
+                <UserInfoText nickName={"임성규"} statusMessage={"연락하지마세요."} email={user.email} isMe={true}/>
             </StyledUserProfileDetail>
         </StyledUserProfile>
     )

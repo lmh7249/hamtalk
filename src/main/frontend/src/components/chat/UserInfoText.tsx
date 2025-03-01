@@ -25,7 +25,7 @@ const StyledUserEmail = styled.div<UserInfoProps>`
 interface UserInfoTextProps extends UserInfoProps{
     nickName: string;
     statusMessage: string;
-    email: string;
+    email: string | null;
 }
 
 interface UserInfoProps {

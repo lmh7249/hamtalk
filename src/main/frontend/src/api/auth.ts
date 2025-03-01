@@ -1,5 +1,8 @@
 import {userLogin} from "../services/auth-service";
 
+
+
+
 export const sendEmailVerificationApi = async (email : string) => {
     try {
         const response = await fetch("/api/auth/email-verification/code", {
@@ -49,24 +52,32 @@ export const verifyEmailVerificationCodeApi = async (email : string, verificatio
     }
 }
 
-export const userLoginApi = async (email:string, password:string) => {
+interface LoginResponse {
+    accessToken: string;
+    loginUserData: {
+        id: number;
+        email: string;
+        roleId: number;
+    };
+}
+
+export interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+export const userLoginApi = async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
         const response =await fetch("/api/auth/login", {
             method:"post",
             headers: {
                "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                "email": email,
-                "password": password,
-            })
+            body: JSON.stringify(credentials),
         })
-        console.log("response 값은?:  ", response);
-        const data = await response.json();
-        console.log("유저의 정보는?: {} ㅎ", data);
-
+        const loginUserData = await response.json();
         // 헤더에서 access 토큰 가져오기
-        const bearerToken = response.headers.get("Authorization"); // 대소문자 주의
+        const bearerToken = response.headers.get("Authorization");
 
         if (!bearerToken || !bearerToken.toLowerCase().startsWith("bearer ")) {
             throw new Error("Access Token이 응답 헤더에 포함되지 않았습니다.");
@@ -75,9 +86,10 @@ export const userLoginApi = async (email:string, password:string) => {
         // "Bearer " 부분 제거 후 순수한 토큰만 추출
         const accessToken = bearerToken.split(" ")[1];
 
-        return accessToken;
+        return {accessToken, loginUserData};
     } catch(error) {
         console.log("아이디 혹은 비밀번호를 확인해주세요.");
+        throw error;
     }
 }
 

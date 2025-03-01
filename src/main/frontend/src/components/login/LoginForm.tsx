@@ -5,6 +5,9 @@ import {LoginInput} from "../common/LoginInput";
 import {userLogin} from "../../services/auth-service";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
+import {AppDispatch} from "../../store";
+import {useDispatch} from "react-redux";
+import {login} from "../../store/userSlice";
 
 
 const StyledLoginForm = styled.form`
@@ -49,6 +52,8 @@ const LoginForm = () => {
     const isFormValid = !emailError && !passwordError && email && password;
     // 이메일, 비밀번호 에러가 없고 둘 다 입력되어 있을 경우 true
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+
     const handleEmailChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const newEmail = e.target.value;
         setEmail(newEmail);
@@ -68,8 +73,8 @@ const LoginForm = () => {
         const loadingToast = toast.loading('로그인 중...');
 
         try {
-        const isLoggedIn = await userLogin(email, password);
-            if(isLoggedIn) {
+        const userData = await userLogin({email, password});
+            if(userData) {
                 toast.success('로그인 성공!', {
                     id: loadingToast,
                     duration: 2000,
@@ -79,6 +84,14 @@ const LoginForm = () => {
                         color: '#fff',
                     },
                 });
+                dispatch(
+                    login({
+                        id: userData.id,
+                        email: userData.email,
+                        roleId: userData.roleId,
+                    })
+                );
+                console.log("로그인 한 유저 정보: ", userData.id, userData.email, userData.roleId);
                 navigate("/chat");
             } else {
                 toast.error('이메일 또는 비밀번호를 다시 확인해주세요.', {

@@ -11,7 +11,4 @@ public class LoginResponse {
     private Long id;
     private String email;
     private int roleId;
-//    private String nickname;
-//    private String profileImage;
-//    private String statusMessage;
 }

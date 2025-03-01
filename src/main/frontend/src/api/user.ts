@@ -19,3 +19,18 @@ export const checkDuplicateEmailApi = async (email: string) => {
         return false;
     }
 };
+
+export const getMyProfileApi = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch("api/profiles/me", {
+        method: "get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+    });
+    if(!response.ok) {
+        throw new Error("프로필 받아오기 실패")
+    }
+    return response.json();
+}

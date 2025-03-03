@@ -1,7 +1,9 @@
 import styled from "styled-components";
 import BaseModal from "../common/BaseModal";
-import UserDefaultImage from "../../assets/images/UserDefaultImage.png";
 import ModalButton from "../common/ModalButton";
+import React, {useEffect, useState} from "react";
+import {getUserProfile} from "../../services/user-service";
+import {isValidEmail} from "../../utils/signupValidation";
 
 const Title = styled.h3`
     margin-top: 0;
@@ -52,16 +54,23 @@ const ButtonWrapper = styled.div`
     width: 100%;
     justify-content: flex-end;
     margin-top: 20px;
-`
+`;
 
-const UserProfile = () => {
+interface UserProfileDataProps {
+    id: number,
+    nickname: string,
+    profile_image_url: string
+}
+
+const UserProfile = ({userProfileData}: {userProfileData: UserProfileDataProps}) => {
     return (
         <>
-            <StyledProfileImage src={UserDefaultImage} alt="유저 프로필 사진"/>
-            <StyledUserNickName>임성규</StyledUserNickName>
+            <StyledProfileImage src={userProfileData.profile_image_url} alt="유저 프로필 사진"/>
+            <StyledUserNickName>{userProfileData.nickname}</StyledUserNickName>
             <ButtonWrapper>
+                {/*TODO: userProfileData.id -> 검색한 유저의 id 값으로 프로필 보기 컴포넌트와 친구추가 기능 구현하기*/}
                 <ModalButton backgroundColor={"#d3d3d3"} hoverColor={"#b0b0b0"} color={"black"}>프로필 보기</ModalButton>
-                <ModalButton backgroundColor={"#2C2D31"} hoverColor={"#3A3B40"} color={"white"}>친구 추가</ModalButton>
+                <ModalButton backgroundColor={"#2C2D31"} hoverColor={"#3A3B40"} color={"white"} onClick={() => {console.log(userProfileData.id)}}>친구 추가</ModalButton>
             </ButtonWrapper>
         </>
     )
@@ -75,43 +84,77 @@ const StyledSearchFailText = styled.p`
     margin-top: 50px;
     white-space: pre-line;
     line-height: 2.5;
-`
+`;
+
+type SearchResultStateProps = "INIT" | "INVALID_EMAIL" | "NOT_FOUND" | "FOUND";
+type SearchResultProps = {
+    searchResultState: SearchResultStateProps;
+    userProfileData: UserProfileDataProps | null;
+};
 
 
-const SearchResult = () => {
+const SearchResult = ({ searchResultState, userProfileData}: SearchResultProps) => {
     return (
         <>
+            {searchResultState === "INIT" && null}
             {/*1. 유효성 검사해서 실패 시, 표현(DB 접근 x)*/}
-            {/*<StyledSearchFailText>유효한 이메일을 입력해주세요.</StyledSearchFailText>*/}
+            {searchResultState === "INVALID_EMAIL" && <StyledSearchFailText>유효한 이메일을 입력해주세요.</StyledSearchFailText>}
             {/*2. DB 접근 -> 찾기 실패 */}
-
-            {/*<StyledSearchFailText>*/}
-            {/*    해당 유저를 찾을 수 없습니다.{"\n"}*/}
-            {/*    이메일을 다시 확인해주세요.*/}
-            {/*</StyledSearchFailText>*/}
-
-             {/*3. 검색 결과가 있을 경우 반환(유저 프로필 이미지, 유저 닉네임)*/}
-            <StyledFindUserProfile>
-                <UserProfile/>
-            </StyledFindUserProfile>
-
+            {searchResultState === "NOT_FOUND" && <StyledSearchFailText>
+                해당 유저를 찾을 수 없습니다.{"\n"}
+                이메일을 다시 확인해주세요.
+            </StyledSearchFailText>}
+            {/*3. 검색 결과가 있을 경우 반환(유저 프로필 이미지, 유저 닉네임)*/}
+            {searchResultState === "FOUND" && userProfileData && <StyledFindUserProfile>
+                <UserProfile userProfileData = {userProfileData}/>
+            </StyledFindUserProfile>}
         </>
     )
 }
 
 type FriendAddModalProps = {
-    modalClose: ()=> void;
+    modalClose: () => void;
 }
 
 const FriendAddModal = ({modalClose}: FriendAddModalProps) => {
+    const [email, setEmail] = useState<string>("");
+    const [searchResultState, setSearchResultState] = useState<SearchResultStateProps>("INIT");
+    const [userProfileData, setUserProfileData] = useState<UserProfileDataProps | null>(null);
+
+    const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            if (!isValidEmail(email).isValid) {
+                setSearchResultState("INVALID_EMAIL");
+                return;
+            } else {
+                let userProfile = await getUserProfile(email);
+                if (userProfile.data) {
+                    // 유저의 프로필 객체 전달
+                    let userProfileObject = userProfile.data;
+                    setSearchResultState("FOUND");
+                    setUserProfileData(userProfileObject);
+                    return;
+                } else {
+                    setSearchResultState("NOT_FOUND");
+                    return;
+                }
+            }
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+    };
+
     return (
-        <BaseModal width="350px" height="350px" modalClose ={modalClose}>
+        <BaseModal width="350px" height="350px" modalClose={modalClose}>
             <Title>친구 추가</Title>
             <SearchOptionWrapper>
                 <SearchOptionText>이메일로 추가</SearchOptionText>
             </SearchOptionWrapper>
-            <SearchInput type="email" placeholder={"이메일이 정확히 일치해야 검색 가능합니다."}/>
-            <SearchResult/>
+            <SearchInput type="email" placeholder={"이메일이 정확히 일치해야 검색 가능합니다."} onChange={handleChange}
+                         onKeyUp={handleKeyPress}/>
+            <SearchResult searchResultState={searchResultState} userProfileData = {userProfileData}/>
         </BaseModal>
     )
 }

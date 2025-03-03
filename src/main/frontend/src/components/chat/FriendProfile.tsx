@@ -10,7 +10,7 @@ const StyledFriendProfile = styled.div`
         cursor: pointer;
         background-color: #f1f1f1;
     }
-`
+`;
 
 const StyledImage = styled.img`
     object-fit: cover; /* 이미지 비율을 유지하면서 부모 요소에 맞게 조정 */
@@ -19,7 +19,7 @@ const StyledImage = styled.img`
     width: 60px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
     max-height: 60px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
     padding: 3px;
-`
+`;
 
 interface FriendProfileProps {
     nickName: string;

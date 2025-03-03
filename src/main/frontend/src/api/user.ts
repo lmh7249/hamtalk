@@ -29,8 +29,20 @@ export const getMyProfileApi = async () => {
             "Authorization": `Bearer ${accessToken}`
         }
     });
-    if(!response.ok) {
+    if (!response.ok) {
         throw new Error("프로필 받아오기 실패")
     }
+    return response.json();
+}
+
+export const getUserProfileApi = async (email: string) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`api/users?email=${email}`, {
+        method: "get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+    });
     return response.json();
 }

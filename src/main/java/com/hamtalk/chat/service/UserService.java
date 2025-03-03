@@ -33,7 +33,7 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    //TODO: 추후 예외처리하기.
+    //TODO: 추후 예외 처리하기.
     @Transactional(readOnly = true)
     public UserProfileResponse getUserByEmail(String email) {
         return userRepository.findUserProfileByEmail(email).orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));

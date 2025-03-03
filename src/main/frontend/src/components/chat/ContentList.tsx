@@ -81,6 +81,7 @@ const ContentList = ({modalOpen}: { modalOpen: modalOpenProps }) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [chatRooms, setChatRooms] = useState();
+    //TODO: 새로고침 시에만 친구목록, 채팅방 목록 api 호출할 지 고민하기
 
     useEffect(() => {
         // 메뉴가 변경 될 때마다 적절한 API 호출
@@ -105,7 +106,7 @@ const ContentList = ({modalOpen}: { modalOpen: modalOpenProps }) => {
             <ContentListTopState selectedMenu={selectedMenu} modalOpen={modalOpen}/>
             {selectedMenu.key === "friends" && <SearchInput type="text" placeholder="이름 또는 이메일을 입력하세요."/>}
             {selectedMenu.key === "chats" && <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요."/>}
-            {selectedMenu.key === "friends" && <div> 친구 200</div>}
+            {selectedMenu.key === "friends" && <div>친구 {friends.length} </div>}
             {selectedMenu.key === "chats" && <div> 채팅방 200</div>}
             {selectedMenu.key === "friends" && <FriendList friends={friends}/>}
             {selectedMenu.key === "chats" && <ChattingRoomList/>}

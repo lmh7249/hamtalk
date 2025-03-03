@@ -17,4 +17,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             "join User u on f.toUserId = u.id " +
             "where f.fromUserId = :fromUserId AND f.friendStatusId IN :friendStatusIds")
     List<FriendResponse> findFriendsWithProfile(@Param("fromUserId") Long fromUserId, @Param("friendStatusIds") List<Integer> friendStatusIds);
+
+
 }

@@ -8,8 +8,6 @@ const StyledFriendListWrapper = styled.div`
     flex-direction: column;
 `;
 
-
-
 interface FriendListProps {
     friends: Friend[];
 }
@@ -30,9 +28,6 @@ const FriendList: React.FC<FriendListProps> = ({friends}) => {
                 ):
                  <p>친구 목록이 없어요 !</p>
             }
-            {/*/!*친구 목록 DB에서 꺼내와서 반복. *!/*/}
-            {/*<FriendProfile nickName={"임성규"} statusMessage={"상메 ㅎㅎ"} email={"lsk@naa.com"} profileImageUrl = {""}/>*/}
-            {/*<FriendProfile nickName={"홍길동"} statusMessage={"반갑습니다."} email={"hgd@naa.com"} profileImageUrl = {""}/>*/}
         </StyledFriendListWrapper>
     );
 }

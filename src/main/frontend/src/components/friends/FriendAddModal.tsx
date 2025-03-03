@@ -90,10 +90,10 @@ const SearchResult = () => {
             {/*    이메일을 다시 확인해주세요.*/}
             {/*</StyledSearchFailText>*/}
 
-            {/* 3. 검색 결과가 있을 경우 반환(유저 프로필 이미지, 유저 닉네임)*/}
-            {/*<StyledFindUserProfile>*/}
-            {/*    <UserProfile/>*/}
-            {/*</StyledFindUserProfile>*/}
+             {/*3. 검색 결과가 있을 경우 반환(유저 프로필 이미지, 유저 닉네임)*/}
+            <StyledFindUserProfile>
+                <UserProfile/>
+            </StyledFindUserProfile>
 
         </>
     )

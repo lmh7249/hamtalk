@@ -8,6 +8,8 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {MenuState, MenuType} from "../../store/menuSlice";
 import {modalOpenProps} from "./MainContent";
+import {useEffect, useState} from "react";
+import {getMyFriendList} from "../../services/friend-service";
 
 const StyledContentList = styled.div`
     min-width: 350px;
@@ -16,19 +18,19 @@ const StyledContentList = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
-`
+`;
 
 const StyledContentListTopState = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-`
+`;
 
 const IconButton = styled.button`
     cursor: pointer;
     border: none;
     background-color: transparent;
-`
+`;
 
 
 const ContentListTopState = ({
@@ -65,10 +67,38 @@ const SearchInput = styled.input`
     padding: 10px 40px 10px 10px;
     background-size: 20px 20px;
     border-radius: 5px;
-`
+`;
+export interface Friend {
+    toUserId: number,
+    friendStatusId: number,
+    nickname: string,
+    email: string,
+    profileImageUrl: string,
+    statusMessage: string
+}
 
 const ContentList = ({modalOpen}: { modalOpen: modalOpenProps }) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
+    const [friends, setFriends] = useState<Friend[]>([]);
+    const [chatRooms, setChatRooms] = useState();
+
+    useEffect(() => {
+        // 메뉴가 변경 될 때마다 적절한 API 호출
+        const fetchData = async () => {
+
+            if (selectedMenu.key === "friends") {
+                const response = await getMyFriendList();
+                if(response.status === 'success') {
+                    console.log("친구 목록 api 호출: " + response.data);
+                    setFriends(response.data);
+                }
+            } else if (selectedMenu.key === "chats") {
+                console.log("추후 채팅방 불러오는 api 호출");
+            }
+        };
+        fetchData();
+    }, [selectedMenu]);
+
 
     return (
         <StyledContentList>
@@ -77,7 +107,7 @@ const ContentList = ({modalOpen}: { modalOpen: modalOpenProps }) => {
             {selectedMenu.key === "chats" && <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요."/>}
             {selectedMenu.key === "friends" && <div> 친구 200</div>}
             {selectedMenu.key === "chats" && <div> 채팅방 200</div>}
-            {selectedMenu.key === "friends" && <FriendList/>}
+            {selectedMenu.key === "friends" && <FriendList friends={friends}/>}
             {selectedMenu.key === "chats" && <ChattingRoomList/>}
             {/*{selectedMenu === "settings" && <ChattingRoomList/>}*/}
         </StyledContentList>

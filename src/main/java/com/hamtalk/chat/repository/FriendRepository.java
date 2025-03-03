@@ -12,8 +12,9 @@ import java.util.List;
 @Repository
 public interface FriendRepository extends JpaRepository<Friend, Long> {
 
-    @Query("select new com.hamtalk.chat.model.response.FriendResponse(f, up) " +
+    @Query("select new com.hamtalk.chat.model.response.FriendResponse(f, up, u) " +
             "from Friend f join UserProfile up on f.toUserId = up.userId " +
+            "join User u on f.toUserId = u.id " +
             "where f.fromUserId = :fromUserId AND f.friendStatusId IN :friendStatusIds")
     List<FriendResponse> findFriendsWithProfile(@Param("fromUserId") Long fromUserId, @Param("friendStatusIds") List<Integer> friendStatusIds);
 }

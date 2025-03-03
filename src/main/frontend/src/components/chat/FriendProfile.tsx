@@ -25,12 +25,13 @@ interface FriendProfileProps {
     nickName: string;
     statusMessage: string;
     email: string;
+    profileImageUrl: string;
 }
 
-const FriendProfile = ({nickName, statusMessage, email}: FriendProfileProps) => {
+const FriendProfile = ({nickName, statusMessage, email, profileImageUrl}: FriendProfileProps) => {
     return (
         <StyledFriendProfile>
-            <StyledImage src={UserDefaultImage} alt="유저이미지"/>
+            <StyledImage src={profileImageUrl} alt="유저이미지"/>
             <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} isMe={false}/>
         </StyledFriendProfile>
     )

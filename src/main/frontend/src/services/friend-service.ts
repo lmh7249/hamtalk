@@ -1,5 +1,9 @@
-import {getMyFriendListApi} from "../api/friend";
+import {addFriendApi, getMyFriendListApi} from "../api/friend";
 
 export const getMyFriendList = async () => {
     return await getMyFriendListApi();
+}
+
+export const addFriend = async (toUserId: number) => {
+    return await addFriendApi(toUserId);
 }

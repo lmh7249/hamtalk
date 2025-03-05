@@ -11,7 +11,6 @@ import lombok.Setter;
 @Setter
 public class FriendResponse {
     private Long toUserId;
-    private int friendStatusId;
     private String nickname;
     private String email;
     private String profileImageUrl;
@@ -19,7 +18,6 @@ public class FriendResponse {
 
     public FriendResponse(Friend friend, UserProfile userProfile, User user) {
         this.toUserId = friend.getToUserId();
-        this.friendStatusId = friend.getFriendStatusId();
         this.nickname = userProfile.getNickname();
         this.email = user.getEmail();
         this.profileImageUrl = userProfile.getProfileImageUrl();

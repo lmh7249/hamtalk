@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "friend")
 public class Friend extends BaseEntity{
 
@@ -20,7 +20,5 @@ public class Friend extends BaseEntity{
     private Long fromUserId;
     @Column(name ="to_user_id")
     private Long toUserId;
-    @Column(name ="friend_status_id")
-    private int friendStatusId;
 
 }

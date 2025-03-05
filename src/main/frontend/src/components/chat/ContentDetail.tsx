@@ -13,8 +13,8 @@ const StyledContentDetail = styled.div`
 const ContentDetail = () => {
     return (
         <StyledContentDetail>
-            <EmptyContentDetail/>
-            {/*<UserProfileDetail/>*/}
+            {/*<EmptyContentDetail/>*/}
+            <UserProfileDetail/>
             {/*<ChatRoomDetail/>*/}
         </StyledContentDetail>
     )

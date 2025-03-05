@@ -26,14 +26,18 @@ public class FriendController {
 
     @GetMapping
     @Operation(summary = "친구 목록 조회", description = "friendStatusIds 값에 따른 친구 목록 조회(1,2: 내 친구, 3: 삭제한 친구, 4: 차단한 친구")
-    public ResponseEntity<ApiResponse<List<FriendResponse>>> getFriendList(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestParam(value = "friendStatusIds", required = true) List<Integer> friendStatusIds) {
+    public ResponseEntity<ApiResponse<List<FriendResponse>>> getFriendList(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         log.info("커스텀유저디테일 객체 생성 완료? : {}", customUserDetails.toString());
         log.info("유저 id : {}", customUserDetails.getId());
         log.info("유저 이메일 : {}", customUserDetails.getUsername());
-        log.info("상태값은? : {}", friendStatusIds);
-        return ResponseEntity.ok(friendService.getFriendList(customUserDetails.getId(), friendStatusIds));
+        return ResponseEntity.ok(friendService.getFriendList(customUserDetails.getId()));
     }
 
-
-
+    @PostMapping("/{toUserId}")
+    @Operation(summary = "친구 추가", description = "toUserId를 가진 사용자를 친구로 추가합니다.")
+    public ResponseEntity<ApiResponse<String>> addFriend(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long toUserId) {
+        log.info("친구 추가 요청 - from: {}, to: {}", customUserDetails.getId(), toUserId);
+        return ResponseEntity.ok(ApiResponse.ok(friendService.addFriend(customUserDetails.getId(), toUserId)));
+    }
 }

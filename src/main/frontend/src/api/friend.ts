@@ -1,6 +1,6 @@
 export const getMyFriendListApi = async () => {
     const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch("/api/friends?friendStatusIds=1,2", {
+    const response = await fetch("/api/friends", {
         method: "get",
         headers: {
             "Content-Type": "application/json",

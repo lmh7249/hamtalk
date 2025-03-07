@@ -7,6 +7,7 @@ import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
 import {useEffect, useState} from "react";
 import {UserProfileDetailProps} from "../chat/ContentDetail";
 import {getUserProfileById} from "../../services/user-service";
+import {checkFriendship} from "../../services/friend-service";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -124,8 +125,9 @@ const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
             const fetchUserProfile  = async () => {
                const profileData = await getUserProfileById(searchUserProfileId);
                 setSearchUserProfile(profileData);
+                const isFriend = await checkFriendship(searchUserProfileId);
+                setIsFriend(isFriend);
             }
-
             //TODO: 추후, Promise.All 학습 후, 적용해보기.
            fetchUserProfile();
             console.log("검색한 유저의 프로필 데이터: ", searchUserProfile);

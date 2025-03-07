@@ -7,7 +7,8 @@ import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
 import {useEffect, useState} from "react";
 import {UserProfileDetailProps} from "../chat/ContentDetail";
 import {getUserProfileById} from "../../services/user-service";
-import {checkFriendship} from "../../services/friend-service";
+import {addFriend, checkFriendship} from "../../services/friend-service";
+import toast from "react-hot-toast";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -120,13 +121,13 @@ const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
 
     useEffect(() => {
         if(searchUserProfileId > 0) {
-            console.log(`유저 정보 가져오기: ${searchUserProfileId}`);
+            console.log(`searchUserProfileId: ${searchUserProfileId}`);
             // api 호출 함수 설정하기.
             const fetchUserProfile  = async () => {
                const profileData = await getUserProfileById(searchUserProfileId);
                 setSearchUserProfile(profileData);
                 const isFriend = await checkFriendship(searchUserProfileId);
-                setIsFriend(isFriend);
+                setIsFriend(isFriend.data);
             }
             //TODO: 추후, Promise.All 학습 후, 적용해보기.
            fetchUserProfile();
@@ -134,6 +135,20 @@ const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
         }
     }, [searchUserProfileId]);
 
+    const handleAddFriend = async (toUserId:number|undefined) => {
+        if(toUserId === undefined) {
+            toast.error("유효하지 않은 사용자입니다.");
+            return;
+        }
+        try {
+            let message = await addFriend(toUserId);
+            toast.success(message.data);
+            setIsFriend(true);
+        } catch (error) {
+            toast.error("친구 추가에 실패했습니다.");
+            console.error("친구 추가 실패:", error);
+        }
+    }
     return (
         // 전체 영역을 잡는 컴포넌트 -> 이름을 레이아웃으로 바꿔야하나?
 
@@ -158,7 +173,7 @@ const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
                         <StyledStateMessage>{searchUserProfile?.statusMessage}</StyledStateMessage>
                     </StyledUserInfo>
                     <ButtonWrapper>
-                        {!isFriend && <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"}>
+                        {!isFriend && <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"} onClick={()=> handleAddFriend(searchUserProfile?.id)}>
                             친구 추가
                         </ModalButton>}
                         <ModalButton backgroundColor={"#2C2D31"} color={"white"} hoverColor={"#3A3B40"}>

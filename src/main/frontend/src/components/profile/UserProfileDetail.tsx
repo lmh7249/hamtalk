@@ -5,10 +5,11 @@ import BackGroundImageSample from "../../assets/images/background.jpg";
 import ModalButton from "../common/ModalButton";
 import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
 import {useEffect, useState} from "react";
-import {UserProfileDetailProps} from "../chat/ContentDetail";
 import {getUserProfileById} from "../../services/user-service";
 import {addFriend, checkFriendship} from "../../services/friend-service";
 import toast from "react-hot-toast";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -115,9 +116,11 @@ interface searchUserProfileData {
     statusMessage: string;
 }
 
-const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
+const UserProfileDetail = () => {
     const [searchUserProfile, setSearchUserProfile] = useState<searchUserProfileData>();
     const [isFriend, setIsFriend] = useState<boolean>(false);
+
+    const searchUserProfileId = useSelector((state:RootState) => state.detailContent.payload?.userId);
 
     useEffect(() => {
         if(searchUserProfileId > 0) {

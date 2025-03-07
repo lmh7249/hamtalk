@@ -11,14 +11,13 @@ const StyledMainContent = styled.div`
 
 export interface OpenModalProps {
     openModal: (type: ModalType) => void;
-    searchUserProfileId: number;
 }
 
-const MainContent = ({openModal, searchUserProfileId}: OpenModalProps) => {
+const MainContent = ({openModal}: OpenModalProps) => {
     return (
         <StyledMainContent>
             <ContentList openModal={openModal}/>
-            <ContentDetail searchUserProfileId ={searchUserProfileId}/>
+            <ContentDetail/>
         </StyledMainContent>
     )
 }

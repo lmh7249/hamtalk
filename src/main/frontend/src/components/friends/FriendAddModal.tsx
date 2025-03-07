@@ -137,10 +137,9 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchResultState, userProf
 
 interface FriendAddModalProps {
     modalClose: () => void;
-    searchUserProfileId: (userId: number) => void;
 }
 
-const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose, searchUserProfileId }) => {
+const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
     const [email, setEmail] = useState<string>("");
     const [searchResultState, setSearchResultState] = useState<SearchResultStateProps>("INIT");
     const [userProfileData, setUserProfileData] = useState<UserProfileDataProps | null>(null);
@@ -184,7 +183,6 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose, searchUserP
 
     // 유저 프로필 보기 함수.
     const handleViewProfile = (userId: number) => {
-        searchUserProfileId(userId);
         console.log("유저 프로필 보기 핸들 실행!", userId);
         console.log(userProfileData);
         if(!userProfileData) return;

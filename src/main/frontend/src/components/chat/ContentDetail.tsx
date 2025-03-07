@@ -13,18 +13,14 @@ const StyledContentDetail = styled.div`
     
 `;
 
-export interface UserProfileDetailProps {
-    searchUserProfileId: number;
-}
-
-const ContentDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
+const ContentDetail = () => {
    const contentDetailType = useSelector((state: RootState) => state.detailContent.type);
 
     return (
         <StyledContentDetail>
             {/*기본 값 = empty */}
             {contentDetailType === "empty" && <EmptyContentDetail/>}
-            {contentDetailType === "userProfile" && <UserProfileDetail searchUserProfileId = {searchUserProfileId}/>}
+            {contentDetailType === "userProfile" && <UserProfileDetail/>}
             {contentDetailType === "chatRoom" && <ChatRoomDetail/>}
         </StyledContentDetail>
     )

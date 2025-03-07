@@ -96,6 +96,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check", "/api/auth/email-verification/code", "/api/auth/email-verification/code/verify", "/api/auth/login").permitAll()
                         // GET 방식 /api/users는 인증 필요(유저 검색)
                         .requestMatchers(HttpMethod.GET, "/api/users").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
                         // POST 방식 /api/users는 인증 없이 허용 (회원가입)
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

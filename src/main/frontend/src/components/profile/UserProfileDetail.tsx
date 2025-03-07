@@ -107,6 +107,15 @@ const ProfileMenuIconWrapper = styled.div`
 
 const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
 
+    useEffect(() => {
+        if(searchUserProfileId > 0) {
+            console.log(`유저 정보 가져오기: ${searchUserProfileId}`)
+            // api 호출 함수 설정하기.
+        }
+
+    }, [searchUserProfileId]);
+
+
     return (
         // 전체 영역을 잡는 컴포넌트 -> 이름을 레이아웃으로 바꿔야하나?
 

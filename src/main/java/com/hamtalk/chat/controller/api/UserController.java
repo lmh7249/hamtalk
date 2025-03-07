@@ -1,8 +1,8 @@
 package com.hamtalk.chat.controller.api;
 
 import com.hamtalk.chat.model.request.UserSignupRequest;
-import com.hamtalk.chat.model.response.FriendResponse;
-import com.hamtalk.chat.model.response.UserProfileResponse;
+import com.hamtalk.chat.model.response.UserProfileByEmailResponse;
+import com.hamtalk.chat.model.response.UserProfileByIdResponse;
 import com.hamtalk.chat.service.UserService;
 import com.hamtalk.common.model.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,10 +43,18 @@ public class UserController {
     // TODO: @GetMapping("/email-check") -> 변경할때 함께 변경해보기.
     @GetMapping
     @Operation(summary = "이메일로 친구 조회", description = "이메일을 입력하면 해당 유저의 프로필 사진과 닉네임을 반환")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> getUserByEmail(@RequestParam String email) {
+    public ResponseEntity<ApiResponse<UserProfileByEmailResponse>> getUserByEmail(@RequestParam String email) {
         log.info("이메일로 친구 조회 요청: {}", email);
         return ResponseEntity.ok(ApiResponse.ok(userService.getUserByEmail(email)));
     }
+
+
+    @GetMapping("/{id}")
+    @Operation(summary = "유저 id값으로 유저 프로필 조회", description = "id 입력 시, 해당 유저의 프로필 사진, 닉네임, 이메일, 상태메시지 반환")
+    public ResponseEntity<ApiResponse<UserProfileByIdResponse>> getUserProfileById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(userService.getUserProfileById(id)));
+    }
+
 
 //    유저 정보 조회 (GET /api/users/{id})
 //    회원가입 (POST /api/users)

@@ -7,15 +7,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserProfileResponse {
+public class UserProfileByEmailResponse {
     private Long id;
     private String nickname;
-    private String profile_image_url;
+    private String profileImageUrl;
 
 
-    public UserProfileResponse(User user, UserProfile userProfile) {
+    public UserProfileByEmailResponse(User user, UserProfile userProfile) {
         this.id = user.getId();
         this.nickname = userProfile.getNickname();
-        this.profile_image_url = userProfile.getProfileImageUrl();
+        this.profileImageUrl = userProfile.getProfileImageUrl();
     }
 }

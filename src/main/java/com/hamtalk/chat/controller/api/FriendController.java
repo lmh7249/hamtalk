@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,11 +25,11 @@ public class FriendController {
 
     @GetMapping
     @Operation(summary = "친구 목록 조회", description = "friendStatusIds 값에 따른 친구 목록 조회(1,2: 내 친구, 3: 삭제한 친구, 4: 차단한 친구")
-    public ResponseEntity<ApiResponse<List<FriendResponse>>> getFriendList(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ApiResponse<List<FriendResponse>>> getAllFriends(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         log.info("커스텀유저디테일 객체 생성 완료? : {}", customUserDetails.toString());
         log.info("유저 id : {}", customUserDetails.getId());
         log.info("유저 이메일 : {}", customUserDetails.getUsername());
-        return ResponseEntity.ok(friendService.getFriendList(customUserDetails.getId()));
+        return ResponseEntity.ok(friendService.getAllFriends(customUserDetails.getId()));
     }
 
     @PostMapping("/{toUserId}")
@@ -40,4 +39,11 @@ public class FriendController {
         log.info("친구 추가 요청 - from: {}, to: {}", customUserDetails.getId(), toUserId);
         return ResponseEntity.ok(ApiResponse.ok(friendService.addFriend(customUserDetails.getId(), toUserId)));
     }
+
+    //TODO: customUserDetails.getId() -> NullPointerException 예외 처리 필요
+    @GetMapping("/{toUserId}")
+    @Operation(summary = "단일 친구 조회", description = "toUserId를 가진 사용자와 로그인 사용자가 친구인지 확인합니다.")
+    public ResponseEntity<ApiResponse<Boolean>> checkFriendship(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long toUserId) {
+        return ResponseEntity.ok(ApiResponse.ok(friendService.isFriend(customUserDetails.getId(), toUserId)));
+    };
 }

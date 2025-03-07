@@ -4,8 +4,9 @@ import TestImage from "../../assets/images/UserDefaultImage.png";
 import BackGroundImageSample from "../../assets/images/background.jpg";
 import ModalButton from "../common/ModalButton";
 import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {UserProfileDetailProps} from "../chat/ContentDetail";
+import {getUserProfileById} from "../../services/user-service";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -104,17 +105,32 @@ const ProfileMenuIconWrapper = styled.div`
     justify-content: flex-end;
     margin-top: 20px;
 `;
+interface searchUserProfileData {
+    id: number;
+    email: string;
+    profileImageUrl: string;
+    nickname: string;
+    statusMessage: string;
+}
 
 const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
+    const [searchUserProfile, setSearchUserProfile] = useState<searchUserProfileData>();
+    const [isFriend, setIsFriend] = useState<boolean>(false);
 
     useEffect(() => {
         if(searchUserProfileId > 0) {
-            console.log(`유저 정보 가져오기: ${searchUserProfileId}`)
+            console.log(`유저 정보 가져오기: ${searchUserProfileId}`);
             // api 호출 함수 설정하기.
+            const fetchUserProfile  = async () => {
+               const profileData = await getUserProfileById(searchUserProfileId);
+                setSearchUserProfile(profileData);
+            }
+
+            //TODO: 추후, Promise.All 학습 후, 적용해보기.
+           fetchUserProfile();
+            console.log("검색한 유저의 프로필 데이터: ", searchUserProfile);
         }
-
     }, [searchUserProfileId]);
-
 
     return (
         // 전체 영역을 잡는 컴포넌트 -> 이름을 레이아웃으로 바꿔야하나?
@@ -130,19 +146,19 @@ const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
                     </ProfileMenuIconButton>
                 </ProfileMenuIconWrapper>
                 <StyledAbsoluteUserPosition>
-                    <UserProfileImage src={ProfileCat}/>
+                    <UserProfileImage src={searchUserProfile?.profileImageUrl}/>
                     <StyledUserInfo>
                         <UserNameAndEmailWrapper>
-                            <StyledNickName>임성규 + {searchUserProfileId} </StyledNickName>
+                            <StyledNickName>{searchUserProfile?.nickname} </StyledNickName>
                             ｜
-                            <StyledEmail> lss@naver.com</StyledEmail>
+                            <StyledEmail>{searchUserProfile?.email}</StyledEmail>
                         </UserNameAndEmailWrapper>
-                        <StyledStateMessage>안녕하세요! 연락하지마세요!</StyledStateMessage>
+                        <StyledStateMessage>{searchUserProfile?.statusMessage}</StyledStateMessage>
                     </StyledUserInfo>
                     <ButtonWrapper>
-                        <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"}>
+                        {!isFriend && <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"}>
                             친구 추가
-                        </ModalButton>
+                        </ModalButton>}
                         <ModalButton backgroundColor={"#2C2D31"} color={"white"} hoverColor={"#3A3B40"}>
                             채팅하기
                         </ModalButton>

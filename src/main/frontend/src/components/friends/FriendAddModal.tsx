@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import styled from "styled-components";
 import BaseModal from "../common/BaseModal";
 import ModalButton from "../common/ModalButton";
-import { getUserProfile } from "../../services/user-service";
+import { getUserProfileByEmail } from "../../services/user-service";
 import { isValidEmail } from "../../utils/signupValidation";
 import toast from "react-hot-toast";
 import {addFriend} from "../../services/friend-service";
@@ -153,7 +153,7 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose, searchUserP
                 return;
             }
             try {
-                const userProfile = await getUserProfile(email);
+                const userProfile = await getUserProfileByEmail(email);
                 if (userProfile.data) {
                     setSearchResultState("FOUND");
                     setUserProfileData(userProfile.data);

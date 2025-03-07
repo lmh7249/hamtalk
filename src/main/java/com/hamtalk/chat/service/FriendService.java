@@ -1,7 +1,6 @@
 package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.domain.entity.Friend;
-import com.hamtalk.chat.domain.entity.User;
 import com.hamtalk.chat.model.response.FriendResponse;
 import com.hamtalk.chat.repository.FriendRepository;
 import com.hamtalk.chat.repository.UserRepository;
@@ -11,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +18,7 @@ public class FriendService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public ApiResponse<List<FriendResponse>> getFriendList(Long userId) {
+    public ApiResponse<List<FriendResponse>> getAllFriends(Long userId) {
         // 3. 정상적인 상태 값만 포함하여 조회
         List<FriendResponse> friends = friendRepository.findFriendsWithProfile(userId);
         return ApiResponse.ok(friends);
@@ -46,5 +43,11 @@ public class FriendService {
         friendRepository.save(new Friend(fromUserId, toUserId));
         return "친구 추가에 성공하였습니다.";
     }
+
+    @Transactional(readOnly = true)
+    public Boolean isFriend(Long fromUserId, Long toUserId) {
+        return friendRepository.existsByFromUserIdAndToUserId(fromUserId, toUserId);
+    }
+
 
 }

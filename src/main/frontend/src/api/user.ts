@@ -35,9 +35,21 @@ export const getMyProfileApi = async () => {
     return response.json();
 }
 
-export const getUserProfileApi = async (email: string) => {
+export const getUserProfileByEmailApi = async (email: string) => {
     const accessToken = localStorage.getItem("accessToken");
     const response = await fetch(`api/users?email=${email}`, {
+        method: "get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+    });
+    return response.json();
+}
+
+export const getUserProfileByIdApi = async (id: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`api/users/${id}`, {
         method: "get",
         headers: {
             "Content-Type": "application/json",

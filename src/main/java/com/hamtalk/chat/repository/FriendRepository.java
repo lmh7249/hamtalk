@@ -18,4 +18,5 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             "where f.fromUserId = :fromUserId")
     List<FriendResponse> findFriendsWithProfile(@Param("fromUserId") Long fromUserId);
     boolean existsByFromUserIdAndToUserId(Long fromUserId, Long toUserId);
+
 }

@@ -6,6 +6,9 @@ import { getUserProfile } from "../../services/user-service";
 import { isValidEmail } from "../../utils/signupValidation";
 import toast from "react-hot-toast";
 import {addFriend} from "../../services/friend-service";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../store";
+import {setUserProfile} from "../../store/contentDetailSlice";
 
 const Title = styled.h3`
     margin-top: 0;
@@ -68,15 +71,16 @@ interface UserProfileDataProps {
 interface UserProfileProps {
     userProfileData: UserProfileDataProps;
     handleAddFriend: (toUserId: number) => Promise<void>;
+    handleViewProfile: (userId: number) => void;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ userProfileData, handleAddFriend }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ userProfileData, handleAddFriend, handleViewProfile }) => {
     return (
         <>
             <StyledProfileImage src={userProfileData.profile_image_url} alt="유저 프로필 사진" />
             <StyledUserNickName>{userProfileData.nickname}</StyledUserNickName>
             <ButtonWrapper>
-                <ModalButton backgroundColor={"#d3d3d3"} hoverColor={"#b0b0b0"} color={"black"}>
+                <ModalButton backgroundColor={"#d3d3d3"} hoverColor={"#b0b0b0"} color={"black"} onClick={() => handleViewProfile(userProfileData.id)}>
                     프로필 보기
                 </ModalButton>
                 <ModalButton
@@ -108,9 +112,10 @@ interface SearchResultProps {
     searchResultState: SearchResultStateProps;
     userProfileData: UserProfileDataProps | null;
     handleAddFriend: (toUserId: number) => Promise<void>;
+    handleViewProfile: (userId: number) => void;
 }
 
-const SearchResult: React.FC<SearchResultProps> = ({ searchResultState, userProfileData, handleAddFriend }) => {
+const SearchResult: React.FC<SearchResultProps> = ({ searchResultState, userProfileData, handleAddFriend, handleViewProfile }) => {
     return (
         <>
             {searchResultState === "INIT" && null}
@@ -123,7 +128,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchResultState, userProf
             )}
             {searchResultState === "FOUND" && userProfileData && (
                 <StyledFindUserProfile>
-                    <UserProfile userProfileData={userProfileData} handleAddFriend={handleAddFriend} />
+                    <UserProfile userProfileData={userProfileData} handleAddFriend={handleAddFriend} handleViewProfile={handleViewProfile} />
                 </StyledFindUserProfile>
             )}
         </>
@@ -132,12 +137,14 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchResultState, userProf
 
 interface FriendAddModalProps {
     modalClose: () => void;
+    searchUserProfileId: (userId: number) => void;
 }
 
-const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
+const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose, searchUserProfileId }) => {
     const [email, setEmail] = useState<string>("");
     const [searchResultState, setSearchResultState] = useState<SearchResultStateProps>("INIT");
     const [userProfileData, setUserProfileData] = useState<UserProfileDataProps | null>(null);
+    const dispatch = useDispatch();
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -175,6 +182,16 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
         }
     }, [modalClose]);
 
+    // 유저 프로필 보기 함수.
+    const handleViewProfile = (userId: number) => {
+        searchUserProfileId(userId);
+        console.log("유저 프로필 보기 핸들 실행!", userId);
+        console.log(userProfileData);
+        if(!userProfileData) return;
+        dispatch(setUserProfile({userId: userId}));
+        modalClose();
+    }
+
     return (
         <BaseModal width="350px" height="350px" modalClose={modalClose}>
             <Title>친구 추가</Title>
@@ -187,7 +204,7 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
                 onChange={handleChange}
                 onKeyUp={handleKeyPress}
             />
-            <SearchResult searchResultState={searchResultState} userProfileData={userProfileData} handleAddFriend={handleAddFriend} />
+            <SearchResult searchResultState={searchResultState} userProfileData={userProfileData} handleAddFriend={handleAddFriend} handleViewProfile = {handleViewProfile}/>
         </BaseModal>
     );
 };

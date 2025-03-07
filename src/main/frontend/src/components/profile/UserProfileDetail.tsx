@@ -4,6 +4,8 @@ import TestImage from "../../assets/images/UserDefaultImage.png";
 import BackGroundImageSample from "../../assets/images/background.jpg";
 import ModalButton from "../common/ModalButton";
 import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
+import {useEffect} from "react";
+import {UserProfileDetailProps} from "../chat/ContentDetail";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -73,42 +75,41 @@ const ButtonWrapper = styled.div`
     justify-content: flex-end;
     margin-top: 20px;
     margin-bottom: 20px;
-
-
-`
+`;
 const StyledAbsoluteUserPosition = styled.div`
     position: absolute;
     transform: translateY(-80px);
     left: 30px;
-`
+`;
 
 const UserNameAndEmailWrapper = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-`
+`;
 const ProfileMenuIconImage = styled.img`
     width: 20px;
     height: 20px;
-`
+`;
 
 const ProfileMenuIconButton = styled.button`
     border: none;
     background-color: transparent;
     cursor: pointer;
-`
+`;
 
 const ProfileMenuIconWrapper = styled.div`
     display: flex;
     width: 99%;
     justify-content: flex-end;
     margin-top: 20px;
-    
-`
+`;
 
-const UserProfileDetail = () => {
+const UserProfileDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
+
     return (
         // 전체 영역을 잡는 컴포넌트 -> 이름을 레이아웃으로 바꿔야하나?
+
         <StyledUserProfileDetail>
             <StyledBackGroundImageWrapper>
                 <BackGroundImage src={BackGroundImageSample}/>
@@ -123,7 +124,7 @@ const UserProfileDetail = () => {
                     <UserProfileImage src={ProfileCat}/>
                     <StyledUserInfo>
                         <UserNameAndEmailWrapper>
-                            <StyledNickName>임성규 </StyledNickName>
+                            <StyledNickName>임성규 + {searchUserProfileId} </StyledNickName>
                             ｜
                             <StyledEmail> lss@naver.com</StyledEmail>
                         </UserNameAndEmailWrapper>

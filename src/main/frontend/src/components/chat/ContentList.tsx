@@ -7,9 +7,9 @@ import ChattingRoomList from "../chatroom/ChatRoomList";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {MenuState, MenuType} from "../../store/menuSlice";
-import {OpenModalProps} from "./MainContent";
 import {useEffect, useState} from "react";
 import {getMyFriendList} from "../../services/friend-service";
+import {ModalType} from "../../containers/ChatMainContainer";
 
 const StyledContentList = styled.div`
     min-width: 350px;
@@ -41,21 +41,21 @@ const ContentListTopState = ({
         key: MenuType;
         label: string;
     };
-    openModal: OpenModalProps
+    openModal: (type: ModalType) => void;
 }) => {
 
     return (
         <StyledContentListTopState>
             <h3>{selectedMenu.label}</h3>
             {selectedMenu.key === "friends" &&
-            <IconButton onClick={() => openModal("friend")}>
-                <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
-            </IconButton>
+                <IconButton onClick={() => openModal("friend")}>
+                    <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
+                </IconButton>
             }
             {selectedMenu.key === "chats" &&
-            <IconButton onClick={() => openModal("chat")}>
-                <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>
-            </IconButton>
+                <IconButton onClick={() => openModal("chat")}>
+                    <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>
+                </IconButton>
             }
         </StyledContentListTopState>
     )
@@ -80,7 +80,12 @@ export interface Friend {
     statusMessage: string
 }
 
-const ContentList = ({openModal}: { openModal: OpenModalProps }) => {
+interface ContentListProps {
+    openModal: (type: ModalType) => void;
+}
+
+
+const ContentList = ({openModal}: ContentListProps) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [chatRooms, setChatRooms] = useState();

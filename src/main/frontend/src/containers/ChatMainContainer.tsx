@@ -16,6 +16,8 @@ export type ModalType = null | "friend" | "chat";
 
 const ChatMainContainer = () => {
     const[modalType, setModalType] = useState<ModalType>(null);
+    const [searchUserId, setSearchUserId] = useState(0);
+
     const openModal = (type: ModalType) => {
         setModalType(type);
     }
@@ -24,14 +26,18 @@ const ChatMainContainer = () => {
         setModalType(null);
     };
 
+    const searchUserProfileId = (userId:number) => {
+        setSearchUserId(userId);
+    }
+
     return (
         <>
             <LeftSideBar>
             </LeftSideBar>
             <MainContentWrapper>
-                <MainContent openModal = {openModal}/>
+                <MainContent openModal = {openModal} searchUserProfileId={searchUserId}/>
             </MainContentWrapper>
-            {modalType === "friend" && <FriendAddModal modalClose ={closeModal}/>}
+            {modalType === "friend" && <FriendAddModal modalClose ={closeModal} searchUserProfileId ={searchUserProfileId}/>}
             {modalType === "chat" && <ChatRoomAddModal modalClose ={closeModal}/>}
         </>
     )

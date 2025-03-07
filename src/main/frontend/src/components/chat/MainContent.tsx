@@ -9,15 +9,18 @@ const StyledMainContent = styled.div`
     height: 100vh;
 `;
 
-export type OpenModalProps = (modalType:ModalType) => void;
+export interface OpenModalProps {
+    openModal: (type: ModalType) => void;
+    searchUserProfileId: number;
+}
 
-const MainContent = ({ openModal }: { openModal: OpenModalProps }) => {
-   return(
-       <StyledMainContent>
-            <ContentList openModal = {openModal}/>
-            <ContentDetail/>
-       </StyledMainContent>
-   )
+const MainContent = ({openModal, searchUserProfileId}: OpenModalProps) => {
+    return (
+        <StyledMainContent>
+            <ContentList openModal={openModal}/>
+            <ContentDetail searchUserProfileId ={searchUserProfileId}/>
+        </StyledMainContent>
+    )
 }
 
 export default MainContent

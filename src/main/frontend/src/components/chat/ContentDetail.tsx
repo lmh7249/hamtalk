@@ -3,6 +3,9 @@ import EmptyContentDetail from "./EmptyContentDetail";
 import UserProfileDetail from "../profile/UserProfileDetail";
 import ChatRoomItem from "../chatroom/ChatRoomItem";
 import ChatRoomDetail from "../chatroom/ChatRoomDetail";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
+import {OpenModalProps} from "./MainContent";
 
 const StyledContentDetail = styled.div`
     flex-grow: 1;
@@ -10,12 +13,19 @@ const StyledContentDetail = styled.div`
     
 `;
 
-const ContentDetail = () => {
+export interface UserProfileDetailProps {
+    searchUserProfileId: number;
+}
+
+const ContentDetail = ({searchUserProfileId}: UserProfileDetailProps) => {
+   const contentDetailType = useSelector((state: RootState) => state.detailContent.type);
+
     return (
         <StyledContentDetail>
-            {/*<EmptyContentDetail/>*/}
-            <UserProfileDetail/>
-            {/*<ChatRoomDetail/>*/}
+            {/*기본 값 = empty */}
+            {contentDetailType === "empty" && <EmptyContentDetail/>}
+            {contentDetailType === "userProfile" && <UserProfileDetail searchUserProfileId = {searchUserProfileId}/>}
+            {contentDetailType === "chatRoom" && <ChatRoomDetail/>}
         </StyledContentDetail>
     )
 }

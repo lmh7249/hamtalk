@@ -9,26 +9,30 @@ const MainContentWrapper = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-`
+`;
+
+//TODO: 모달 추가 시, 여기에 모달 타입명을 추가
+export type ModalType = null | "friend" | "chat";
+
 const ChatMainContainer = () => {
-    const[isModalOpen, setIsModalOpen] = useState(false);
-    const modalOpen = () => {
-        setIsModalOpen(true);
+    const[modalType, setModalType] = useState<ModalType>(null);
+    const openModal = (type: ModalType) => {
+        setModalType(type);
     }
 
-    const modalClose = () => {
-        setIsModalOpen(false);
+    const closeModal = () => {
+        setModalType(null);
     };
+
     return (
         <>
             <LeftSideBar>
             </LeftSideBar>
             <MainContentWrapper>
-                <MainContent modalOpen = {modalOpen}>
-                </MainContent>
+                <MainContent openModal = {openModal}/>
             </MainContentWrapper>
-            {isModalOpen && <FriendAddModal modalClose ={modalClose}/>}
-            {/*{isModalOpen && <ChatRoomAddModal modalClose ={modalClose}/>}*/}
+            {modalType === "friend" && <FriendAddModal modalClose ={closeModal}/>}
+            {modalType === "chat" && <ChatRoomAddModal modalClose ={closeModal}/>}
         </>
     )
 }

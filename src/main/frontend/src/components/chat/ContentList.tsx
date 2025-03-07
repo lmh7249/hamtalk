@@ -7,7 +7,7 @@ import ChattingRoomList from "../chatroom/ChatRoomList";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {MenuState, MenuType} from "../../store/menuSlice";
-import {modalOpenProps} from "./MainContent";
+import {OpenModalProps} from "./MainContent";
 import {useEffect, useState} from "react";
 import {getMyFriendList} from "../../services/friend-service";
 
@@ -35,26 +35,29 @@ const IconButton = styled.button`
 
 const ContentListTopState = ({
                                  selectedMenu,
-                                 modalOpen
+                                 openModal
                              }: {
     selectedMenu: {
         key: MenuType;
         label: string;
     };
-    modalOpen: modalOpenProps
+    openModal: OpenModalProps
 }) => {
 
     return (
         <StyledContentListTopState>
             <h3>{selectedMenu.label}</h3>
-            <IconButton onClick={() => {
-                modalOpen();
-            }}>
-                {selectedMenu.key === "friends" && <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>}
-                {selectedMenu.key === "chats" && <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>}
+            {selectedMenu.key === "friends" &&
+            <IconButton onClick={() => openModal("friend")}>
+                <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
             </IconButton>
+            }
+            {selectedMenu.key === "chats" &&
+            <IconButton onClick={() => openModal("chat")}>
+                <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>
+            </IconButton>
+            }
         </StyledContentListTopState>
-
     )
 }
 
@@ -77,7 +80,7 @@ export interface Friend {
     statusMessage: string
 }
 
-const ContentList = ({modalOpen}: { modalOpen: modalOpenProps }) => {
+const ContentList = ({openModal}: { openModal: OpenModalProps }) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [chatRooms, setChatRooms] = useState();
@@ -103,7 +106,7 @@ const ContentList = ({modalOpen}: { modalOpen: modalOpenProps }) => {
 
     return (
         <StyledContentList>
-            <ContentListTopState selectedMenu={selectedMenu} modalOpen={modalOpen}/>
+            <ContentListTopState selectedMenu={selectedMenu} openModal={openModal}/>
             {selectedMenu.key === "friends" && <SearchInput type="text" placeholder="이름 또는 이메일을 입력하세요."/>}
             {selectedMenu.key === "chats" && <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요."/>}
             {selectedMenu.key === "friends" && <div>친구 {friends.length} </div>}

@@ -64,18 +64,18 @@ const StyledBubble = styled.div`
     background-color: #FFFFFF;
     color: #222222;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`
+`;
 
 const StyledMessageInfo = styled.div`
     display: flex;
     flex-direction: column;
-`
+`;
 
 const StyledTime = styled.span`
     font-size: 12px;            // 글자 크기
     color: #8e8e93;             // 회색 (가독성 좋은 색)
     font-weight: 500;           // 중간 굵기
-`
+`;
 
 const StyledUnreadCount = styled.span`
     color: #444444;             // 글자색 (흰색)
@@ -84,14 +84,13 @@ const StyledUnreadCount = styled.span`
     padding: 2px 6px;           // 내부 여백
     border-radius: 10px;        // 동그란 모양
     text-align: right;         // 중앙 정렬
-`
+`;
 
 const StyledUsername = styled.span`
     font-size: 14px;
     font-weight: bold;
     color: #444444;
-
-`
+`;
 
 const ChatDateDivider = () => {
     return (

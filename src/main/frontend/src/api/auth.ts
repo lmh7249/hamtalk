@@ -1,5 +1,8 @@
 import {userLogin} from "../services/auth-service";
 
+
+
+
 export const sendEmailVerificationApi = async (email : string) => {
     try {
         const response = await fetch("/api/auth/email-verification/code", {
@@ -49,36 +52,50 @@ export const verifyEmailVerificationCodeApi = async (email : string, verificatio
     }
 }
 
-export const userLoginApi = async (email:string, password:string) => {
+interface LoginResponse {
+    accessToken: string;
+    loginUserData: {
+        id: number;
+        email: string;
+        roleId: number;
+    };
+}
+
+export interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+export const userLoginApi = async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-        const response =await fetch("/login", {
+        const response =await fetch("/api/auth/login", {
             method:"post",
             headers: {
                "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                "email": email,
-                "password": password,
-            })
+            body: JSON.stringify(credentials),
         })
-        console.log("response 값은?:  ", response);
-        if (!response.ok) {  // 응답 상태가 200-299 범위가 아닐 때
-            throw new Error("로그인에 실패했습니다.");
-        }
+        const loginUserData = await response.json();
         // 헤더에서 access 토큰 가져오기
-        const accessToken = response.headers.get("access");
-        if (!accessToken) {
+        const bearerToken = response.headers.get("Authorization");
+
+        if (!bearerToken || !bearerToken.toLowerCase().startsWith("bearer ")) {
             throw new Error("Access Token이 응답 헤더에 포함되지 않았습니다.");
         }
-        return accessToken
+
+        // "Bearer " 부분 제거 후 순수한 토큰만 추출
+        const accessToken = bearerToken.split(" ")[1];
+
+        return {accessToken, loginUserData};
     } catch(error) {
         console.log("아이디 혹은 비밀번호를 확인해주세요.");
+        throw error;
     }
 }
 
 export const userLogoutApi = async () => {
     try {
-        const response = await fetch("/logout", {
+        const response = await fetch("/api/auth/logout", {
             method: "post",
             credentials: "include",
         })

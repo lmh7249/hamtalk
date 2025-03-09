@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -92,16 +93,29 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/static/**"
                         ).permitAll()
-                        .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check", "/api/users", "/api/auth/email-verification/code", "/api/auth/email-verification/code/verify").permitAll()
+                        .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check", "/api/auth/email-verification/code", "/api/auth/email-verification/code/verify", "/api/auth/login").permitAll()
+                        // GET 방식 /api/users는 인증 필요(유저 검색)
+                        .requestMatchers(HttpMethod.GET, "/api/users").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
+                        // POST 방식 /api/users는 인증 없이 허용 (회원가입)
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/auth/reissue").permitAll()
+                        .requestMatchers("/api/auth/refresh").permitAll()
                         // 나머지 모든 요청은 React 라우팅으로 처리되도록 허용
                         .anyRequest().permitAll()
                 );
         http
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
-        http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, jwtProperties, redisService), UsernamePasswordAuthenticationFilter.class);
+        LoginFilter loginFilter = new LoginFilter(
+                authenticationManager(authenticationConfiguration),
+                jwtUtil,
+                jwtProperties,
+                redisService
+        );
+        loginFilter.setFilterProcessesUrl("/api/auth/login");  // URL 설정
+
+// 설정된 필터를 추가
+        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisService), LogoutFilter.class);
 

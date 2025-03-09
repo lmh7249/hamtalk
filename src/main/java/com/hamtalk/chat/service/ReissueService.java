@@ -48,15 +48,16 @@ public class ReissueService {
         if (!category.equals("refresh")) {
             throw new RuntimeException("카테고리명이 refresh가 아닙니다.");
         }
+        Long userId = jwtUtil.getUserId(refreshToken);
 
         // 5. 새 토큰 발급
-        int authorityId = jwtUtil.getAuthorityId(refreshToken);
-        String newAccessToken = jwtUtil.createJwt("access", email, authorityId, jwtProperties.getAccessTtl());
-        String newRefreshToken = jwtUtil.createJwt("refresh", email, authorityId, jwtProperties.getRefreshTtl());
+        int authorityId = jwtUtil.getRoleId(refreshToken);
+        String newAccessToken = jwtUtil.createJwt("access", userId, email, authorityId, jwtProperties.getAccessTtl());
+        String newRefreshToken = jwtUtil.createJwt("refresh", userId, email, authorityId, jwtProperties.getRefreshTtl());
 
         // 6. Redis 업데이트 및 응답 설정
         redisService.saveRefreshToken(email, newRefreshToken);
-        response.setHeader("access", newAccessToken);
+        response.setHeader("access", "Bearer " + newAccessToken);
         addRefreshTokenCookie(response, newRefreshToken);
 
     }

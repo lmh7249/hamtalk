@@ -19,3 +19,42 @@ export const checkDuplicateEmailApi = async (email: string) => {
         return false;
     }
 };
+
+export const getMyProfileApi = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch("api/profiles/me", {
+        method: "get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+    });
+    if (!response.ok) {
+        throw new Error("프로필 받아오기 실패")
+    }
+    return response.json();
+}
+
+export const getUserProfileByEmailApi = async (email: string) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`api/users?email=${email}`, {
+        method: "get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+    });
+    return response.json();
+}
+
+export const getUserProfileByIdApi = async (id: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`api/users/${id}`, {
+        method: "get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+    });
+    return response.json();
+}

@@ -3,6 +3,7 @@ package com.hamtalk.chat.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hamtalk.chat.config.jwt.JwtProperties;
 import com.hamtalk.chat.model.request.LoginRequest;
+import com.hamtalk.chat.model.response.LoginResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.RedisService;
 import jakarta.servlet.FilterChain;
@@ -16,6 +17,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import java.io.IOException;
 
 @RequiredArgsConstructor
@@ -50,20 +52,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
         log.info("로그인 성공! JWT 토큰 생성 중 ......... ");
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = customUserDetails.getId();
         String email = customUserDetails.getUsername();
-        int authorityId = customUserDetails.getAuthorityId();
+        int roleId = customUserDetails.getRoleId();
         //토큰 생성
-        String accessToken = jwtUtil.createJwt("access", email, authorityId, jwtProperties.getAccessTtl());
-        String refreshToken = jwtUtil.createJwt("refresh", email, authorityId, jwtProperties.getRefreshTtl());
+
+        String accessToken = jwtUtil.createJwt("access", userId, email, roleId, jwtProperties.getAccessTtl());
+        String refreshToken = jwtUtil.createJwt("refresh", userId, email, roleId, jwtProperties.getRefreshTtl());
         // 레디스에 리프레쉬 토큰 저장
         redisService.saveRefreshToken(email, refreshToken);
+
         //응답 설정
-        response.setHeader("access", accessToken);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
         response.setStatus(HttpStatus.OK.value());
+        // 로그인 시, 아래 데이터를 body에 전달.
+        new ObjectMapper().writeValue(response.getOutputStream(), new LoginResponse(userId, email, roleId));
+
     }
 
     //로그인 실패시 실행할 메소드
@@ -91,7 +101,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24*60*60);
+        cookie.setMaxAge(24 * 60 * 60);
         cookie.setPath("/"); // 적용 패스
         cookie.setHttpOnly(true);
         log.info("로그인 필터에서 쿠키를 생성하는 중... {}", cookie.getValue());

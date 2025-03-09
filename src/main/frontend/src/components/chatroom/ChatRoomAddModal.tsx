@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import BaseModal from "../common/BaseModal";
 import ModalButton from "../common/ModalButton";
+import {getFilteredFriendListProps} from "../../containers/ChatMainContainer";
 
 const Title = styled.h3`
     margin-top: 0;
 
 `;
-
 
 const SearchInput = styled.input`
     border-radius: 20px;
@@ -24,7 +24,7 @@ const FriendListContainer = styled.div`
     margin-top: 10px;
     gap: 10px;
     overflow-y: auto;
-    max-height: 450px;  
+    max-height: 450px;
 `;
 
 const FriendCount = styled.p`
@@ -43,7 +43,7 @@ const FriendItem = styled.li`
     align-items: center;
     cursor: pointer;
     margin: 0 10px;
-    
+
 
     &:hover {
         background-color: #D0D3D5;
@@ -97,9 +97,10 @@ const ModalButtonWrapper = styled.div`
 
 type ChattingRoomAddModalProps = {
     modalClose: () => void;
+    friendList: getFilteredFriendListProps[];
 };
 
-const ChatRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
+const ChatRoomAddModal = ({modalClose, friendList}: ChattingRoomAddModalProps) => {
     return (
         <BaseModal width={"400px"} height={"600px"} modalClose={modalClose}>
             <Title>채팅방 생성</Title>
@@ -107,19 +108,21 @@ const ChatRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
             <FriendListContainer>
                 <FriendCount>
                     친구
-                    <span> 20</span>
+                    <span> {friendList.length}</span>
                 </FriendCount>
                 <FriendWrapper>
-                    <FriendItem>
-                        <StyledFriendItemLabel>
-                            <ProfileImage src="user_image.png" alt="유저 프로필 이미지"/>
-                            <StyledNickNameAndEmail>
-                                <FriendNikName>임성규</FriendNikName>
-                                <FriendEmail>im@domain.com</FriendEmail>
-                            </StyledNickNameAndEmail>
-                            <input type="radio" name="friend"/>
-                        </StyledFriendItemLabel>
-                    </FriendItem>
+                    {friendList.map((friend) => (
+                        <FriendItem key={friend.toUserId}>
+                            <StyledFriendItemLabel>
+                                <ProfileImage src={friend.profileImageUrl} alt="유저 프로필 이미지"/>
+                                <StyledNickNameAndEmail>
+                                    <FriendNikName>{friend.nickname}</FriendNikName>
+                                    <FriendEmail>{friend.email}</FriendEmail>
+                                </StyledNickNameAndEmail>
+                                <input type="radio" name="friend"/>
+                            </StyledFriendItemLabel>
+                        </FriendItem>
+                    ))}
                 </FriendWrapper>
             </FriendListContainer>
             <ModalButtonWrapper>

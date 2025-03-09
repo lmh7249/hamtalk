@@ -6,14 +6,12 @@ import com.hamtalk.chat.service.EmailService;
 import com.hamtalk.chat.model.request.EmailAuthRequest;
 import com.hamtalk.chat.service.ReissueService;
 import com.hamtalk.common.model.response.ApiResponse;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.Cookie;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "AuthController", description = "인증 관련 API")
 @RequestMapping("/api/auth")
 public class AuthController {
     private final EmailService emailService;
@@ -58,7 +57,8 @@ public class AuthController {
 //    로그아웃 (POST /api/auth/logout)
 //    액세스 토큰 재발급 (POST /api/auth/refresh)
 
-    @PostMapping("/reissue")
+    @PostMapping("/refresh")
+    @Operation(summary = "액세스 토큰 재발급", description = "액세스 토큰 만료 시, 리프레시 토큰을 통해 액세스 토큰을 재발급 합니다.")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
         reissueService.reissueTokens(request, response);
         return ResponseEntity.ok().build();

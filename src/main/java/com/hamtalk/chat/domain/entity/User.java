@@ -7,13 +7,13 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Entity
 @Getter
 @Setter
 @Builder
-@Table(name = "user")
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "user")
 public class User extends BaseEntity{
 
     @Column(name ="email")
@@ -33,11 +33,11 @@ public class User extends BaseEntity{
     private String gender;
     // M, F, O 형식으로 저장
 
-    @Column(name ="authority_id")
-    private int authorityId;
+    @Column(name ="role_id")
+    private int roleId;
     // 일반 유저: 3
 
-    @Column(name ="user_state_id")
-    private int userStateId;
+    @Column(name ="user_status_id")
+    private int userStatusId;
     // 활성화: 1
 }

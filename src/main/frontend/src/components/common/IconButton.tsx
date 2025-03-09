@@ -5,6 +5,7 @@ interface IconButtonProps {
     alt: string;
     bgColor: string;
     hoverBgColor: string;
+    onClick?: () => void;
 }
 
 interface StyledButtonProps {
@@ -30,9 +31,9 @@ const StyledIconImage = styled.img`
     align-items: center;
 `;
 
-const IconButton = ({iconName, alt, bgColor, hoverBgColor}: IconButtonProps) => {
+const IconButton = ({iconName, alt, bgColor, hoverBgColor, onClick}: IconButtonProps) => {
     return (
-        <StyledButton bgColor={bgColor} hoverBgColor={hoverBgColor}>
+        <StyledButton bgColor={bgColor} hoverBgColor={hoverBgColor} onClick={onClick}>
             <StyledIconImage src={iconName} alt={alt}/>
         </StyledButton>
     )

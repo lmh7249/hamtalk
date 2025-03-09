@@ -3,6 +3,8 @@ import ChatRoomCloseIcon from "../../assets/icons/close-icon.svg";
 import ChatRoomSearchIcon from "../../assets/icons/search.svg";
 import ChatRoomExitIcon from "../../assets/icons/exit.svg";
 import IconButton from "../common/IconButton";
+import {useDispatch} from "react-redux";
+import {setEmpty} from "../../store/contentDetailSlice";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -11,14 +13,14 @@ const StyledChatRoomHeaderWrapper = styled.div`
     background-color: white;
     width: 100%;
     height: 5%;
-`
+`;
 
 const StyledChatRoomParticipantItemWrapper = styled.div`
     //border: 1px solid green;
     display: flex;
     align-items: center;
     gap: 5px;
-`
+`;
 
 const ChatRoomParticipants = () => {
     return (
@@ -29,7 +31,7 @@ const ChatRoomParticipants = () => {
 const ParticipantProfileNickName = styled.span`
     font-weight: bold;
     font-size: 12px;
-`
+`;
 
 const ChatRoomParticipantItem = () => {
     return (
@@ -45,19 +47,27 @@ export const ParticipantProfileImage = styled.img`
     height: 30px;
     border-radius: 50%;
     border: 1px solid magenta;
-`
+`;
 
 const ChatRoomButtonWrapper = styled.div`
     display: flex;
     align-items: center;
-`
+`;
+
+
 
 const ChatRoomActions = () => {
+    let dispatch = useDispatch();
+
+    const handleClose = () => {
+        dispatch(setEmpty());
+    }
+
     return (
         <ChatRoomButtonWrapper>
             <IconButton iconName={ChatRoomSearchIcon} alt={"검색"} bgColor="transparent" hoverBgColor="#F2F2F2"/>
             <IconButton iconName={ChatRoomExitIcon} alt={"채팅방 나가기"} bgColor="transparent" hoverBgColor="#F2F2F2"/>
-            <IconButton iconName={ChatRoomCloseIcon} alt={"채팅방 닫기"} bgColor="transparent" hoverBgColor="#F2F2F2"/>
+            <IconButton iconName={ChatRoomCloseIcon} alt={"채팅방 닫기"} bgColor="transparent" hoverBgColor="#F2F2F2" onClick={handleClose}/>
         </ChatRoomButtonWrapper>
     )
 }

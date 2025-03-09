@@ -51,7 +51,6 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
     }
     const handleImageClick = (e: React.MouseEvent, userId: number) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
-        alert(userId);
         dispatch(setUserProfile({userId: userId}));
     }
 

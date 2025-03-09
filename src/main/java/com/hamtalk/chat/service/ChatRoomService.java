@@ -4,9 +4,11 @@ import com.hamtalk.chat.domain.entity.ChatRoom;
 import com.hamtalk.chat.domain.entity.ChatRoomParticipant;
 import com.hamtalk.chat.model.request.ChatRoomCreateRequest;
 import com.hamtalk.chat.model.request.ChatRoomParticipantCreateRequest;
+import com.hamtalk.chat.model.response.ChatRoomListResponse;
 import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
@@ -36,6 +39,13 @@ public class ChatRoomService {
         chatRoomParticipantRepository.saveAll(participants);
         // 3. 채팅 첫 메세지도 저장할듯 ? mongodb
         return chatRoom.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatRoomListResponse> findChatRoomsByUserId(Long userId) {
+        List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
+        log.info("db 반환 값: {}", chatRoomsList);
+        return chatRoomsList;
     }
 
 }

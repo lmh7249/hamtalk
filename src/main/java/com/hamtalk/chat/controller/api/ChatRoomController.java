@@ -1,6 +1,7 @@
 package com.hamtalk.chat.controller.api;
 
 import com.hamtalk.chat.model.request.ParticipantUserIdsRequest;
+import com.hamtalk.chat.model.response.ChatRoomListResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.ChatRoomService;
 import com.hamtalk.common.model.response.ApiResponse;
@@ -24,11 +25,12 @@ public class ChatRoomController {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.createChatRoom(customUserDetails.getId(), request.getUserIds())));
     }
 
-//    @GetMapping
-//    @Operation(summary = "채팅방 목록 조회", description = "로그인 한 유저가 속한 모든 채팅방을 조회합니다.")
-//    public ResponseEntity<ApiResponse<>> getChatRoomList() {
-//        return null;
-//    }
+    //TODO: 메세지도 함께 불러오기.
+    @GetMapping
+    @Operation(summary = "채팅방 목록 조회", description = "로그인 한 유저가 속한 모든 채팅방을 조회합니다.")
+    public ResponseEntity<ApiResponse<List<ChatRoomListResponse>>> getChatRoomList(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.findChatRoomsByUserId(customUserDetails.getId())));
+    }
 
     //    @GetMapping("/{id}")
 //    @Operation(summary = "특정 채팅방 조회", description = "특정 채팅방을 조회합니다.")

@@ -32,11 +32,12 @@ public class ChatRoomController {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.findChatRoomsByUserId(customUserDetails.getId())));
     }
 
-    //    @GetMapping("/{id}")
+    //    @GetMapping("/{chatRoomId}")
 //    @Operation(summary = "특정 채팅방 조회", description = "특정 채팅방을 조회합니다.")
 //    public ResponseEntity<ApiResponse<>> getChatRoomById() {
 //        return null;
 //    }
+
 //    @DeleteMapping("/{id}")
 //    @Operation(summary = "채팅방 삭제", description = "특정 채팅방을 삭제합니다.")
 //    public ResponseEntity<ApiResponse<>> getChatRoomList() {

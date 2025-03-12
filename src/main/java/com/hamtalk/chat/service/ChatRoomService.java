@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -43,9 +45,32 @@ public class ChatRoomService {
 
     @Transactional(readOnly = true)
     public List<ChatRoomListResponse> findChatRoomsByUserId(Long userId) {
+        // 1. DB 접근해서 로그인한 유저의 모든 채팅 상대 불러오기
         List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
-        log.info("db 반환 값: {}", chatRoomsList);
-        return chatRoomsList;
+
+        // 2. 채팅방 ID 기준으로 participants 리스트 묶기
+        Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
+
+        for (ChatRoomListResponse chatRoomResponse : chatRoomsList) {
+            // 채팅방 ID를 기준으로 데이터 그룹화
+            Long chatRoomId = chatRoomResponse.getChatRoomId();
+
+            // 채팅방 ID가 이미 맵에 존재하는 경우
+            if (chatRoomMap.containsKey(chatRoomId)) {
+                // 기존에 있던 채팅방에 현재 참여자를 추가
+                ChatRoomListResponse existingChatRoom = chatRoomMap.get(chatRoomId);
+                existingChatRoom.getParticipants().addAll(chatRoomResponse.getParticipants());
+            } else {
+                // 새로운 채팅방에 참여자 추가
+                chatRoomMap.put(chatRoomId, chatRoomResponse);
+            }
+        }
+
+        // 3. 결과값으로 반환할 데이터 리스트 생성
+        List<ChatRoomListResponse> result = new ArrayList<>(chatRoomMap.values());
+
+        log.info("DB 반환 값: {}", result);
+        return result;
     }
 
 }

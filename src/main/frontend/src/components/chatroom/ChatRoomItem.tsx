@@ -39,7 +39,7 @@ const MessageMetaInfo = styled.div`
     
 `
 
-const ParticipantName = styled.span`
+const ChatRoomName = styled.span`
     font-size: 16px;
     font-weight: bold;
     color: #333;
@@ -68,7 +68,7 @@ const UnreadCount = styled.span`
 `;
 
 interface ChattingRoomItemProps {
-    participants: string;
+    chatRoomName: string;
     profileImage: string;
     lastMessage: string;
     lastMessageTime: string;
@@ -77,7 +77,7 @@ interface ChattingRoomItemProps {
 }
 
 const ChatRoomItem = ({
-                              participants,
+                              chatRoomName,
                               profileImage,
                               lastMessage,
                               lastMessageTime,
@@ -88,7 +88,7 @@ const ChatRoomItem = ({
             <StyledImage src={profileImage} alt={"채팅방 이미지"}></StyledImage>
             <ChattingRoomInfoText>
                 <ChatMainInfo>
-                    <ParticipantName>{participants}</ParticipantName>
+                    <ChatRoomName>{chatRoomName}</ChatRoomName>
                     <LastMessage>{lastMessage}</LastMessage>
                 </ChatMainInfo>
                 <MessageMetaInfo>

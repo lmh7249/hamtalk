@@ -11,5 +11,4 @@ export const getMyChatRoomListApi = async () => {
         throw new Error("채팅방 목록 api 호출 실패")
     }
     return response.json();
-
 }

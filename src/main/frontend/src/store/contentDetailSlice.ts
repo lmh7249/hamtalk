@@ -8,6 +8,18 @@ interface ContentDetailState {
 
 }
 
+export interface ChatRoomPayload {
+    chatRoomId: number;
+    creatorId: number;
+    chatRoomName?: string | null;
+    friendId: number;
+}
+
+interface UserProfilePayload {
+    userId: number;
+    nickName: string;
+}
+
 const initialState : ContentDetailState = {
     type: "empty",
 };
@@ -24,7 +36,7 @@ const contentDetailSlice = createSlice({
             state.type = "userProfile";
             state.payload = action.payload;
         },
-        setChatRoom: (state, action: PayloadAction<{chatRoomId: number}>) => {
+        setChatRoom: (state, action: PayloadAction<ChatRoomPayload | UserProfilePayload>) => {
             state.type = "chatRoom";
             state.payload = action.payload;
         },

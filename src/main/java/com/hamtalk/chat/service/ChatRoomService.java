@@ -5,6 +5,7 @@ import com.hamtalk.chat.domain.entity.ChatRoomParticipant;
 import com.hamtalk.chat.model.request.ChatRoomCreateRequest;
 import com.hamtalk.chat.model.request.ChatRoomParticipantCreateRequest;
 import com.hamtalk.chat.model.response.ChatRoomListResponse;
+import com.hamtalk.chat.model.response.DirectChatRoomResponse;
 import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,17 @@ public class ChatRoomService {
 
         log.info("DB 반환 값: {}", result);
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public DirectChatRoomResponse findDirectChatRoom(Long myId, Long friendId) {
+        // TODO: 해당 유저가 존재하는지 확인
+        log.info("넘어 온 값 조회: {}, {}", myId, friendId);
+
+        DirectChatRoomResponse directChatRoomResponse = chatRoomRepository.findDirectChatRoom(myId, friendId).orElse(null);
+        log.info("객체에 저장된 값: {}", directChatRoomResponse);
+        // 채팅방이 없으면 null 반환, orElse -> 없을 경우 무엇을 반환할지.
+        return directChatRoomResponse;
     }
 
 }

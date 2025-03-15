@@ -9,7 +9,7 @@ const SideBar = styled.div`
     background-color: #2C2D31;
     color: white;
     align-items: center;
-`
+`;
 
 const LeftSideBar = () => {
     return (

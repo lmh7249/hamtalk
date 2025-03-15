@@ -97,7 +97,6 @@ export interface ChatRoom {
     participants: Participant[];  // participants 배열 추가
 }
 
-
 const ContentList = ({openModal}: ContentListProps) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const [friends, setFriends] = useState<Friend[]>([]);
@@ -131,7 +130,7 @@ const ContentList = ({openModal}: ContentListProps) => {
             <ContentListTopState selectedMenu={selectedMenu} openModal={openModal}/>
             {selectedMenu.key === "friends" && <SearchInput type="text" placeholder="이름 또는 이메일을 입력하세요."/>}
             {selectedMenu.key === "chats" && <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요."/>}
-            {selectedMenu.key === "friends" && <div>친구 {friends.length} </div>}
+            {selectedMenu.key === "friends" && <div> 친구 {friends.length} </div>}
             {selectedMenu.key === "chats" && <div> 채팅방 {chatRooms.length}</div>}
             {selectedMenu.key === "friends" && <FriendList friends={friends}/>}
             {selectedMenu.key === "chats" && <ChattingRoomList chatRooms = {chatRooms}/>}

@@ -4,7 +4,9 @@ import UserInfoText from "./UserInfoText";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
+import {ChatRoomPayload, setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
+import {findDirectChatRoomApi} from "../../api/chat";
+import {findDirectChatRoom} from "../../services/chat-service";
 
 const StyledFriendProfile = styled.div`
     display: flex;
@@ -44,18 +46,30 @@ interface FriendProfileProps {
 const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}: FriendProfileProps) => {
     const dispatch = useDispatch();
 
-    const handleProfileClick = () => {
-        let chatRoomId =0;
-        dispatch(setChatRoom({chatRoomId}));
-        alert("채팅방 컴포넌트 on");
+    const handleProfileDoubleClick = async () => {
+        alert("친구 id:" + userId);
+        //TODO: 로그인 userId, 친구 userId를 통해 기존 채팅방이 존재하는지 확인 -> 존재: response 반환, 존재 X: 친구의 nickname, id 반환
+        const response = await findDirectChatRoom(userId);
+        if(response === undefined || response === null) {
+            dispatch(setChatRoom({userId, nickName}));
+            return;
+        }
+        dispatch(setChatRoom({
+            chatRoomId: response.chatRoomId,
+            creatorId: response.creatorId,
+            //TODO: null or undefined일 경우, 오른쪽 값 반환.
+            chatRoomName: response.chatRoomName ?? nickName,
+            friendId: response.friendId
+        }));
     }
+
     const handleImageClick = (e: React.MouseEvent, userId: number) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
         dispatch(setUserProfile({userId: userId}));
     }
 
     return (
-        <StyledFriendProfile onDoubleClick={() => handleProfileClick()}>
+        <StyledFriendProfile onDoubleClick={() => handleProfileDoubleClick()}>
             <ImageWrapper onClick={(e: React.MouseEvent) => handleImageClick(e, userId)}>
                 <StyledImage src={UserDefaultImage} alt="유저이미지"/>
                 </ImageWrapper>

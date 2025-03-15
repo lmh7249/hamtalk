@@ -3,8 +3,9 @@ import ChatRoomCloseIcon from "../../assets/icons/close-icon.svg";
 import ChatRoomSearchIcon from "../../assets/icons/search.svg";
 import ChatRoomExitIcon from "../../assets/icons/exit.svg";
 import IconButton from "../common/IconButton";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setEmpty} from "../../store/contentDetailSlice";
+import {RootState} from "../../store";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -34,10 +35,13 @@ const ParticipantProfileNickName = styled.span`
 `;
 
 const ChatRoomParticipantItem = () => {
+    const chatRoom = useSelector((state: RootState) => state.detailContent.payload);
+    const chatRoomName = chatRoom?.chatRoomName || chatRoom?.nickName || "알수 없음";
+    console.log("Redux에서 가져온 chatRoom:", chatRoom);
     return (
         <StyledChatRoomParticipantItemWrapper>
             <ParticipantProfileImage/>
-            <ParticipantProfileNickName>참여자닉네임1</ParticipantProfileNickName>
+            <ParticipantProfileNickName>{chatRoomName}</ParticipantProfileNickName>
         </StyledChatRoomParticipantItemWrapper>
     )
 }

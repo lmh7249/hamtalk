@@ -2,6 +2,7 @@ package com.hamtalk.chat.controller.api;
 
 import com.hamtalk.chat.model.request.ParticipantUserIdsRequest;
 import com.hamtalk.chat.model.response.ChatRoomListResponse;
+import com.hamtalk.chat.model.response.DirectChatRoomResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.ChatRoomService;
 import com.hamtalk.common.model.response.ApiResponse;
@@ -30,6 +31,12 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 목록 조회", description = "로그인 한 유저가 속한 모든 채팅방을 조회합니다.")
     public ResponseEntity<ApiResponse<List<ChatRoomListResponse>>> getChatRoomList(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.findChatRoomsByUserId(customUserDetails.getId())));
+    }
+
+    @GetMapping("/direct/{friendId}")
+    @Operation(summary = "1:1 채팅방 조회", description = "로그인 유저 id와 친구 id 값으로 1:1 채팅방이 존재하는지 조회, 없을 경우 data 값 x")
+    public ResponseEntity<ApiResponse<DirectChatRoomResponse>> findDirectChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long friendId) {
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.findDirectChatRoom(customUserDetails.getId(), friendId)));
     }
 
     //    @GetMapping("/{chatRoomId}")

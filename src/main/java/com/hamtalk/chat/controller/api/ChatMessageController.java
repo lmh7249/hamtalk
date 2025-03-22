@@ -1,14 +1,18 @@
 package com.hamtalk.chat.controller.api;
 
 import com.hamtalk.chat.model.request.ChatMessageRequest;
+import com.hamtalk.chat.model.response.ChatRoomMessagesResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.ChatMessageService;
 import com.hamtalk.common.model.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/chat")
@@ -17,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChatMessageController {
     private final ChatMessageService chatMessageService;
 
-    //TODO: 몽고 DB 테스트 api
+    //TODO: 데이터 삽입, 추후 웹소켓 적용.
     @PostMapping("/rooms/{chatRoomId}/messages")
     public ResponseEntity<ApiResponse<Boolean>> sendMessage(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                             @PathVariable Long chatRoomId,
@@ -25,5 +29,12 @@ public class ChatMessageController {
         return ResponseEntity.ok(ApiResponse.ok(chatMessageService.saveChatMessage(customUserDetails.getId(), chatRoomId, chatMessageRequest)));
     }
 
+    // TODO: 메세지 조회 시, 무한 스크롤로 구현 + 가장 최신 메세지가 가장 나중에 오게.
+    @GetMapping("/rooms/{chatRoomId}")
+    @Operation(summary = "메세지 조회", description = "채팅방 id의 메세지를 조회합니다.")
+    public ResponseEntity<ApiResponse<ChatRoomMessagesResponse>> getMessageList(@PathVariable Long chatRoomId) {
+        ChatRoomMessagesResponse chatMessageList = chatMessageService.getChatMessageList(chatRoomId);
+        return ResponseEntity.ok(ApiResponse.ok(chatMessageList));
+    }
 
 }

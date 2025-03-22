@@ -133,9 +133,9 @@ const ChatMessageOther = () => {
 const ChatRoomBody = () => {
     return (
         <StyledChatRoomBodyWrapper>
-            <ChatDateDivider/>
-            <ChatMessageMine/>
-            <ChatMessageOther/>
+            {/*<ChatDateDivider/>*/}
+            {/*<ChatMessageMine/>*/}
+            {/*<ChatMessageOther/>*/}
         </StyledChatRoomBodyWrapper>
     )
 }

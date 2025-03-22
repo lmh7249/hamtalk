@@ -47,8 +47,7 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
     const dispatch = useDispatch();
 
     const handleProfileDoubleClick = async () => {
-        alert("친구 id:" + userId);
-        //TODO: 로그인 userId, 친구 userId를 통해 기존 채팅방이 존재하는지 확인 -> 존재: response 반환, 존재 X: 친구의 nickname, id 반환
+        //TODO: profileImageUrl 함께 반환하기.
         const response = await findDirectChatRoom(userId);
         if(response === undefined || response === null) {
             dispatch(setChatRoom({userId, nickName}));

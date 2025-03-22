@@ -11,8 +11,8 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
 
     //TODO: 몽고 DB 테스트
-    public Boolean saveChatMessage(ChatMessageRequest chatMessageRequest) {
-        chatMessageRepository.save(chatMessageRequest.toChatMessageEntity());
+    public Boolean saveChatMessage(Long senderId, Long chatRoomId, ChatMessageRequest chatMessageRequest) {
+        chatMessageRepository.save(chatMessageRequest.toChatMessageEntity(senderId, chatRoomId));
         return true;
     }
 

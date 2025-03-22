@@ -13,11 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageRequest {
-    private Long chatRoomId;
-    private Long senderId;
     private String message;
 
-    public ChatMessage toChatMessageEntity() {
+    public ChatMessage toChatMessageEntity(Long senderId, Long chatRoomId) {
         return ChatMessage.builder()
                 .chatRoomId(chatRoomId)
                 .senderId(senderId)

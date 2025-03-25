@@ -46,3 +46,20 @@ export const sendChatMessageApi = async (chatRoomId: number, message: string) =>
     }
     return response.json();
 }
+
+// 채팅방 id 별, 메세지 조회
+
+export const getChatMessageListApi = async (chatRoomId: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`/api/chat/rooms/${chatRoomId}`, {
+        method: "get",
+        headers: {
+            "Content-Type" : "application/json",
+            "Authorization" :  `Bearer ${accessToken}`
+        }
+    });
+    if(!response.ok) {
+        throw new Error("채팅방 메세지 리스트 조회 실패");
+    }
+    return response.json();
+}

@@ -1,11 +1,13 @@
 import styled from "styled-components";
 import {ParticipantProfileImage} from "./ChatRoomHeader";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
+import {getChatMessageList} from "../../services/chat-service";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
+    overflow-y: auto;
 `;
 
 const StyledDateContainer = styled.div`
@@ -49,6 +51,7 @@ const StyledChatMessageMineContainer = styled.div`
     display: flex;
     justify-content: flex-end;
     gap: 5px;
+    margin: 10px;
 `;
 
 const StyledChatMessageOtherContainer = styled.div`
@@ -57,6 +60,7 @@ const StyledChatMessageOtherContainer = styled.div`
     align-items: center;
     width: 100%;
     gap: 5px;
+    margin: 10px;
 `;
 
 const StyledBubble = styled.div`
@@ -103,50 +107,80 @@ const ChatDateDivider = () => {
     )
 }
 
-const ChatMessageMine = () => {
+const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
     return (
         <StyledChatMessageMineContainer >
             <StyledMessageInfo>
                 <StyledUnreadCount>1</StyledUnreadCount>
-                <StyledTime>오후 12:00</StyledTime>
+                <StyledTime>{createdAt}</StyledTime>
             </StyledMessageInfo>
             <StyledBubble>
-                안녕 ㅎㅎ
+                {message}
             </StyledBubble>
         </StyledChatMessageMineContainer>
     )
 }
 
-const ChatMessageOther = () => {
+const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profileImageUrl}: ChatMessage) => {
     return (
         <StyledChatMessageOtherContainer>
             <ParticipantProfileImage/>
                 <div>
-                <StyledUsername>호날두</StyledUsername>
-                <StyledBubble>안녕하세요?</StyledBubble>
+                <StyledUsername>{senderNickName}</StyledUsername>
+                <StyledBubble>{message}</StyledBubble>
                 </div>
                 <StyledMessageInfo>
                     <StyledUnreadCount>2</StyledUnreadCount>
-                    <StyledTime>오후 12:51</StyledTime>
+                    <StyledTime>{createdAt}</StyledTime>
                 </StyledMessageInfo>
         </StyledChatMessageOtherContainer>
     )
 }
 
+interface ChatMessage {
+    messageId: string;
+    senderId: number;
+    senderNickName: string;
+    profileImageUrl: string;
+    message: string;
+    createdAt: string;
+}
+
 const ChatRoomBody = () => {
+    const [loginUserId, setLoginUserId] = useState<number>(0);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+
     const chatRoomData = useSelector((state:RootState) => state.detailContent.payload);
     const chatRoomId = chatRoomData.chatRoomId;
+
     useEffect(() => {
+        if(!chatRoomId) {
+            setMessages([]);
+            return;
+        }
+        const fetchMessages = async () => {
+            const response = await getChatMessageList(chatRoomId);
+            setLoginUserId(response.loginUserId);
+            console.log(response);
+            setMessages(response.messages);
+        }
+
         //TODO: 여기에 api 호출
-        alert("채팅 메세지 api 호출! " + chatRoomId);
+        fetchMessages();
     }, [chatRoomId]);
+
+
 
     return (
 
         <StyledChatRoomBodyWrapper>
-            {/*<ChatDateDivider/>*/}
-            {/*<ChatMessageMine/>*/}
-            {/*<ChatMessageOther/>*/}
+            <ChatDateDivider/>
+
+            {messages.map((message) =>
+                loginUserId === message.senderId ?
+                <ChatMessageMine key={message.messageId} {...message}/> :
+                <ChatMessageOther key={message.messageId} {...message}/>
+                )}
         </StyledChatRoomBodyWrapper>
     )
 }

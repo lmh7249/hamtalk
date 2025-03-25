@@ -24,6 +24,8 @@ public class ChatMessageService {
 
     //TODO: 몽고 DB 테스트
     public Boolean saveChatMessage(Long senderId, Long chatRoomId, ChatMessageRequest chatMessageRequest) {
+        //TODO: 메세지 삽입 전, 채팅방이 존재하는지 확인, 없다면 채팅방을 생성하는 로직 먼저 추가.
+
         chatMessageRepository.save(chatMessageRequest.toChatMessageEntity(senderId, chatRoomId));
         return true;
     }
@@ -47,7 +49,6 @@ public class ChatMessageService {
         List<ChatMessageResponse> list = chatMessages.stream().map(message -> {
             UserProfileProjection userProfile = userProfileMap.get(message.getSenderId());
             return ChatMessageResponse.builder()
-
                     .messageId(message.getId())
                     .senderId(message.getSenderId())
                     .senderNickName(userProfile.getNickname())

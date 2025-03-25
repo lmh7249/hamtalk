@@ -32,8 +32,8 @@ public class ChatMessageController {
     // TODO: 메세지 조회 시, 무한 스크롤로 구현 + 가장 최신 메세지가 가장 나중에 오게.
     @GetMapping("/rooms/{chatRoomId}")
     @Operation(summary = "메세지 조회", description = "채팅방 id의 메세지를 조회합니다.")
-    public ResponseEntity<ApiResponse<ChatRoomMessagesResponse>> getMessageList(@PathVariable Long chatRoomId) {
-        ChatRoomMessagesResponse chatMessageList = chatMessageService.getChatMessageList(chatRoomId);
+    public ResponseEntity<ApiResponse<ChatRoomMessagesResponse>> getMessageList(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long chatRoomId) {
+        ChatRoomMessagesResponse chatMessageList = chatMessageService.getChatMessageList(customUserDetails.getId(), chatRoomId);
         return ResponseEntity.ok(ApiResponse.ok(chatMessageList));
     }
 

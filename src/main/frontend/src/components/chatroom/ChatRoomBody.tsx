@@ -1,5 +1,8 @@
 import styled from "styled-components";
 import {ParticipantProfileImage} from "./ChatRoomHeader";
+import React, {useEffect} from "react";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -131,7 +134,15 @@ const ChatMessageOther = () => {
 }
 
 const ChatRoomBody = () => {
+    const chatRoomData = useSelector((state:RootState) => state.detailContent.payload);
+    const chatRoomId = chatRoomData.chatRoomId;
+    useEffect(() => {
+        //TODO: 여기에 api 호출
+        alert("채팅 메세지 api 호출! " + chatRoomId);
+    }, [chatRoomId]);
+
     return (
+
         <StyledChatRoomBodyWrapper>
             {/*<ChatDateDivider/>*/}
             {/*<ChatMessageMine/>*/}

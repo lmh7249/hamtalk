@@ -28,7 +28,7 @@ public class ChatMessageService {
         return true;
     }
     //TODO: 위 엔티티 리스트를 dto로 한번 바꿔주는 작업이 필요할지?
-    public ChatRoomMessagesResponse getChatMessageList(Long chatRoomId) {
+    public ChatRoomMessagesResponse getChatMessageList(Long loginUserId,Long chatRoomId) {
         // 1. 채팅방에 있는 모든 채팅메세지 조회
         List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId);
         // 2. 채팅 메세지 리스트에서 중복을 제거한 보낸 사람 id 조회
@@ -47,6 +47,7 @@ public class ChatMessageService {
         List<ChatMessageResponse> list = chatMessages.stream().map(message -> {
             UserProfileProjection userProfile = userProfileMap.get(message.getSenderId());
             return ChatMessageResponse.builder()
+
                     .messageId(message.getId())
                     .senderId(message.getSenderId())
                     .senderNickName(userProfile.getNickname())
@@ -57,13 +58,11 @@ public class ChatMessageService {
         }).toList();
 
         return ChatRoomMessagesResponse.builder()
+                .loginUserId(loginUserId)
                 .chatRoomId(chatRoomId)
                 .messages(list)
                 .build();
     }
-
-
-
 
 
 }

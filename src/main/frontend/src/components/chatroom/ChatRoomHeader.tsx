@@ -10,14 +10,12 @@ import {RootState} from "../../store";
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
     justify-content: space-between;
-    //border: solid 1px red;
     background-color: white;
     width: 100%;
     height: 5%;
 `;
 
 const StyledChatRoomParticipantItemWrapper = styled.div`
-    //border: 1px solid green;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -83,7 +81,6 @@ const ChatRoomHeader = () => {
         <StyledChatRoomHeaderWrapper>
             <ChatRoomParticipants/>
             <ChatRoomActions/>
-            {/*상단바: 검색 채팅방 닫기, 나가기 아이콘 등 넣기*/}
         </StyledChatRoomHeaderWrapper>
 
     )

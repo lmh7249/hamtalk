@@ -8,7 +8,6 @@ import {getChatMessageList} from "../../services/chat-service";
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
     overflow-y: auto;
-    //overflow-x: hidden;
     width: 100%;
     max-width: 100%;
 `;
@@ -55,15 +54,15 @@ const StyledChatMessageMineContainer = styled.div`
     justify-content: flex-end;
     gap: 5px;
     margin: 10px;
+    max-width: 100%;
 `;
 
 const StyledChatMessageOtherContainer = styled.div`
     display: flex;
-    //justify-content: flex-start;
-    //align-items: center;
     width: 100%;
     gap: 5px;
     margin: 10px;
+    max-width: 100%;
 `;
 
 const StyledBubble = styled.div`
@@ -76,10 +75,9 @@ const StyledBubble = styled.div`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     max-width: 70%;
     word-wrap: break-word; // 추가
-    word-break: break-all; // 추가
+    word-break: break-word; // 추가
     white-space: normal; // 추가
     overflow-wrap: break-word; // 기존 속성 유지
-    width: fit-content; // 추가
 `;
 
 const StyledMessageInfo = styled.div`
@@ -112,10 +110,12 @@ const StyledUsername = styled.span`
 
 const StyledBubbleMine = styled(StyledBubble)`
     background-color: #DCF8C6; // 내 메시지 색상
+    
 `;
 
 const StyledBubbleOther = styled(StyledBubble)`
     margin-right: 5px;
+    
 `;
 
 const StyledUnreadCountOther = styled(StyledUnreadCount)`

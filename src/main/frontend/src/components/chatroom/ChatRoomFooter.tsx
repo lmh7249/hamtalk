@@ -15,8 +15,9 @@ const StyledChatRoomFooterWrapper = styled.div`
     height: 10%;
     align-items: center;
     background-color: white;
-
-`
+    flex-shrink: 0;  //TODO: 다른 flex 자식 요소들의 공간이 부족해도 해당 css가 있는 영역은 줄어들지 않고 보장받음.
+    //TODO: 즉, 채팅 내용이 많아져도 해당 풋터는 항상 height: 10%;을 보장받음.
+`;
 
 const ChatRoomTextArea = styled.textarea`
     flex-grow: 1;

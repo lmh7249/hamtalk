@@ -10,6 +10,7 @@ const StyledChatRoomBodyWrapper = styled.div`
     overflow-y: auto;
     width: 100%;
     max-width: 100%;
+    overflow-x: hidden;
 `;
 
 const StyledDateContainer = styled.div`

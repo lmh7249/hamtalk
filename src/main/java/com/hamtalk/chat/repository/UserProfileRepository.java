@@ -20,5 +20,5 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     //TODO: 설명: senderIds 목록에 포함된 유저를 projection에 매핑해서 반환.
     List<UserProfileProjection> findByUserIdIn(List<Long> senderIds);
 
-
+    Optional<UserProfileProjection> findByUserId(Long userId);
 }

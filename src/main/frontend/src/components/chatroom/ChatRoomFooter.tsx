@@ -6,6 +6,7 @@ import IconButton from "../common/IconButton";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {sendChatMessage} from "../../services/chat-service";
+import {sendChatMessageViaSocket} from "../../utils/websocketUtil";
 
 const StyledChatRoomFooterWrapper = styled.div`
     display: flex;
@@ -58,9 +59,9 @@ const ChatRoomFooter = () => {
 
     // 메세지 전송
     const sendMessage = async () => {
-        // TODO: 만약 채팅방이 없다면, 채팅방 id를 먼저 생성(내 id와 친구 id), 채팅방id를 통해 값 삽입.
+        // TODO: 만약 채팅방이 없다면, 채팅방 id를 먼저 생성(내 id와 친구 id), 채팅방 id를 통해 값 삽입.
         if(!message.trim()) return;
-        const response = await sendChatMessage(chatRoomId, message);
+        sendChatMessageViaSocket(chatRoomId, message);
         setMessage("");
     }
 

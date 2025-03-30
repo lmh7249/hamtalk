@@ -7,6 +7,7 @@ import {RootState} from "../../store";
 import {ChatRoomPayload, setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
 import {findDirectChatRoomApi} from "../../api/chat";
 import {findDirectChatRoom} from "../../services/chat-service";
+import {subscribeToChatRoom} from "../../utils/websocketUtil";
 
 const StyledFriendProfile = styled.div`
     display: flex;
@@ -60,6 +61,14 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
             chatRoomName: response.chatRoomName ?? nickName,
             friendId: response.friendId
         }));
+        // 채팅방 구독로직.
+        if(response.chatRoomId) {
+            subscribeToChatRoom(response.chatRoomId, (message) => {
+                console.log("전달된 메세지: ", message);
+            })
+        }
+
+
     }
 
     const handleImageClick = (e: React.MouseEvent, userId: number) => {

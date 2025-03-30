@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {getChatMessageList} from "../../services/chat-service";
+import {formatTime} from "../../utils/formatTime";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -146,7 +147,7 @@ const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
         <StyledChatMessageMineContainer>
             <StyledMessageInfo>
                 <StyledUnreadCount>1</StyledUnreadCount>
-                <StyledTime>{createdAt}</StyledTime>
+                <StyledTime>{formatTime(createdAt)}</StyledTime>
             </StyledMessageInfo>
             <StyledBubbleMine>
                 {message}
@@ -170,7 +171,7 @@ const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profile
                     <StyledBubbleOther>{message}</StyledBubbleOther>
                     <StyledMessageInfo>
                         <StyledUnreadCountOther>2</StyledUnreadCountOther>
-                        <StyledTime>{createdAt}</StyledTime>
+                        <StyledTime>{formatTime(createdAt)}</StyledTime>
                     </StyledMessageInfo>
                 </StyledMessageRow>
             </StyledMessageContentWrapper>

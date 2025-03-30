@@ -10,6 +10,7 @@ import com.hamtalk.chat.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -22,15 +23,25 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserProfileRepository userProfileRepository;
 
-    //TODO: 몽고 DB 테스트
-    public Boolean saveChatMessage(Long senderId, Long chatRoomId, ChatMessageRequest chatMessageRequest) {
+    // 메세지 저장
+    @Transactional
+    public ChatMessageResponse saveChatMessage(Long senderId, Long chatRoomId, ChatMessageRequest chatMessageRequest) {
+        //TODO: 분산 트랜잭션 적용
         //TODO: 메세지 삽입 전, 채팅방이 존재하는지 확인, 없다면 채팅방을 생성하는 로직 먼저 추가.
-
-        chatMessageRepository.save(chatMessageRequest.toChatMessageEntity(senderId, chatRoomId));
-        return true;
+        ChatMessage chatMessage = chatMessageRepository.save(chatMessageRequest.toChatMessageEntity(senderId, chatRoomId));
+        UserProfileProjection userProfileProjection = userProfileRepository.findByUserId(chatMessage.getSenderId()).orElseThrow(() -> new RuntimeException());
+        return ChatMessageResponse.builder()
+                .messageId(chatMessage.getId())
+                .senderId(chatMessage.getSenderId())
+                .senderNickName(userProfileProjection.getNickname())
+                .profileImageUrl(userProfileProjection.getProfileImageUrl())
+                .message(chatMessage.getMessage())
+                .createdAt(chatMessage.getCreatedAt())
+                .build();
     }
+
     //TODO: 위 엔티티 리스트를 dto로 한번 바꿔주는 작업이 필요할지?
-    public ChatRoomMessagesResponse getChatMessageList(Long loginUserId,Long chatRoomId) {
+    public ChatRoomMessagesResponse getChatMessageList(Long loginUserId, Long chatRoomId) {
         // 1. 채팅방에 있는 모든 채팅메세지 조회
         List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId);
         // 2. 채팅 메세지 리스트에서 중복을 제거한 보낸 사람 id 조회

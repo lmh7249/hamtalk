@@ -1,10 +1,11 @@
 import styled from "styled-components";
 import {ParticipantProfileImage} from "./ChatRoomHeader";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {getChatMessageList} from "../../services/chat-service";
 import {formatTime} from "../../utils/formatTime";
+import {subscribeToChatRoom} from "../../utils/websocketUtil";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -194,6 +195,8 @@ const ChatRoomBody = () => {
 
     const chatRoomData = useSelector((state: RootState) => state.detailContent.payload);
     const chatRoomId = chatRoomData.chatRoomId;
+    // 채팅창 스크롤바 위치를 위한 ref
+    const chatRoomBodyRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!chatRoomId) {
@@ -209,12 +212,31 @@ const ChatRoomBody = () => {
 
         //TODO: 여기에 api 호출
         fetchMessages();
+
+        // 채팅방 구독로직.
+        if(chatRoomId) {
+            subscribeToChatRoom(chatRoomId, (receivedMessage) => {
+                console.log("전달된 메세지: ", receivedMessage);
+                setMessages((prevMessages) =>[...prevMessages, receivedMessage]);
+            })
+        }
+        return () => {
+            //TODO: 구독 해제 로직 넣을지 고민 (optional: 실제 해제 기능 추가 가능)
+        };
+
     }, [chatRoomId]);
+
+    // 내가 보낸 메시지일 경우에만 스크롤을 하단으로 이동
+    useEffect(() => {
+        if (chatRoomBodyRef.current) {
+            chatRoomBodyRef.current.scrollTop = chatRoomBodyRef.current.scrollHeight;
+        }
+    }, [messages]);  // 메시지가 추가될 때마다 확인
 
 
     return (
 
-        <StyledChatRoomBodyWrapper>
+        <StyledChatRoomBodyWrapper ref={chatRoomBodyRef}>
             <ChatDateDivider/>
             {messages.map((message) =>
                 loginUserId === message.senderId ?

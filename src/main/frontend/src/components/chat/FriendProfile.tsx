@@ -61,12 +61,7 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
             chatRoomName: response.chatRoomName ?? nickName,
             friendId: response.friendId
         }));
-        // 채팅방 구독로직.
-        if(response.chatRoomId) {
-            subscribeToChatRoom(response.chatRoomId, (message) => {
-                console.log("전달된 메세지: ", message);
-            })
-        }
+
 
 
     }

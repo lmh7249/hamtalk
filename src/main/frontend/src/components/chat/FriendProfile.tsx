@@ -14,7 +14,8 @@ const StyledFriendProfile = styled.div`
     gap: 10px;
     padding: 10px;
     // 드래그 방지
-    user-select: none; 
+    user-select: none;
+
     &:hover {
         background-color: #f1f1f1;
     }
@@ -50,7 +51,7 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
     const handleProfileDoubleClick = async () => {
         //TODO: profileImageUrl 함께 반환하기.
         const response = await findDirectChatRoom(userId);
-        if(response === undefined || response === null) {
+        if (response === undefined || response === null) {
             dispatch(setChatRoom({userId, nickName}));
             return;
         }
@@ -61,7 +62,6 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
             chatRoomName: response.chatRoomName ?? nickName,
             friendId: response.friendId
         }));
-
 
 
     }
@@ -75,8 +75,8 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
         <StyledFriendProfile onDoubleClick={() => handleProfileDoubleClick()}>
             <ImageWrapper onClick={(e: React.MouseEvent) => handleImageClick(e, userId)}>
                 <StyledImage src={UserDefaultImage} alt="유저이미지"/>
-                </ImageWrapper>
-                <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} isMe={false}/>
+            </ImageWrapper>
+            <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} isMe={false}/>
         </StyledFriendProfile>
     )
 }

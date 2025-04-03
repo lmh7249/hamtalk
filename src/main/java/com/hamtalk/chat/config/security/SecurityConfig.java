@@ -100,8 +100,10 @@ public class SecurityConfig {
                                 "/api/auth/email-verification/code/verify",
                                 "/api/auth/login",
                                 "/api/auth/refresh",
-                                "/ws-chat/**" // 웹소켓 핸드셰이크 엔드포인트는 허용
-                                ).permitAll()
+                                "/ws-chat/**", // 웹소켓 핸드셰이크 엔드포인트는 허용
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**" // swagger-ui 허용
+                        ).permitAll()
 
                         // POST 방식 /api/users는 인증 없이 허용 (회원가입)
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()

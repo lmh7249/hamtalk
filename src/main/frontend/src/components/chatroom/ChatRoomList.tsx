@@ -27,11 +27,14 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({chatRooms}) => {
                     return (
                         <ChatRoomItem
                             key={chatRoom.chatRoomId}
+                            chatRoomId ={chatRoom.chatRoomId}
                             chatRoomName={chatRoomName}  // 수정된 채팅방 이름 사용
+                            creatorId={chatRoom.creatorId}
                             profileImage={UserDefaultImage}
-                            lastMessage={"마지막으로 보낸 메세지입니다."}
-                            lastMessageTime={"3시간 전"}
+                            lastMessage={chatRoom.lastMessage}
+                            lastMessageTime={chatRoom.lastMessageTime}
                             unreadCount={2}
+                            participantIds={chatRoom.participants.map(participant => participant.userId)}
                         />
                     );
                 })

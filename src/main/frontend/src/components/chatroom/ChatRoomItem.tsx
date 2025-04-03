@@ -1,43 +1,47 @@
 import styled from "styled-components";
+import React from "react";
+import {findDirectChatRoom} from "../../services/chat-service";
+import {setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
+import {useDispatch} from "react-redux";
 
 const StyledChattingRoomItem = styled.div`
     display: flex;
     gap: 10px;
     padding: 10px;
+    // 드래그 방지
+    user-select: none;
 
     &:hover {
-        cursor: pointer;
         background-color: #f1f1f1;
     }
 `
 
 const StyledImage = styled.img`
     object-fit: cover; /* 이미지 비율을 유지하면서 부모 요소에 맞게 조정 */
-    border: 1px black solid;
     border-radius: 50%;
     width: 60px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
     max-height: 60px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
     padding: 3px;
-`
+`;
 
 const ChattingRoomInfoText = styled.div`
     display: flex;
 
-`
+`;
 
 const ChatMainInfo = styled.div`
     display: flex;
     flex-direction: column;
     gap: 5px;
-`
+`;
 
 const MessageMetaInfo = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 10px;
-    
-`
+
+`;
 
 const ChatRoomName = styled.span`
     font-size: 16px;
@@ -67,25 +71,70 @@ const UnreadCount = styled.span`
     border-radius: 50%;
 `;
 
+const ImageWrapper = styled.div`
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border: 1px black solid;
+    border-radius: 50%;
+    padding: 3px;
+`;
+
 interface ChattingRoomItemProps {
     chatRoomName: string;
+    chatRoomId: number;
+    creatorId: number;
     profileImage: string;
     lastMessage: string;
     lastMessageTime: string;
     //TODO: 추후에 Date로 바꿀지 고민
     unreadCount: number;
+    participantIds: number[];
 }
 
 const ChatRoomItem = ({
-                              chatRoomName,
-                              profileImage,
-                              lastMessage,
-                              lastMessageTime,
-                              unreadCount
-                          }: ChattingRoomItemProps) => {
+                          chatRoomName,
+                          chatRoomId,
+                          creatorId,
+                          profileImage,
+                          lastMessage,
+                          lastMessageTime,
+                          unreadCount,
+                          participantIds
+                      }: ChattingRoomItemProps) => {
+    const dispatch = useDispatch();
+
+    const handleChatRoomDoubleClick = async (chatRoomId: number, chatRoomName: string, participantIds: number[], creatorId: number) => {
+
+        alert(chatRoomId);
+
+        dispatch(setChatRoom({
+            chatRoomId: chatRoomId,
+            creatorId: creatorId,
+            //TODO: null or undefined일 경우, 오른쪽 값 반환.
+            chatRoomName: chatRoomName,
+            friendId: participantIds[0]
+        }));
+
+
+    }
+
+    //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
+    const handleProfileImageClick = (e: React.MouseEvent, participantIds: number) => {
+
+        e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
+        alert(participantIds);
+        dispatch(setUserProfile({userId: participantIds}));
+    }
+
+
+
+
     return (
-        <StyledChattingRoomItem>
-            <StyledImage src={profileImage} alt={"채팅방 이미지"}></StyledImage>
+        <StyledChattingRoomItem onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
+            <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
+                <StyledImage src={profileImage} alt={"채팅방 이미지"}></StyledImage>
+            </ImageWrapper>
             <ChattingRoomInfoText>
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>

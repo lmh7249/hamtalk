@@ -38,7 +38,7 @@ export const subscribeToChatRoom = (chatRoomId: number, callback: (message: any)
 
 
 // 메세지 전송 함수
-export const sendChatMessageViaSocket  = (chatRoomId: number, message: string) => {
+export const sendChatMessageViaSocket  = (chatRoomId: number, message: string, receiverId: number) => {
     if(!stompClient || !stompClient.connected) {
         console.error("웹소켓 연결 안되어있어요. 채팅방 구독 실패");
         return;
@@ -46,7 +46,8 @@ export const sendChatMessageViaSocket  = (chatRoomId: number, message: string) =
 
     // 서버가 기대하는 요청 형태(ChatMessageRequest DTO에 맞춤)
     const chatMessageRequest = {
-        message: message
+        message: message,
+        receiverId: receiverId
     };
 
     // 메시지 전송

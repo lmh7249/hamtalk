@@ -94,7 +94,10 @@ export interface Participant {
 export interface ChatRoom {
     chatRoomId: number;
     chatRoomName: string;
+    creatorId: number;
     participants: Participant[];  // participants 배열 추가
+    lastMessage: string;
+    lastMessageTime: string;
 }
 
 const ContentList = ({openModal}: ContentListProps) => {

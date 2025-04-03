@@ -2,10 +2,12 @@ package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.domain.entity.ChatRoom;
 import com.hamtalk.chat.domain.entity.ChatRoomParticipant;
+import com.hamtalk.chat.model.projection.ChatMessageProjection;
 import com.hamtalk.chat.model.request.ChatRoomCreateRequest;
 import com.hamtalk.chat.model.request.ChatRoomParticipantCreateRequest;
 import com.hamtalk.chat.model.response.ChatRoomListResponse;
 import com.hamtalk.chat.model.response.DirectChatRoomResponse;
+import com.hamtalk.chat.repository.ChatMessageRepository;
 import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +28,12 @@ import java.util.Map;
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Transactional
-    public Long createChatRoom(Long creatorId, List<Long> userIds) {
+    public ChatRoom createChatRoom(Long creatorId, List<Long> userIds) {
+        // TODO: 1. 해당 채팅방이 존재하는지 확인해야 함. -> 반환타입 Entity 말고 dto로 추후 변경하기.
+
         List<ChatRoomParticipant> participants = new ArrayList<>();
         // 1. 채팅방 생성
         ChatRoomCreateRequest chatRoomCreateRequest = new ChatRoomCreateRequest(creatorId, 1);
@@ -40,40 +47,66 @@ public class ChatRoomService {
             participants.add(participant.toChatRoomParticipantEntity());
         }
         chatRoomParticipantRepository.saveAll(participants);
-        // 3. 채팅 첫 메세지도 저장할듯 ? mongodb
-        return chatRoom.getId();
+        return chatRoom;
     }
 
     @Transactional(readOnly = true)
-    public List<ChatRoomListResponse> findChatRoomsByUserId(Long userId) {
-        // 1. DB 접근해서 로그인한 유저의 모든 채팅 상대 불러오기
+    public List<ChatRoomListResponse> getChatRoomsWithLastMessage(Long userId) {
+        // 1. MySQL에서 로그인한 유저의 채팅방 목록 조회
         List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
 
-        // 2. 채팅방 ID 기준으로 participants 리스트 묶기
+        // 2. 채팅방 ID 기준으로 데이터 그룹화
         Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
 
-        for (ChatRoomListResponse chatRoomResponse : chatRoomsList) {
-            // 채팅방 ID를 기준으로 데이터 그룹화
-            Long chatRoomId = chatRoomResponse.getChatRoomId();
+        for (ChatRoomListResponse chatRoom : chatRoomsList) {
+            Long chatRoomId = chatRoom.getChatRoomId();
 
-            // 채팅방 ID가 이미 맵에 존재하는 경우
             if (chatRoomMap.containsKey(chatRoomId)) {
-                // 기존에 있던 채팅방에 현재 참여자를 추가
+                // 이미 존재하는 채팅방이면 참여자만 추가
                 ChatRoomListResponse existingChatRoom = chatRoomMap.get(chatRoomId);
-                existingChatRoom.getParticipants().addAll(chatRoomResponse.getParticipants());
+                existingChatRoom.getParticipants().addAll(chatRoom.getParticipants());
             } else {
-                // 새로운 채팅방에 참여자 추가
-                chatRoomMap.put(chatRoomId, chatRoomResponse);
+                // 새로운 채팅방이면 맵에 추가
+                chatRoomMap.put(chatRoomId, chatRoom);
             }
         }
 
-        // 3. 결과값으로 반환할 데이터 리스트 생성
-        List<ChatRoomListResponse> result = new ArrayList<>(chatRoomMap.values());
+        // 3. 중복 제거된 채팅방 목록 생성
+        List<ChatRoomListResponse> uniqueChatRooms = new ArrayList<>(chatRoomMap.values());
 
-        log.info("DB 반환 값: {}", result);
-        return result;
+        // 4. 채팅방 ID 목록 추출
+        List<Long> chatRoomIds = uniqueChatRooms.stream()
+                .map(ChatRoomListResponse::getChatRoomId)
+                .collect(Collectors.toList());
+
+        if (chatRoomIds.isEmpty()) {
+            return uniqueChatRooms; // 채팅방이 없으면 바로 반환
+        }
+
+        // 5. MongoDB에서 마지막 메시지 조회
+        List<ChatMessageProjection> lastMessages = chatMessageRepository.findLastMessagesByChatRoomIds(chatRoomIds);
+
+        // 6. 채팅방 ID 기준으로 마지막 메시지 맵핑
+        Map<Long, String> lastMessageMap = lastMessages.stream()
+                .collect(Collectors.toMap(ChatMessageProjection::getChatRoomId,
+                        ChatMessageProjection::getLastMessage,
+                        (existing, replacement) -> existing)); // 중복 키가 있을 경우 기존 값 유지
+
+        Map<Long, LocalDateTime> lastMessageTimeMap = lastMessages.stream()
+                .collect(Collectors.toMap(ChatMessageProjection::getChatRoomId,
+                        ChatMessageProjection::getLastMessageTime,
+                        (existing, replacement) -> existing));
+
+        // 7. 채팅방에 마지막 메시지와 시간 추가
+        uniqueChatRooms.forEach(chatRoom -> {
+            Long roomId = chatRoom.getChatRoomId();
+            chatRoom.setLastMessage(lastMessageMap.getOrDefault(roomId, ""));
+            chatRoom.setLastMessageTime(lastMessageTimeMap.getOrDefault(roomId, null));
+        });
+
+        log.info("최종 반환 값: {}", uniqueChatRooms);
+        return uniqueChatRooms;
     }
-
     @Transactional(readOnly = true)
     public DirectChatRoomResponse findDirectChatRoom(Long myId, Long friendId) {
         // TODO: 해당 유저가 존재하는지 확인

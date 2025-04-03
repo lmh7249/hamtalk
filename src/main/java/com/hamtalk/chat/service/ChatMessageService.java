@@ -6,12 +6,14 @@ import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
 import com.hamtalk.chat.model.response.ChatRoomMessagesResponse;
 import com.hamtalk.chat.repository.ChatMessageRepository;
+import com.hamtalk.chat.repository.ChatRoomRepository;
 import com.hamtalk.chat.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,12 +24,14 @@ import java.util.stream.Collectors;
 public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
 
     // 메세지 저장
     @Transactional
     public ChatMessageResponse saveChatMessage(Long senderId, Long chatRoomId, ChatMessageRequest chatMessageRequest) {
         //TODO: 분산 트랜잭션 적용
-        //TODO: 메세지 삽입 전, 채팅방이 존재하는지 확인, 없다면 채팅방을 생성하는 로직 먼저 추가.
+        // 1. 메세지 저장
         ChatMessage chatMessage = chatMessageRepository.save(chatMessageRequest.toChatMessageEntity(senderId, chatRoomId));
         UserProfileProjection userProfileProjection = userProfileRepository.findByUserId(chatMessage.getSenderId()).orElseThrow(() -> new RuntimeException());
         return ChatMessageResponse.builder()

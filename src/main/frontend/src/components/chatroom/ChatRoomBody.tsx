@@ -79,7 +79,7 @@ const StyledBubble = styled.div`
     max-width: 70%;
     word-wrap: break-word; // 추가
     word-break: break-word; // 추가
-    white-space: normal; // 추가
+    white-space: pre-wrap; // 줄바꿈 문자 자동인식
     overflow-wrap: break-word; // 기존 속성 유지
 `;
 
@@ -142,6 +142,7 @@ const ChatDateDivider = () => {
         </StyledDateContainer>
     )
 }
+
 
 const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
     return (

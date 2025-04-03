@@ -2,7 +2,6 @@ package com.hamtalk.chat.controller;
 
 import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
-import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.ChatMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,7 +11,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j

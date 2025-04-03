@@ -11,6 +11,7 @@ import {useEffect, useState} from "react";
 import {getMyFriendList} from "../../services/friend-service";
 import {ModalType} from "../../containers/ChatMainContainer";
 import {getMyChatRoomList} from "../../services/chat-service";
+import SettingList from "./SettingList";
 
 const StyledContentList = styled.div`
     min-width: 350px;
@@ -137,7 +138,7 @@ const ContentList = ({openModal}: ContentListProps) => {
             {selectedMenu.key === "chats" && <div> 채팅방 {chatRooms.length}</div>}
             {selectedMenu.key === "friends" && <FriendList friends={friends}/>}
             {selectedMenu.key === "chats" && <ChattingRoomList chatRooms = {chatRooms}/>}
-            {/*{selectedMenu === "settings" && <ChattingRoomList/>}*/}
+            {selectedMenu.key === "settings" && <SettingList/>}
         </StyledContentList>
     )
 }

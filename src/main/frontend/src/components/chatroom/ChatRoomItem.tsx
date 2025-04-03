@@ -115,20 +115,14 @@ const ChatRoomItem = ({
             chatRoomName: chatRoomName,
             friendId: participantIds[0]
         }));
-
-
     }
 
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
     const handleProfileImageClick = (e: React.MouseEvent, participantIds: number) => {
-
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
         alert(participantIds);
         dispatch(setUserProfile({userId: participantIds}));
     }
-
-
-
 
     return (
         <StyledChattingRoomItem onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>

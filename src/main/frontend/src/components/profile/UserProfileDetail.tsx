@@ -121,6 +121,8 @@ const UserProfileDetail = () => {
     const [isFriend, setIsFriend] = useState<boolean>(false);
 
     const searchUserProfileId = useSelector((state:RootState) => state.detailContent.payload?.userId);
+    const loginUserId = useSelector((state:RootState) => state.user.id);
+    const isMyUserId: boolean = searchUserProfileId === loginUserId;
 
     useEffect(() => {
         if(searchUserProfileId > 0) {
@@ -176,12 +178,12 @@ const UserProfileDetail = () => {
                         <StyledStateMessage>{searchUserProfile?.statusMessage}</StyledStateMessage>
                     </StyledUserInfo>
                     <ButtonWrapper>
-                        {!isFriend && <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"} onClick={()=> handleAddFriend(searchUserProfile?.id)}>
+                        {(!isFriend && !isMyUserId) && <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"} onClick={()=> handleAddFriend(searchUserProfile?.id)}>
                             친구 추가
                         </ModalButton>}
-                        <ModalButton backgroundColor={"#2C2D31"} color={"white"} hoverColor={"#3A3B40"}>
+                        {!isMyUserId && <ModalButton backgroundColor={"#2C2D31"} color={"white"} hoverColor={"#3A3B40"}>
                             채팅하기
-                        </ModalButton>
+                        </ModalButton>}
                     </ButtonWrapper>
                 </StyledAbsoluteUserPosition>
             </StyledUserProfileWrapper>

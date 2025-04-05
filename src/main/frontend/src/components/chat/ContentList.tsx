@@ -132,8 +132,17 @@ const ContentList = ({openModal}: ContentListProps) => {
     }, [selectedMenu]);
 
     const filteredFriends = friends.filter(friend =>
-        friend.nickname.toLowerCase().includes(searchKeyword.toLowerCase())
+        (friend.nickname || "").toLowerCase().includes(searchKeyword.toLowerCase())
     );
+
+    const filteredChatRooms = chatRooms.filter(chatRoom => {
+        const roomName = chatRoom.chatRoomName || "";
+        const participants = (chatRoom.participants || [])
+            .map(p => p.nickname || "") // 닉네임만 추출
+            .join(", ");
+        const target = (roomName + participants).toLowerCase();
+        return target.toLowerCase().includes(searchKeyword.toLowerCase());
+    });
 
 
     return (
@@ -154,9 +163,14 @@ const ContentList = ({openModal}: ContentListProps) => {
 
             {selectedMenu.key === "chats" && (
                 <>
-                    <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요." />
-                    <div> 채팅방 {chatRooms.length} </div>
-                    <ChattingRoomList chatRooms={chatRooms} />
+                    <SearchInput
+                        type="text"
+                        placeholder="참여자 또는 채팅방명을 검색하세요."
+                        value = {searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                    />
+                    <div> 채팅방 {filteredChatRooms.length} </div>
+                    <ChattingRoomList chatRooms={filteredChatRooms} />
                 </>
             )}
 

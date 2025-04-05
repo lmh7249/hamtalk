@@ -12,7 +12,7 @@ import {subscribeToChatRoom} from "../../utils/websocketUtil";
 const StyledFriendProfile = styled.div`
     display: flex;
     gap: 10px;
-    padding: 10px;
+    padding: 10px 10px 10px 0;
     // 드래그 방지
     user-select: none;
 

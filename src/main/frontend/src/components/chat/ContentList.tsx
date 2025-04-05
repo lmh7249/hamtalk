@@ -105,6 +105,8 @@ const ContentList = ({openModal}: ContentListProps) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+    const [searchKeyword, setSearchKeyword] = useState("");
+
     //TODO: 새로고침 시에만 친구목록, 채팅방 목록 api 호출할 지 고민하기
 
     useEffect(() => {
@@ -124,23 +126,43 @@ const ContentList = ({openModal}: ContentListProps) => {
                     setChatRooms(response.data);
                 }
             }
+            setSearchKeyword("");
         };
         fetchData();
     }, [selectedMenu]);
 
+    const filteredFriends = friends.filter(friend =>
+        friend.nickname.toLowerCase().includes(searchKeyword.toLowerCase())
+    );
+
 
     return (
         <StyledContentList>
-            <ContentListTopState selectedMenu={selectedMenu} openModal={openModal}/>
-            {selectedMenu.key === "friends" && <SearchInput type="text" placeholder="이름 또는 이메일을 입력하세요."/>}
-            {selectedMenu.key === "chats" && <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요."/>}
-            {selectedMenu.key === "friends" && <div> 친구 {friends.length} </div>}
-            {selectedMenu.key === "chats" && <div> 채팅방 {chatRooms.length}</div>}
-            {selectedMenu.key === "friends" && <FriendList friends={friends}/>}
-            {selectedMenu.key === "chats" && <ChattingRoomList chatRooms = {chatRooms}/>}
-            {selectedMenu.key === "settings" && <SettingList/>}
+            <ContentListTopState selectedMenu={selectedMenu} openModal={openModal} />
+            {selectedMenu.key === "friends" && (
+                <>
+                    <SearchInput
+                        type="text"
+                        placeholder="이름 또는 이메일을 입력하세요."
+                        value ={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                    />
+                    <div> 친구 {filteredFriends.length} </div>
+                    <FriendList friends={filteredFriends} />
+                </>
+            )}
+
+            {selectedMenu.key === "chats" && (
+                <>
+                    <SearchInput type="text" placeholder="참여자 또는 채팅방명을 검색하세요." />
+                    <div> 채팅방 {chatRooms.length} </div>
+                    <ChattingRoomList chatRooms={chatRooms} />
+                </>
+            )}
+
+            {selectedMenu.key === "settings" && <SettingList />}
         </StyledContentList>
-    )
+    );
 }
 
 export default ContentList

@@ -3,14 +3,15 @@ import React from "react";
 import {findDirectChatRoom} from "../../services/chat-service";
 import {setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
 import {useDispatch} from "react-redux";
+import {formatLastMessageTime} from "../../utils/formatTime";
 
 const StyledChattingRoomItem = styled.div`
     display: flex;
     gap: 10px;
-    padding: 10px;
+    padding: 10px 10px 10px 0;
     // 드래그 방지
     user-select: none;
-
+    justify-content: space-between;
     &:hover {
         background-color: #f1f1f1;
     }
@@ -19,14 +20,9 @@ const StyledChattingRoomItem = styled.div`
 const StyledImage = styled.img`
     object-fit: cover; /* 이미지 비율을 유지하면서 부모 요소에 맞게 조정 */
     border-radius: 50%;
-    width: 60px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
-    max-height: 60px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
+    width: 50px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
+    max-height: 50px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
     padding: 3px;
-`;
-
-const ChattingRoomInfoText = styled.div`
-    display: flex;
-
 `;
 
 const ChatMainInfo = styled.div`
@@ -78,6 +74,7 @@ const ImageWrapper = styled.div`
     border: 1px black solid;
     border-radius: 50%;
     padding: 3px;
+    height: 50px;
 `;
 
 interface ChattingRoomItemProps {
@@ -126,19 +123,21 @@ const ChatRoomItem = ({
 
     return (
         <StyledChattingRoomItem onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
+            <div style={{display: "flex", gap: "5px"}}>
             <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
                 <StyledImage src={profileImage} alt={"채팅방 이미지"}></StyledImage>
             </ImageWrapper>
-            <ChattingRoomInfoText>
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
                     <LastMessage>{lastMessage}</LastMessage>
                 </ChatMainInfo>
+            </div>
+
                 <MessageMetaInfo>
-                    <LastMessageTime>{lastMessageTime}</LastMessageTime>
+                    <LastMessageTime>{formatLastMessageTime(lastMessageTime)}</LastMessageTime>
                     <UnreadCount>{unreadCount}</UnreadCount>
                 </MessageMetaInfo>
-            </ChattingRoomInfoText>
+
         </StyledChattingRoomItem>
     )
 }

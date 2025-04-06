@@ -1,4 +1,10 @@
-import {createDirectChatRoomApi, findDirectChatRoomApi, getChatMessageListApi, getMyChatRoomListApi} from "../api/chat";
+import {
+    createDirectChatRoomApi,
+    findDirectChatRoomApi,
+    getChatMessageListApi,
+    getMyChatRoomListApi,
+    notifyEnterChatRoomApi
+} from "../api/chat";
 
 export const getMyChatRoomList = async () => {
     const response = getMyChatRoomListApi();
@@ -25,4 +31,9 @@ export const getChatMessageList = async (chatRoomId: number) => {
 export const createDirectChatRoom = async (friendId: number) =>{
     const response = await createDirectChatRoomApi(friendId);
     return response.data;
+}
+
+//TODO: API 데이터 반환 타입 결정하기.
+export const notifyEnterChatRoom = async (chatRoomId: number) => {
+    const response = await notifyEnterChatRoomApi(chatRoomId);
 }

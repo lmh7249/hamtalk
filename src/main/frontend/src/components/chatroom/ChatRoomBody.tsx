@@ -3,7 +3,7 @@ import {ParticipantProfileImage} from "./ChatRoomHeader";
 import React, {useEffect, useRef, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {getChatMessageList} from "../../services/chat-service";
+import {getChatMessageList, notifyEnterChatRoom} from "../../services/chat-service";
 import {formatTime} from "../../utils/formatTime";
 import {subscribeToChatRoom} from "../../utils/websocketUtil";
 
@@ -210,10 +210,8 @@ const ChatRoomBody = () => {
             console.log(response);
             setMessages(response.messages);
         }
-
-        //TODO: 여기에 api 호출
         fetchMessages();
-
+        notifyEnterChatRoom(chatRoomId);
         // 채팅방 구독로직.
         if(chatRoomId) {
             subscribeToChatRoom(chatRoomId, (receivedMessage) => {

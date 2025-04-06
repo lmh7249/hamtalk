@@ -7,7 +7,7 @@ export const getMyChatRoomListApi = async () => {
             "Authorization": `Bearer ${accessToken}`
         }
     });
-    if(!response.ok) {
+    if (!response.ok) {
         throw new Error("채팅방 목록 api 호출 실패")
     }
     return response.json();
@@ -15,14 +15,14 @@ export const getMyChatRoomListApi = async () => {
 
 export const findDirectChatRoomApi = async (friendId: number) => {
     const accessToken = localStorage.getItem("accessToken");
-    const response =await fetch(`/api/chat-rooms/direct/${friendId}`, {
+    const response = await fetch(`/api/chat-rooms/direct/${friendId}`, {
         method: "get",
         headers: {
-            "Content-Type" : "application/json",
-            "Authorization" :  `Bearer ${accessToken}`
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
         }
     });
-    if(!response.ok) {
+    if (!response.ok) {
         throw new Error("1:1 채팅방 불러오기 api 호출 실패");
     }
     return response.json();
@@ -54,11 +54,11 @@ export const getChatMessageListApi = async (chatRoomId: number) => {
     const response = await fetch(`/api/chat/rooms/${chatRoomId}`, {
         method: "get",
         headers: {
-            "Content-Type" : "application/json",
-            "Authorization" :  `Bearer ${accessToken}`
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
         }
     });
-    if(!response.ok) {
+    if (!response.ok) {
         throw new Error("채팅방 메세지 리스트 조회 실패");
     }
     return response.json();
@@ -82,3 +82,21 @@ export const createDirectChatRoomApi = async (friendId: number) => {
     }
     return await response.json();
 };
+
+// 채팅방 입장 시간을 저장하는 api
+export const notifyEnterChatRoomApi = async (chatRoomId: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`/api/chat-rooms/enter/${chatRoomId}`, {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        },
+        // body: JSON.stringify({
+        //     chatRoomId: chatRoomId
+        // })
+    });
+    if (!response.ok) {
+        throw new Error(`채팅방 입장 시간 기록 실패: ${response.status}`);
+    }
+}

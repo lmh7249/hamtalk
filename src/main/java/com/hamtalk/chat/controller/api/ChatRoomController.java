@@ -5,6 +5,7 @@ import com.hamtalk.chat.model.request.ParticipantUserIdsRequest;
 import com.hamtalk.chat.model.response.ChatRoomListResponse;
 import com.hamtalk.chat.model.response.DirectChatRoomResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
+import com.hamtalk.chat.service.ChatReadStatusService;
 import com.hamtalk.chat.service.ChatRoomService;
 import com.hamtalk.common.model.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/chat-rooms")
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
+    private final ChatReadStatusService chatReadStatusService;
 
     @PostMapping
     @Operation(summary = "채팅방 생성", description = "첫 메세지를 보낸 유저의 id 값으로 채팅방 생성")
@@ -39,6 +41,14 @@ public class ChatRoomController {
     public ResponseEntity<ApiResponse<DirectChatRoomResponse>> findDirectChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long friendId) {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.findDirectChatRoom(customUserDetails.getId(), friendId)));
     }
+
+    @PostMapping("/enter/{chatRoomId}")
+    @Operation(summary = "채팅방 접속 시간 기록", description = "로그인 유저의 특정 채팅방 접속 시간을 저장합니다.")
+    public ResponseEntity<Void> enterChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long chatRoomId) {
+        chatReadStatusService.updateLastReadTime(customUserDetails.getId(), chatRoomId);
+        return ResponseEntity.ok().build();
+    }
+
 
     //    @GetMapping("/{chatRoomId}")
 //    @Operation(summary = "특정 채팅방 조회", description = "특정 채팅방을 조회합니다.")

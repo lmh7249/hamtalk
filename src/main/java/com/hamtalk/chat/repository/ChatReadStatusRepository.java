@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ChatReadStatusRepository extends MongoRepository<ChatReadStatus, String> {
     Optional<ChatReadStatus> findByUserIdAndChatRoomId(Long userId, Long chatRoomId);
+
+
 }

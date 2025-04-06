@@ -100,3 +100,20 @@ export const notifyEnterChatRoomApi = async (chatRoomId: number) => {
         throw new Error(`채팅방 입장 시간 기록 실패: ${response.status}`);
     }
 }
+
+export const getUnreadMessageCountApi   = async (chatRoomId: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`/api/chat/rooms/${chatRoomId}/messages/unread-count`, {
+        method:"get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+    })
+    if (!response.ok) {
+        throw new Error(`읽지 않은 메시지 수 조회 실패: ${response.status}`);
+    }
+
+    return await response.json();
+
+}

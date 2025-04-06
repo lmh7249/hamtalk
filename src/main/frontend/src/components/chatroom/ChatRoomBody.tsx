@@ -5,7 +5,8 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {getChatMessageList, notifyEnterChatRoom} from "../../services/chat-service";
 import {formatTime} from "../../utils/formatTime";
-import {subscribeToChatRoom} from "../../utils/websocketUtil";
+import {subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
+import {Participant} from "../chat/ContentList";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -198,12 +199,19 @@ const ChatRoomBody = () => {
     const chatRoomId = chatRoomData.chatRoomId;
     // 채팅창 스크롤바 위치를 위한 ref
     const chatRoomBodyRef = useRef<HTMLDivElement>(null);
+    // 채팅방 유저 목록을 상태관리하기.
+    const [participants, setParticipants] = useState<Participant[]>([]);
+
+
 
     useEffect(() => {
         if (!chatRoomId) {
             setMessages([]);
             return;
         }
+
+        let chatSubscription: any = null;
+
         const fetchMessages = async () => {
             const response = await getChatMessageList(chatRoomId);
             setLoginUserId(response.loginUserId);
@@ -214,13 +222,18 @@ const ChatRoomBody = () => {
         notifyEnterChatRoom(chatRoomId);
         // 채팅방 구독로직.
         if(chatRoomId) {
-            subscribeToChatRoom(chatRoomId, (receivedMessage) => {
+            chatSubscription = subscribeToChatRoom(chatRoomId, (receivedMessage) => {
                 console.log("전달된 메세지: ", receivedMessage);
                 setMessages((prevMessages) =>[...prevMessages, receivedMessage]);
             })
         }
         return () => {
-            //TODO: 구독 해제 로직 넣을지 고민 (optional: 실제 해제 기능 추가 가능)
+            // 채팅방 구독 해제.
+            if(chatSubscription) {
+                unsubscribeFromChatRoom(chatSubscription);
+            }
+            // 채팅방을 나갈때도, 접속 시간을 업데이트 해야 최신정보를 유지 가능.
+            notifyEnterChatRoom(chatRoomId);
         };
 
     }, [chatRoomId]);

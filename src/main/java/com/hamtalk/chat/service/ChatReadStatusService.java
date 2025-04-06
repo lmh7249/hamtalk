@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+// 책임: 유저의 "읽은 시간"을 기록하거나 갱신하는 역할
 public class ChatReadStatusService {
     private final ChatReadStatusRepository chatReadStatusRepository;
 

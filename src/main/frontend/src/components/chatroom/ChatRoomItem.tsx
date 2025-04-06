@@ -135,7 +135,7 @@ const ChatRoomItem = ({
 
                 <MessageMetaInfo>
                     <LastMessageTime>{formatLastMessageTime(lastMessageTime)}</LastMessageTime>
-                    <UnreadCount>{unreadCount}</UnreadCount>
+                    {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
                 </MessageMetaInfo>
 
         </StyledChattingRoomItem>

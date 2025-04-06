@@ -28,13 +28,22 @@ export const subscribeToChatRoom = (chatRoomId: number, callback: (message: any)
       console.error("웹소켓 연결 안되어있어요. 채팅방 구독 실패");
       return;
   }
-  stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message: any) => {
+  const subscription = stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message: any) => {
       const receivedMessage = JSON.parse(message.body);
       callback(receivedMessage);
       console.log("새로운 메시지:", receivedMessage);
   });
     console.log(`구독 시작: /topic/chat/${chatRoomId}`);
+    return subscription;
 }
+
+// 채팅방 구독 해제 함수
+export const unsubscribeFromChatRoom = (subscription: any) => {
+    if (subscription) {
+        subscription.unsubscribe();
+        console.log('채팅방 구독 해제 완료');
+    }
+};
 
 
 // 메세지 전송 함수
@@ -60,6 +69,8 @@ export const sendChatMessageViaSocket  = (chatRoomId: number, message: string, r
     console.log("메시지 전송:", chatMessageRequest);
 
 }
+
+
 
 
 export const disconnectWebSocket = () => {

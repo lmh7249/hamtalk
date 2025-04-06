@@ -40,4 +40,15 @@ public class ChatMessageController {
         return ResponseEntity.ok(ApiResponse.ok(chatMessageList));
     }
 
+    @GetMapping("/rooms/{chatRoomId}/messages/unread-count")
+    @Operation(summary = "읽지 않은 메세지 수 조회", description = "로그인 한 유저의 읽지 않은 메세지 수를 반환합니다.")
+    public ResponseEntity<ApiResponse<Long>> getUnreadMessageCount(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long chatRoomId
+    ) {
+        long unreadCount = chatMessageService.countUnreadMessages(customUserDetails.getId(), chatRoomId);
+        return ResponseEntity.ok(ApiResponse.ok(unreadCount));
+    }
+
+
 }

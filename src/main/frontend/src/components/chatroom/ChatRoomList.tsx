@@ -2,7 +2,8 @@ import styled from "styled-components";
 import ChatRoomItem from "./ChatRoomItem";
 import UserDefaultImage from "../../assets/images/UserDefaultImage.png";
 import {ChatRoom} from "../chat/ContentList";
-import React from "react";
+import React, {useEffect, useState} from "react";
+import {getUnreadMessageCount} from "../../services/chat-service";
 
 const StyledChattingRoomListWrapper = styled.div`
     display: flex;
@@ -15,6 +16,34 @@ interface ChatRoomListProps {
 
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({chatRooms}) => {
+    const [unreadCounts, setUnreadCounts] = useState<{ [chatRoomId: number]: number }>({});
+
+    useEffect(() => {
+        const fetchUnreadCounts = async () => {
+            const counts: { [chatRoomId: number]: number } = {};
+
+            await Promise.all(chatRooms.map(async (chatRoom) => {
+                try {
+                    const response = await getUnreadMessageCount(chatRoom.chatRoomId);
+                    console.log("읽지 않은 메세지 수");
+                    console.log(response);
+                    counts[chatRoom.chatRoomId] = response ?? 0;
+                } catch (error) {
+                    console.error("읽지 않은 메시지 수 불러오기 실패", error);
+                    counts[chatRoom.chatRoomId] = 0; // 실패 시 0으로 처리
+                }
+            }));
+
+            setUnreadCounts(counts);
+        };
+
+        if (chatRooms.length > 0) {
+            fetchUnreadCounts();
+        }
+
+    }, [chatRooms]);
+
+
     return (
         <StyledChattingRoomListWrapper>
             {chatRooms.length > 0 ?
@@ -33,7 +62,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({chatRooms}) => {
                             profileImage={UserDefaultImage}
                             lastMessage={chatRoom.lastMessage}
                             lastMessageTime={chatRoom.lastMessageTime}
-                            unreadCount={2}
+                            unreadCount={unreadCounts[chatRoom.chatRoomId] ?? 0}
                             participantIds={chatRoom.participants.map(participant => participant.userId)}
                         />
                     );

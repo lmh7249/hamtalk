@@ -1,11 +1,13 @@
 package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.domain.entity.ChatMessage;
+import com.hamtalk.chat.domain.entity.ChatReadStatus;
 import com.hamtalk.chat.model.projection.UserProfileProjection;
 import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
 import com.hamtalk.chat.model.response.ChatRoomMessagesResponse;
 import com.hamtalk.chat.repository.ChatMessageRepository;
+import com.hamtalk.chat.repository.ChatReadStatusRepository;
 import com.hamtalk.chat.repository.ChatRoomRepository;
 import com.hamtalk.chat.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +23,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+// 책임: 메시지와 관련된 데이터 처리(읽지 않은 메시지 개수 계산 포함)
 public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserProfileRepository userProfileRepository;
-    private final ChatRoomRepository chatRoomRepository;
-    private final ChatRoomService chatRoomService;
+    private final ChatReadStatusRepository chatReadStatusRepository;
 
     // 메세지 저장
     @Transactional
@@ -80,5 +82,12 @@ public class ChatMessageService {
                 .build();
     }
 
+    public long countUnreadMessages(Long userId, Long chatRoomId) {
+        ChatReadStatus chatReadStatus = chatReadStatusRepository.findByUserIdAndChatRoomId(userId, chatRoomId).orElse(null);
 
+        if (chatReadStatus == null || chatReadStatus.getLastReadAt() == null) {
+            return chatMessageRepository.countByChatRoomIdAndSenderIdNot(chatRoomId, userId);
+        }
+        return chatMessageRepository.countByChatRoomIdAndSenderIdNotAndCreatedAtAfter(chatRoomId, userId, chatReadStatus.getLastReadAt());
+    }
 }

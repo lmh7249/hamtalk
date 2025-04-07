@@ -8,6 +8,7 @@ import {ChatRoomPayload, setChatRoom, setUserProfile} from "../../store/contentD
 import {findDirectChatRoomApi} from "../../api/chat";
 import {findDirectChatRoom} from "../../services/chat-service";
 import {subscribeToChatRoom} from "../../utils/websocketUtil";
+import testImg from "../../assets/images/img.png"
 
 const StyledFriendProfile = styled.div`
     display: flex;
@@ -23,8 +24,9 @@ const StyledFriendProfile = styled.div`
 
 const StyledImage = styled.img`
     object-fit: cover; /* 이미지 비율을 유지하면서 부모 요소에 맞게 조정 */
-    width: 60px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
-    max-height: 60px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
 `;
 
 const ImageWrapper = styled.div`
@@ -34,6 +36,10 @@ const ImageWrapper = styled.div`
     border: 1px black solid;
     border-radius: 50%;
     padding: 3px;
+    width: 60px;
+    height: 60px;
+    overflow: hidden; 
+    box-sizing: border-box;
 `;
 
 

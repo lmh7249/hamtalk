@@ -6,6 +6,7 @@ import IconButton from "../common/IconButton";
 import {useDispatch, useSelector} from "react-redux";
 import {setEmpty} from "../../store/contentDetailSlice";
 import {RootState} from "../../store";
+import testImage from "../../assets/images/UserDefaultImage.png";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -38,7 +39,7 @@ const ChatRoomParticipantItem = () => {
     console.log("Redux에서 가져온 chatRoom:", chatRoom);
     return (
         <StyledChatRoomParticipantItemWrapper>
-            <ParticipantProfileImage/>
+            <ParticipantProfileImage src={testImage}/>
             <ParticipantProfileNickName>{chatRoomName}</ParticipantProfileNickName>
         </StyledChatRoomParticipantItemWrapper>
     )
@@ -48,7 +49,6 @@ export const ParticipantProfileImage = styled.img`
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 1px solid magenta;
 `;
 
 const ChatRoomButtonWrapper = styled.div`

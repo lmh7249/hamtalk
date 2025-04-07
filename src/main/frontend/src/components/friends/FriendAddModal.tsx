@@ -9,6 +9,7 @@ import {addFriend} from "../../services/friend-service";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {setUserProfile} from "../../store/contentDetailSlice";
+import testImage from "../../assets/images/UserDefaultImage.png";
 
 const Title = styled.h3`
     margin-top: 0;
@@ -77,7 +78,8 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ userProfileData, handleAddFriend, handleViewProfile }) => {
     return (
         <>
-            <StyledProfileImage src={userProfileData.profile_image_url} alt="유저 프로필 사진" />
+            {/*userProfileData.profile_image_url -> 이거 이미지쪽에 넣기.*/}
+            <StyledProfileImage src={testImage} alt="유저 프로필 사진" />
             <StyledUserNickName>{userProfileData.nickname}</StyledUserNickName>
             <ButtonWrapper>
                 <ModalButton backgroundColor={"#d3d3d3"} hoverColor={"#b0b0b0"} color={"black"} onClick={() => handleViewProfile(userProfileData.id)}>

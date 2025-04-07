@@ -7,6 +7,7 @@ import {getChatMessageList, notifyEnterChatRoom} from "../../services/chat-servi
 import {formatTime} from "../../utils/formatTime";
 import {subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
 import {Participant} from "../chat/ContentList";
+import testImage from "../../assets/images/UserDefaultImage.png";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -139,7 +140,7 @@ const StyledMessageRow = styled.div`
 const ChatDateDivider = () => {
     return (
         <StyledDateContainer>
-            <StyledDateText>2025년 2월 12일</StyledDateText>
+            <StyledDateText>2025년 4월 5일</StyledDateText>
         </StyledDateContainer>
     )
 }
@@ -149,7 +150,7 @@ const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
     return (
         <StyledChatMessageMineContainer>
             <StyledMessageInfo>
-                <StyledUnreadCount>1</StyledUnreadCount>
+                {/*<StyledUnreadCount>1</StyledUnreadCount>*/}
                 <StyledTime>{formatTime(createdAt)}</StyledTime>
             </StyledMessageInfo>
             <StyledBubbleMine>
@@ -165,7 +166,7 @@ const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profile
         <StyledChatMessageOtherContainer>
             {/*TODO: alignSelf : 부모 요소가 display: flex or grid 일 때만 사용가능. 노션에 정리 */}
             <div style={{alignSelf: "center"}}>
-                <ParticipantProfileImage/>
+                <ParticipantProfileImage src={testImage}/>
             </div>
 
             <StyledMessageContentWrapper>
@@ -173,7 +174,7 @@ const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profile
                 <StyledMessageRow>
                     <StyledBubbleOther>{message}</StyledBubbleOther>
                     <StyledMessageInfo>
-                        <StyledUnreadCountOther>2</StyledUnreadCountOther>
+                        {/*<StyledUnreadCountOther>2</StyledUnreadCountOther>*/}
                         <StyledTime>{formatTime(createdAt)}</StyledTime>
                     </StyledMessageInfo>
                 </StyledMessageRow>
@@ -253,6 +254,7 @@ const ChatRoomBody = () => {
             {messages.map((message) =>
                 loginUserId === message.senderId ?
                     <ChatMessageMine key={message.messageId} {...message}/> :
+
                     <ChatMessageOther key={message.messageId} {...message}/>
             )}
         </StyledChatRoomBodyWrapper>

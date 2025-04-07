@@ -27,14 +27,17 @@
   - WebSocket + STOMP 프로토콜 기반의 실시간 채팅 구현
   - 채팅방 입장, 메세지 전송/수신, 읽음 처리 기능
   - Redis Pub/Sub을 활용한 메시지 브로드캐스팅
+    
 🔐 JWT 기반 로그인 및 인증/인가
   - 로그인 시 Access Token + Refresh Token 발급
   - Spring Security + JWT 필터를 통한 인증 처리
   - 사용자 권한에 따른 페이지 접근 제어
+    
 📦 파일 업로드 및 S3 이미지 관리
   - AWS S3를 활용한 프로필 이미지 업로드
   - 기본 프로필 이미지 및 사용자별 디렉토리 구조 설정
   - S3 접근 권한 설정 및 URL 반환 처리
+    
 💬 SPA 기반 커뮤니티 UI
   - React + React Router 기반 싱글 페이지 앱
   - Redux Toolkit을 이용한 상태 관리

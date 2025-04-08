@@ -239,7 +239,7 @@ const UserProfileDetail = () => {
                 </ProfileMenuIconWrapper>
                 <StyledAbsoluteUserPosition>
                     <ProfileImageWrapper>
-                        <UserProfileImage src={TestImage}/>
+                        <UserProfileImage src={searchUserProfile?.profileImageUrl}/>
                         {isMyUserId && <ProfileImageEditButton/>}
                     </ProfileImageWrapper>
                     <StyledUserInfo>

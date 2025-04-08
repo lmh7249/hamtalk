@@ -80,7 +80,7 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
     return (
         <StyledFriendProfile onDoubleClick={() => handleProfileDoubleClick()}>
             <ImageWrapper onClick={(e: React.MouseEvent) => handleImageClick(e, userId)}>
-                <StyledImage src={UserDefaultImage} alt="유저이미지"/>
+                <StyledImage src={profileImageUrl} alt="유저이미지"/>
             </ImageWrapper>
             <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} isMe={false}/>
         </StyledFriendProfile>

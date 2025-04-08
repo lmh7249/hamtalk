@@ -59,7 +59,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({chatRooms}) => {
                             chatRoomId ={chatRoom.chatRoomId}
                             chatRoomName={chatRoomName}  // 수정된 채팅방 이름 사용
                             creatorId={chatRoom.creatorId}
-                            profileImage={UserDefaultImage}
+                            profileImage={chatRoom.participants[0].profileImageUrl}
                             lastMessage={chatRoom.lastMessage}
                             lastMessageTime={chatRoom.lastMessageTime}
                             unreadCount={unreadCounts[chatRoom.chatRoomId] ?? 0}

@@ -166,7 +166,7 @@ const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profile
         <StyledChatMessageOtherContainer>
             {/*TODO: alignSelf : 부모 요소가 display: flex or grid 일 때만 사용가능. 노션에 정리 */}
             <div style={{alignSelf: "center"}}>
-                <ParticipantProfileImage src={testImage}/>
+                <ParticipantProfileImage src={profileImageUrl}/>
             </div>
 
             <StyledMessageContentWrapper>

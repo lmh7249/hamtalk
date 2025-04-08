@@ -81,7 +81,7 @@ interface ChattingRoomItemProps {
     chatRoomName: string;
     chatRoomId: number;
     creatorId: number;
-    profileImage: string;
+    profileImage: string | null;
     lastMessage: string;
     lastMessageTime: string;
     //TODO: 추후에 Date로 바꿀지 고민

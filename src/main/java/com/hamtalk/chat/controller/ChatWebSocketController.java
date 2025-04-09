@@ -2,7 +2,9 @@ package com.hamtalk.chat.controller;
 
 import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
+import com.hamtalk.chat.pubsub.RedisPublisher;
 import com.hamtalk.chat.service.ChatMessageService;
+import com.hamtalk.chat.service.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "ChatWebSocketController", description = "실시간 채팅 관련 API")
 public class ChatWebSocketController {
-    private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
+    private final RedisPublisher redisPublisher;
+    private final RedisService redisService;
 
     @MessageMapping("/chat/{chatRoomId}/sendMessage")
     @Operation(summary = "실시간 메세지 전송", description = "실시간 메세지 전송 + MongoDB 메세지 저장, 두 로직을 실행합니다." )
@@ -30,6 +33,9 @@ public class ChatWebSocketController {
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
         log.info("User ID: {}", userId);
         ChatMessageResponse chatMessageResponse = chatMessageService.saveChatMessage(userId, chatRoomId, chatMessageRequest);
-        messagingTemplate.convertAndSend("/topic/chat/"+ chatRoomId, chatMessageResponse);
+        // 채팅방 Redis 채널 구독 (최초 메시지 전송 시)
+        redisService.subscribe(chatRoomId);
+        // Redis 발행
+        redisPublisher.publish("chatRoom:" +chatRoomId, chatMessageResponse);
     }
 }

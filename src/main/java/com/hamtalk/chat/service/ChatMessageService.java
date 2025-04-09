@@ -38,6 +38,7 @@ public class ChatMessageService {
         UserProfileProjection userProfileProjection = userProfileRepository.findByUserId(chatMessage.getSenderId()).orElseThrow(() -> new RuntimeException());
         return ChatMessageResponse.builder()
                 .messageId(chatMessage.getId())
+                .chatRoomId(chatMessage.getChatRoomId())
                 .senderId(chatMessage.getSenderId())
                 .senderNickName(userProfileProjection.getNickname())
                 .profileImageUrl(userProfileProjection.getProfileImageUrl())

@@ -5,8 +5,13 @@ import com.hamtalk.common.constant.EmailConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -15,6 +20,9 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtProperties jwtProperties;
+    private final RedisMessageListenerContainer container;
+    private final MessageListenerAdapter listenerAdapter;
+    private final Set<String> subscribedChannels = ConcurrentHashMap.newKeySet();
     // Hash 형식으로 값 저장
     // 추후 30분 이내 호출 5회 미만 설정하기
     public void saveAuthCode(String email, String authCode) {
@@ -47,6 +55,16 @@ public class RedisService {
     public void deleteByRefresh(String email) {
         String key = "auth:refresh-token:" + email;
         redisTemplate.delete(key);
+    }
+
+    public void subscribe(Long chatRoomId) {
+        String topicName = "chatRoom:" + chatRoomId;
+        // 중복 구독 방지
+        if(!subscribedChannels.contains(topicName)) {
+            container.addMessageListener(listenerAdapter, new ChannelTopic(topicName));
+            subscribedChannels.add(topicName);
+        }
+
     }
 
 

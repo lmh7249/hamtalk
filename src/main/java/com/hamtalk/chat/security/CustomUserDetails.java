@@ -1,6 +1,8 @@
 package com.hamtalk.chat.security;
 
 import com.hamtalk.chat.model.response.UserAuthenticationResponse;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;

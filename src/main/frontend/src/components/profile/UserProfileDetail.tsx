@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import ProfileCat from "../../assets/images/profile-cat.jpg";
-import TestImage from "../../assets/images/UserDefaultImage.png";
+import TestImage from "../../assets/images/img.png";
 import BackGroundImageSample from "../../assets/images/background.jpg";
 import ModalButton from "../common/ModalButton";
 import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
@@ -10,6 +10,8 @@ import {addFriend, checkFriendship} from "../../services/friend-service";
 import toast from "react-hot-toast";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
+import {FaCamera} from 'react-icons/fa';
+import {FiEdit} from "react-icons/fi";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -50,6 +52,8 @@ const StyledUserInfo = styled.div`
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+
 `;
 
 const StyledNickName = styled.p`
@@ -108,6 +112,74 @@ const ProfileMenuIconWrapper = styled.div`
     justify-content: flex-end;
     margin-top: 20px;
 `;
+
+const ProfileImageWrapper = styled.div`
+    position: relative;
+    width: 150px;
+    height: 150px;
+`;
+
+const ProfileImageEditButton = () => {
+    return (
+        <button style={{
+            position: "absolute",
+            bottom: "3px",
+            right: "1px",
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "50%",
+            padding: "6px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+        }}
+                onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f0f0f0";
+                }}
+                onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = "white";
+                }}
+        >
+            <FaCamera size={20} color="#333"/>
+        </button>
+    );
+};
+
+const StatusMessageWrapper = styled.div`
+    display: flex;
+    gap: 6px; // 버튼과 메시지 사이 여백
+`;
+
+const ProfileStatusEditButton = () => {
+    return (
+        <button style={{
+            backgroundColor: "white",
+            border: "none",
+            width: "28px",
+            height: "28px",
+            borderRadius: "50%",
+            cursor: "pointer",
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "center",
+            padding: 0,
+            transition: "background-color 0.2s ease-in-out",
+        }}
+                onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f0f0f0";
+                }}
+                onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = "white";
+                }}
+
+        >
+            <FiEdit size={18} color="#333"/>
+        </button>
+    );
+};
+
+
 interface searchUserProfileData {
     id: number;
     email: string;
@@ -120,26 +192,28 @@ const UserProfileDetail = () => {
     const [searchUserProfile, setSearchUserProfile] = useState<searchUserProfileData>();
     const [isFriend, setIsFriend] = useState<boolean>(false);
 
-    const searchUserProfileId = useSelector((state:RootState) => state.detailContent.payload?.userId);
+    const searchUserProfileId = useSelector((state: RootState) => state.detailContent.payload?.userId);
+    const loginUserId = useSelector((state: RootState) => state.user.id);
+    const isMyUserId: boolean = searchUserProfileId === loginUserId;
 
     useEffect(() => {
-        if(searchUserProfileId > 0) {
+        if (searchUserProfileId > 0) {
             console.log(`searchUserProfileId: ${searchUserProfileId}`);
             // api 호출 함수 설정하기.
-            const fetchUserProfile  = async () => {
-               const profileData = await getUserProfileById(searchUserProfileId);
+            const fetchUserProfile = async () => {
+                const profileData = await getUserProfileById(searchUserProfileId);
                 setSearchUserProfile(profileData);
                 const isFriend = await checkFriendship(searchUserProfileId);
                 setIsFriend(isFriend.data);
             }
             //TODO: 추후, Promise.All 학습 후, 적용해보기.
-           fetchUserProfile();
+            fetchUserProfile();
             console.log("검색한 유저의 프로필 데이터: ", searchUserProfile);
         }
     }, [searchUserProfileId]);
 
-    const handleAddFriend = async (toUserId:number|undefined) => {
-        if(toUserId === undefined) {
+    const handleAddFriend = async (toUserId: number | undefined) => {
+        if (toUserId === undefined) {
             toast.error("유효하지 않은 사용자입니다.");
             return;
         }
@@ -153,8 +227,6 @@ const UserProfileDetail = () => {
         }
     }
     return (
-        // 전체 영역을 잡는 컴포넌트 -> 이름을 레이아웃으로 바꿔야하나?
-
         <StyledUserProfileDetail>
             <StyledBackGroundImageWrapper>
                 <BackGroundImage src={BackGroundImageSample}/>
@@ -166,22 +238,30 @@ const UserProfileDetail = () => {
                     </ProfileMenuIconButton>
                 </ProfileMenuIconWrapper>
                 <StyledAbsoluteUserPosition>
-                    <UserProfileImage src={searchUserProfile?.profileImageUrl}/>
+                    <ProfileImageWrapper>
+                        <UserProfileImage src={searchUserProfile?.profileImageUrl}/>
+                        {isMyUserId && <ProfileImageEditButton/>}
+                    </ProfileImageWrapper>
                     <StyledUserInfo>
                         <UserNameAndEmailWrapper>
                             <StyledNickName>{searchUserProfile?.nickname} </StyledNickName>
                             ｜
                             <StyledEmail>{searchUserProfile?.email}</StyledEmail>
                         </UserNameAndEmailWrapper>
-                        <StyledStateMessage>{searchUserProfile?.statusMessage}</StyledStateMessage>
+                        <StatusMessageWrapper>
+                            <StyledStateMessage>{searchUserProfile?.statusMessage}</StyledStateMessage>
+                            {isMyUserId && <ProfileStatusEditButton/>}
+                        </StatusMessageWrapper>
                     </StyledUserInfo>
                     <ButtonWrapper>
-                        {!isFriend && <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"} onClick={()=> handleAddFriend(searchUserProfile?.id)}>
-                            친구 추가
-                        </ModalButton>}
-                        <ModalButton backgroundColor={"#2C2D31"} color={"white"} hoverColor={"#3A3B40"}>
+                        {(!isFriend && !isMyUserId) &&
+                            <ModalButton backgroundColor={"#d3d3d3"} color={"black"} hoverColor={"#b0b0b0"}
+                                         onClick={() => handleAddFriend(searchUserProfile?.id)}>
+                                친구 추가
+                            </ModalButton>}
+                        {!isMyUserId && <ModalButton backgroundColor={"#2C2D31"} color={"white"} hoverColor={"#3A3B40"}>
                             채팅하기
-                        </ModalButton>
+                        </ModalButton>}
                     </ButtonWrapper>
                 </StyledAbsoluteUserPosition>
             </StyledUserProfileWrapper>

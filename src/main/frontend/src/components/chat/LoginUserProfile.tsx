@@ -3,6 +3,7 @@ import UserDefaultImage from "../../assets/images/UserDefaultImage.png";
 import UserInfoText from "./UserInfoText";
 import {useEffect, useState} from "react";
 import {getMyProfile} from "../../services/user-service";
+import testImage from "../../assets/images/img.png";
 
 const StyledUserProfile = styled.div`
     height: 200px;
@@ -33,6 +34,7 @@ interface MyProfile {
     nickname: string;
     stateMessage: string;
     email: string;
+    profileImageUrl: string;
 }
 
 //TODO: 로그인 한 유저의 프로필 정보 api 호출, 추후 Redux로 관리할지, 이대로 사용할지 고민해보기.
@@ -59,7 +61,7 @@ const LoginUserProfile = () => {
             </ProfileTitle>
             {myProfile ?
                 <StyledUserProfileDetail>
-                    <StyledImage src={UserDefaultImage} alt="유저이미지"/>
+                    <StyledImage src={myProfile.profileImageUrl} alt="유저이미지"/>
                     <UserInfoText nickName={myProfile.nickname} statusMessage={myProfile.stateMessage}
                                   email={myProfile.email} isMe={true}/>
                 </StyledUserProfileDetail>

@@ -10,8 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -24,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 import java.util.Collections;
 
@@ -42,6 +45,15 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+
+    //TODO: multipart 필터 설정을 해줘야 403Error가 안나옴.
+    @Bean
+    public FilterRegistrationBean<MultipartFilter> multipartFilter() {
+        FilterRegistrationBean<MultipartFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new MultipartFilter());
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE); // 가장 먼저 실행되도록 설정
+        return registration;
     }
 
 
@@ -93,16 +105,23 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/static/**"
                         ).permitAll()
-                        .requestMatchers("/api/user/signup", "/api/login", "/api/users/email-check", "/api/auth/email-verification/code", "/api/auth/email-verification/code/verify", "/api/auth/login").permitAll()
-                        // GET 방식 /api/users는 인증 필요(유저 검색)
-                        .requestMatchers(HttpMethod.GET, "/api/users").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
+                        .requestMatchers("/api/user/signup",
+                                "/api/login",
+                                "/api/users/email-check",
+                                "/api/auth/email-verification/code",
+                                "/api/auth/email-verification/code/verify",
+                                "/api/auth/login",
+                                "/api/auth/refresh",
+                                "/ws-chat/**", // 웹소켓 핸드셰이크 엔드포인트는 허용
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**" // swagger-ui 허용
+                        ).permitAll()
+
                         // POST 방식 /api/users는 인증 없이 허용 (회원가입)
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/auth/refresh").permitAll()
                         // 나머지 모든 요청은 React 라우팅으로 처리되도록 허용
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 );
         http
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);

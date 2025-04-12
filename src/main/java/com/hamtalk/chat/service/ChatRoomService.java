@@ -10,6 +10,8 @@ import com.hamtalk.chat.model.response.DirectChatRoomResponse;
 import com.hamtalk.chat.repository.ChatMessageRepository;
 import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.repository.ChatRoomRepository;
+import com.hamtalk.chat.repository.UserRepository;
+import com.hamtalk.common.exeption.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public ChatRoom createChatRoom(Long creatorId, List<Long> userIds) {
@@ -50,6 +53,7 @@ public class ChatRoomService {
         return chatRoom;
     }
 
+    // 수정 안해도 됨.
     @Transactional(readOnly = true)
     public List<ChatRoomListResponse> getChatRoomsWithLastMessage(Long userId) {
         // 1. MySQL에서 로그인한 유저의 채팅방 목록 조회
@@ -122,9 +126,8 @@ public class ChatRoomService {
     }
     @Transactional(readOnly = true)
     public DirectChatRoomResponse findDirectChatRoom(Long myId, Long friendId) {
-        // TODO: 해당 유저가 존재하는지 확인
         log.info("넘어 온 값 조회: {}, {}", myId, friendId);
-
+        userRepository.findById(friendId).orElseThrow(UserNotFoundException::new);
         DirectChatRoomResponse directChatRoomResponse = chatRoomRepository.findDirectChatRoom(myId, friendId).orElse(null);
         log.info("객체에 저장된 값: {}", directChatRoomResponse);
         // 채팅방이 없으면 null 반환, orElse -> 없을 경우 무엇을 반환할지.

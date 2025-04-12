@@ -1,7 +1,10 @@
 package com.hamtalk.common.exeption;
 
+import com.hamtalk.common.exeption.custom.EmailSendFailedException;
 import com.hamtalk.common.exeption.custom.FileUploadException;
+import com.hamtalk.common.exeption.custom.RedisOperationException;
 import com.hamtalk.common.model.response.ApiResponse;
+import io.lettuce.core.RedisBusyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,6 +46,23 @@ public class ApiExceptionHandler {
                 .body(ApiResponse.fail("INVALID_MULTIPART", "이미지 업로드 요청은 multipart/form-data 형식이어야 합니다."));
     }
 
+    @ExceptionHandler(RedisOperationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRedisOperationException(RedisOperationException e){
+
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.error(errorCode.getCode(), errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(EmailSendFailedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleEmailSendFailedException(EmailSendFailedException e){
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.error(errorCode.getCode(), errorCode.getMessage()));
+    }
+
 
     // 그 외 에러는 모두 해당 예외로 반환.
     @ExceptionHandler(Exception.class)
@@ -50,7 +70,7 @@ public class ApiExceptionHandler {
         // 알수 없는 에러는 500으로 처리
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus())
-                .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
+                .body(ApiResponse.error("INTERNAL_SERVER_ERROR", ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
 
     }
 

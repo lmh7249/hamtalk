@@ -38,33 +38,15 @@ public class AuthController {
     @PostMapping("/email-verification/code/verify")
     @Operation(summary = "이메일 인증번호 확인", description = "Redis에 저장된 인증번호와 사용자가 입력한 인증번호가 일치하는지 확인합니다.")
     public ResponseEntity<ApiResponse<Boolean>> verifyEmailVerificationCode(@RequestBody EmailVerificationCodeRequest dto) {
-        Boolean isValid = emailService.verifyAuthCode(dto);
-        if (!isValid) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.fail("인증번호를 다시 확인해주세요."));
-
-        }
-        return ResponseEntity.ok(ApiResponse.ok(isValid));
+        emailService.verifyAuthCode(dto);
+        return ResponseEntity.ok(ApiResponse.ok(true));
     }
-
-
-//    @PostMapping("/login")
-//    public ResponseEntity<ApiResponse<>> login() {
-//
-//    }
-
-//
-//    로그인 (POST /api/auth/login)
-//    로그아웃 (POST /api/auth/logout)
-//    액세스 토큰 재발급 (POST /api/auth/refresh)
 
     @PostMapping("/refresh")
-    @Operation(summary = "액세스 토큰 재발급", description = "액세스 토큰 만료 시, 리프레시 토큰을 통해 액세스 토큰을 재발급 합니다.")
-    public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+    @Operation(summary = "액세스 토큰 재발급", description = "액세스 토큰 만료 시, 리프레시 토큰을 통해 액세스 토큰과 리프레시 토큰을 재발급 합니다.")
+    public ResponseEntity<ApiResponse<Object>> reissue(HttpServletRequest request, HttpServletResponse response) {
         reissueService.reissueTokens(request, response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.ok("토큰이 재발급되었습니다."));
 
     }
-
-
-
 }

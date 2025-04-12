@@ -49,9 +49,10 @@ public class ApiResponse<T> {
     }
 
     // 서버 오류 응답
-    public static <T> ApiResponse<T> error(String errorMessage) {
+    public static <T> ApiResponse<T> error(String errorCode, String errorMessage) {
         return ApiResponse.<T>builder()
                 .status(ERROR)
+                .errorCode(errorCode)
                 .errorMessage(errorMessage)
                 .build();
     }

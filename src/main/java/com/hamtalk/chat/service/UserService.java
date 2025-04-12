@@ -48,6 +48,10 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserProfileByEmailResponse getUserByEmail(String email) {
+        if (!EmailValidator.isValidEmailFormat(email)) {
+            throw new InvalidEmailFormatException();
+        }
+
         return userRepository.findUserProfileByEmail(email).orElseThrow(UserProfileNotFoundException::new);
     }
 

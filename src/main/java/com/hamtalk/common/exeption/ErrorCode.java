@@ -13,7 +13,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "해당 사용자를 찾을 수 없습니다."),
     ALREADY_FRIEND(HttpStatus.CONFLICT, "ALREADY_FRIEND", "이미 친구인 유저입니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_ROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),
-    USER_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_PROFILE_NOT_FOUND", "해당 유저의 프로필이 존재하지 않습니다.");
+    USER_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_PROFILE_NOT_FOUND", "해당 유저의 프로필이 존재하지 않습니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "FILE_UPLOAD_FAILED", "파일 업로드에 실패했습니다.");
 
 
     private final HttpStatus httpStatus;

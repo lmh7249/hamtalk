@@ -5,6 +5,6 @@ import com.hamtalk.common.exeption.GlobalException;
 
 public class UserProfileNotFoundException extends GlobalException {
     public UserProfileNotFoundException() {
-        super(ErrorCode.USER_NOT_FOUND);
+        super(ErrorCode.USER_PROFILE_NOT_FOUND);
     }
 }

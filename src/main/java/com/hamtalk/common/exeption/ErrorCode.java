@@ -14,7 +14,9 @@ public enum ErrorCode {
     ALREADY_FRIEND(HttpStatus.CONFLICT, "ALREADY_FRIEND", "이미 친구인 유저입니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_ROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),
     USER_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_PROFILE_NOT_FOUND", "해당 유저의 프로필이 존재하지 않습니다."),
-    FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "FILE_UPLOAD_FAILED", "파일 업로드에 실패했습니다.");
+    FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "FILE_UPLOAD_FAILED", "파일 업로드에 실패했습니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "EMAIL_ALREADY_EXISTS", "이미 존재하는 이메일입니다."),
+    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "INVALID_EMAIL_FORMAT", "유효하지 않은 이메일 형식입니다.");
 
 
     private final HttpStatus httpStatus;

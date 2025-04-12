@@ -25,21 +25,17 @@ public class UserController {
     @PostMapping
     @Operation(summary = "회원가입", description = "회원가입 성공 시, 해당 유저의 이름 반환")
     public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody UserSignupRequest dto) {
-        if(!userService.signup(dto)) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail("회원가입 실패"));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(dto.getName()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(userService.signup(dto)));
     }
 
     // TODO: 추후 api명 restful하게 변경하기. 동작이 포함되어 있어 부적절
     @GetMapping("/email-check")
     @Operation(summary = "이메일 중복 검사", description = "이메일 중복일 경우 에러 메세지 반환, 회원가입이 가능할 경우 true 반환")
     public ResponseEntity<ApiResponse<Boolean>> emailCheck(@RequestParam String email) {
-        if (userService.emailCheck(email)) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail("이미 사용중인 이메일입니다. 다른 이메일을 사용해주세요."));
-        }
+        userService.emailCheck(email);
         return ResponseEntity.ok(ApiResponse.ok(true));
     }
+
     // TODO: @GetMapping("/email-check") -> 변경할때 함께 변경해보기.
     @GetMapping
     @Operation(summary = "이메일로 친구 조회", description = "이메일을 입력하면 해당 유저의 프로필 사진과 닉네임을 반환")

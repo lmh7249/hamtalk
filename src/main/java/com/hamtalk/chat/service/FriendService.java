@@ -21,10 +21,9 @@ public class FriendService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public ApiResponse<List<FriendResponse>> getAllFriends(Long userId) {
+    public List<FriendResponse> getAllFriends(Long userId) {
         // 3. 정상적인 상태 값만 포함하여 조회
-        List<FriendResponse> friends = friendRepository.findFriendsWithProfile(userId);
-        return ApiResponse.ok(friends);
+        return friendRepository.findFriendsWithProfile(userId);
     }
 
     //TODO: 구조 변경 예정

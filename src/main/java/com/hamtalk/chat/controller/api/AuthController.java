@@ -40,7 +40,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Boolean>> verifyEmailVerificationCode(@RequestBody EmailVerificationCodeRequest dto) {
         Boolean isValid = emailService.verifyAuthCode(dto);
         if (!isValid) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.fail("인증번호를 다시 확인해주세요."));
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.fail("인증번호를 다시 확인해주세요."));
 
         }
         return ResponseEntity.ok(ApiResponse.ok(isValid));

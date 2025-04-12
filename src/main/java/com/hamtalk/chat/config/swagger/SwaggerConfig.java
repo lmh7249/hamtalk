@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -25,19 +27,43 @@ import java.util.Optional;
 public class SwaggerConfig {
     private final ApplicationContext applicationContext;
 
+//    @Bean
+//    public OpenAPI openAPI() {
+//        return new OpenAPI()
+//                .components(new Components())
+//                .info(apiInfo());
+//    }
+
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI customOpenAPI() {
+        // Security Scheme 정의
+        // Swagger UI에서 JWT 토큰 테스트를 하기 위한 설정.
+        SecurityScheme securityScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT")
+                .in(SecurityScheme.In.HEADER)
+                .name("Authorization");
+
+        // Security Requirement 정의
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("BearerAuth");
+
         return new OpenAPI()
-                .components(new Components())
-                .info(apiInfo());
+                .info(new Info().title("HamTalk API")
+                        .description("채팅 웹사이트 API")
+                        .version("2.6.0"))
+                .addSecurityItem(securityRequirement)  // Security Requirement 추가
+                .schemaRequirement("BearerAuth", securityScheme);  // Security Scheme 추가
     }
 
-    private Info apiInfo() {
-        return new Info()
-                .title("HamTalk API")
-                .description("채팅 웹사이트 API")
-                .version("2.6.0");
-    }
+
+
+//    private Info apiInfo() {
+//        return new Info()
+//                .title("HamTalk API")
+//                .description("채팅 웹사이트 API")
+//                .version("2.6.0");
+//    }
 
     @Bean
     public OpenApiCustomizer springSecurityEndpointCustomiser() {

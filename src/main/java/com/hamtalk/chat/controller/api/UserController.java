@@ -26,7 +26,7 @@ public class UserController {
     @Operation(summary = "회원가입", description = "회원가입 성공 시, 해당 유저의 이름 반환")
     public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody UserSignupRequest dto) {
         if(!userService.signup(dto)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail("회원가입 실패"));
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail("회원가입 실패"));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(dto.getName()));
     }
@@ -36,7 +36,7 @@ public class UserController {
     @Operation(summary = "이메일 중복 검사", description = "이메일 중복일 경우 에러 메세지 반환, 회원가입이 가능할 경우 true 반환")
     public ResponseEntity<ApiResponse<Boolean>> emailCheck(@RequestParam String email) {
         if (userService.emailCheck(email)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail("이미 사용중인 이메일입니다. 다른 이메일을 사용해주세요."));
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail("이미 사용중인 이메일입니다. 다른 이메일을 사용해주세요."));
         }
         return ResponseEntity.ok(ApiResponse.ok(true));
     }

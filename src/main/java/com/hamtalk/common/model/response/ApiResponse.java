@@ -22,7 +22,12 @@ public class ApiResponse<T> {
     private T data;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String errorCode;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String errorMessage;
+
+
 
     // 성공 응답 생성
     // TODO: 앞쪽 <T> -> 이 메세드에서 사용할 제네릭 타입 선언
@@ -35,17 +40,19 @@ public class ApiResponse<T> {
     }
 
     // 클라이언트 요청 실패 응답
-    public static <T> ApiResponse<T> fail(String errorMessage) {
+    public static <T> ApiResponse<T> fail(String errorCode, String errorMessage) {
         return ApiResponse.<T>builder()
                 .status(FAIL)
+                .errorCode(errorCode)
                 .errorMessage(errorMessage)
                 .build();
     }
 
     // 서버 오류 응답
-    public static <T> ApiResponse<T> error(String errorMessage) {
+    public static <T> ApiResponse<T> error(String errorCode, String errorMessage) {
         return ApiResponse.<T>builder()
                 .status(ERROR)
+                .errorCode(errorCode)
                 .errorMessage(errorMessage)
                 .build();
     }

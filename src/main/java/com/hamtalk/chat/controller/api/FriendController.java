@@ -29,7 +29,7 @@ public class FriendController {
         log.info("커스텀유저디테일 객체 생성 완료? : {}", customUserDetails.toString());
         log.info("유저 id : {}", customUserDetails.getId());
         log.info("유저 이메일 : {}", customUserDetails.getUsername());
-        return ResponseEntity.ok(friendService.getAllFriends(customUserDetails.getId()));
+        return ResponseEntity.ok(ApiResponse.ok(friendService.getAllFriends(customUserDetails.getId())));
     }
 
     @PostMapping("/{toUserId}")

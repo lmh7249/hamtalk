@@ -8,14 +8,14 @@ import com.hamtalk.chat.model.response.ChatMessageResponse;
 import com.hamtalk.chat.model.response.ChatRoomMessagesResponse;
 import com.hamtalk.chat.repository.ChatMessageRepository;
 import com.hamtalk.chat.repository.ChatReadStatusRepository;
-import com.hamtalk.chat.repository.ChatRoomRepository;
 import com.hamtalk.chat.repository.UserProfileRepository;
+import com.hamtalk.common.exeption.custom.ChatRoomNotFoundException;
+import com.hamtalk.common.exeption.custom.UserProfileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,7 +35,7 @@ public class ChatMessageService {
         //TODO: 분산 트랜잭션 적용
         // 1. 메세지 저장
         ChatMessage chatMessage = chatMessageRepository.save(chatMessageRequest.toChatMessageEntity(senderId, chatRoomId));
-        UserProfileProjection userProfileProjection = userProfileRepository.findByUserId(chatMessage.getSenderId()).orElseThrow(() -> new RuntimeException());
+        UserProfileProjection userProfileProjection = userProfileRepository.findByUserId(chatMessage.getSenderId()).orElseThrow(UserProfileNotFoundException::new);
         return ChatMessageResponse.builder()
                 .messageId(chatMessage.getId())
                 .chatRoomId(chatMessage.getChatRoomId())
@@ -48,9 +48,16 @@ public class ChatMessageService {
     }
 
     //TODO: 위 엔티티 리스트를 dto로 한번 바꿔주는 작업이 필요할지?
+    @Transactional(readOnly = true)
     public ChatRoomMessagesResponse getChatMessageList(Long loginUserId, Long chatRoomId) {
         // 1. 채팅방에 있는 모든 채팅메세지 조회
         List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId);
+
+        // 채팅방 존재 유무 검증
+        if(chatMessages == null) {
+            throw new ChatRoomNotFoundException();
+        }
+
         // 2. 채팅 메세지 리스트에서 중복을 제거한 보낸 사람 id 조회
         List<Long> senderIds = chatMessages.stream()
                 .map(ChatMessage::getSenderId)
@@ -66,6 +73,9 @@ public class ChatMessageService {
         // 4. 채팅 메시지와 사용자 프로필 정보를 결합하여 응답 DTO 생성
         List<ChatMessageResponse> list = chatMessages.stream().map(message -> {
             UserProfileProjection userProfile = userProfileMap.get(message.getSenderId());
+            if (userProfile == null) {
+                throw new UserProfileNotFoundException();
+            }
             return ChatMessageResponse.builder()
                     .messageId(message.getId())
                     .senderId(message.getSenderId())

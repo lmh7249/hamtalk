@@ -28,25 +28,6 @@ export const findDirectChatRoomApi = async (friendId: number) => {
     return response.json();
 }
 
-// 채팅방에 메세지 저장, 웹소켓 이전 rest api
-// export const sendChatMessageApi = async (chatRoomId: number, message: string) => {
-//     const accessToken = localStorage.getItem("accessToken");
-//     const response = await fetch(`/api/chat/rooms/${chatRoomId}/messages`, {
-//         method: "post",
-//         headers: {
-//             "Content-Type" : "application/json",
-//             "Authorization" :  `Bearer ${accessToken}`
-//         },
-//         body: JSON.stringify({
-//             message: message
-//         })
-//     });
-//     if(!response.ok) {
-//         throw new Error("채팅 메세지 저장 실패");
-//     }
-//     return response.json();
-// }
-
 // 채팅방 id 별, 메세지 조회
 
 export const getChatMessageListApi = async (chatRoomId: number) => {

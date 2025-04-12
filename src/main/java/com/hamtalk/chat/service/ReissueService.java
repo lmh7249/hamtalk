@@ -2,6 +2,8 @@ package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.config.jwt.JwtProperties;
 import com.hamtalk.chat.jwt.JwtUtil;
+import com.hamtalk.common.exeption.ErrorCode;
+import com.hamtalk.common.exeption.custom.InvalidRefreshTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +27,7 @@ public class ReissueService {
         String refreshToken = getRefreshTokenFromCookie(request);
         log.info("검증1_쿠키에서 추출한 리프레시 토큰: {}", refreshToken);
         if (refreshToken == null) {
-            throw new RuntimeException("리프레시 토큰을 찾을 수 없습니다.");
+            throw new InvalidRefreshTokenException(ErrorCode.MISSING_REFRESH_TOKEN);
         }
 
         // 2. Redis에 저장된 리프레시 토큰과 비교
@@ -34,19 +36,19 @@ public class ReissueService {
         String storedRefreshToken = redisService.getRefreshToken(email);
         log.info("검증2_레디스에서 추출한 리프레시 토큰: {}", storedRefreshToken);
         if (!refreshToken.equals(storedRefreshToken)) {
-            throw new RuntimeException("레디스에 저장된 토큰과 일치하지 않습니다.");
+            throw new InvalidRefreshTokenException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         // 3. 토큰 만료 검증
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("만료된 리프레시 토큰입니다.");
+            throw new InvalidRefreshTokenException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
         // 4. 토큰 타입이 refresh인지 확인
         String category = jwtUtil.getCategory(refreshToken);
         if (!category.equals("refresh")) {
-            throw new RuntimeException("카테고리명이 refresh가 아닙니다.");
+            throw new InvalidRefreshTokenException(ErrorCode.INVALID_TOKEN_CATEGORY);
         }
         Long userId = jwtUtil.getUserId(refreshToken);
 

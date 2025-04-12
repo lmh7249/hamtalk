@@ -48,6 +48,7 @@ public class ChatMessageService {
     }
 
     //TODO: 위 엔티티 리스트를 dto로 한번 바꿔주는 작업이 필요할지?
+    @Transactional(readOnly = true)
     public ChatRoomMessagesResponse getChatMessageList(Long loginUserId, Long chatRoomId) {
         // 1. 채팅방에 있는 모든 채팅메세지 조회
         List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId);

@@ -1,8 +1,10 @@
 package com.hamtalk.chat.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hamtalk.chat.domain.entity.User;
 import com.hamtalk.chat.model.response.UserAuthenticationResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
+import com.hamtalk.common.model.response.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,13 +46,17 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-
-            //response body
-            PrintWriter writer = response.getWriter();
-            writer.print("access token expired");
-
-            //response status code
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            ApiResponse<Object> apiResponse = ApiResponse.fail("UNAUTHORIZED", "액세스 토큰이 만료되었습니다.");
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
+
+            PrintWriter writer = response.getWriter();
+            writer.write(jsonResponse);
+            writer.flush();
             return;
         }
 

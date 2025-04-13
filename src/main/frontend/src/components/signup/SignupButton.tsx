@@ -23,6 +23,7 @@ interface SignupButtonProps {
     isStepValid: boolean;
     handleErrorMessages: (messages: { [key: string]: string }) => void;
     validateStep: (step: number) => { isValid: boolean; errorMessages: { [key: string]: string } };
+    setIsLoading: (isLoading: boolean) => void;
 }
 
 const SignupButton = ({
@@ -33,13 +34,14 @@ const SignupButton = ({
                           onPrevStep,
                           isStepValid,
                           handleErrorMessages,
-                          validateStep
+                          validateStep,
+                          setIsLoading
                       }: SignupButtonProps) => {
     const isLast = (questionLength - 1 === currentStep);
 
     const handleNext = async (e: React.MouseEvent) => {
         e.preventDefault();
-
+        setIsLoading(true);
         const validationResult = validateStep(currentStep);
         handleErrorMessages(validationResult.errorMessages);
 
@@ -48,17 +50,19 @@ const SignupButton = ({
             const email = formData.email;
             // 이메일 유효성 검사 먼저 하고. 만약 여기에
             if (!isValidEmail(email).isValid) {
-                console.log("유효하지 않은 이메일 주소입니다. 다시 확인해주세요.");
+                setIsLoading(false);
                 return; // 유효하지 않으면 DB 접근 안하고 리턴
             }
             // 이메일 중복검사 api
         const isEmailAvailable =  await checkDuplicateEmail(email);
             if(!isEmailAvailable) {
+                setIsLoading(false);
                 return;
             }
             // 이메일 인증번호 전송 api
         const isEmailVerified  = await sendEmailVerification(email);
             if(!isEmailVerified ) {
+                setIsLoading(false);
                 return;
             }
         }
@@ -71,6 +75,7 @@ const SignupButton = ({
                 console.log(isValid);
                 handleErrorMessages({ verificationCode: isValid.errorMessage });
                 // 인증번호 검증 실패 에러메세지 설정
+                setIsLoading(false);
                 return;
             }
         }
@@ -80,6 +85,7 @@ const SignupButton = ({
         } else {
             // 유효성 검사 실패 시 처리
             console.log("유효성 검사를 통과하지 못했습니다. 다시 확인해주세요.");
+            setIsLoading(false);
         }
     };
 

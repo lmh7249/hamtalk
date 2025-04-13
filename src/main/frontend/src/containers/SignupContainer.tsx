@@ -23,13 +23,19 @@ interface SignupContainerProps {
     currentStep: number;
     onNextStep: () => void;  // 단계 변경 함수
     onPrevStep: () => void;
+    setIsLoading: (isLoading: boolean) => void;
 }
 
-const SignupContainer = ({currentStep, onNextStep, onPrevStep}: SignupContainerProps) => {
+const SignupContainer = ({currentStep, onNextStep, onPrevStep, setIsLoading}: SignupContainerProps) => {
     return (
         <SignupContainerWrapper>
+
             <SignupGuide title={questions[currentStep].title} desc={questions[currentStep].desc}/>
-            <SignupForm currentStep={currentStep} questionLength={questions.length} onNextStep={onNextStep} onPrevStep={onPrevStep}/>
+
+            <SignupForm currentStep={currentStep} questionLength={questions.length} onNextStep={onNextStep}
+                        onPrevStep={onPrevStep}
+                        setIsLoading = {setIsLoading}
+            />
         </SignupContainerWrapper>
     )
 }

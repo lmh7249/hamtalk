@@ -1,15 +1,17 @@
+import toast from "react-hot-toast";
+
 export const checkDuplicateEmailApi = async (email: string) => {
     try {
         const response = await fetch(`/api/users/email-check?email=${email}`, {
             method: "get",
         });
+        const data = await response.json();
+        console.log("응답 데이터:", data);
 
         if (response.ok) {
-            console.log("사용 가능한 이메일");
-            // 이메일 인증번호 전송하는 api 호출 -> return true 반환해서 true일때 다른 api 또 호출하게 만들기?
             return true;
         } else if (response.status === 409) {
-            alert("이미 사용중인 이메일입니다. 다른 이메일을 사용해주세요.");
+            toast.error(data.errorMessage);
             return false;
         }
     } catch (error) {

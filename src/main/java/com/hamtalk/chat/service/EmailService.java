@@ -25,7 +25,7 @@ public class EmailService {
 
     public void sendEmailVerificationCode(EmailAuthRequest request) {
         String email = request.getEmail();
-        if(EmailValidator.isValidEmailFormat(email)) {
+        if(!EmailValidator.isValidEmailFormat(email)) {
             throw new InvalidEmailFormatException();
         }
         String authCode = createAuthCode();

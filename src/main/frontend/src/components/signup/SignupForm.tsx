@@ -26,6 +26,7 @@ interface SignupFormProps {
     questionLength: number;
     onNextStep: () => void;
     onPrevStep: () => void;
+    setIsLoading: (isLoading: boolean) => void;
 }
 
 export interface FormData {
@@ -40,7 +41,7 @@ export interface FormData {
     confirmPassword: string;
 }
 
-const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: SignupFormProps) => {
+const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep, setIsLoading}: SignupFormProps) => {
     // 1~4단계 모든 데이터 관리
     const [formData, setFormData] = useState<FormData>({
         name: '',
@@ -173,7 +174,7 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
                     navigate("/signup-success", {state: {name: data.data}});
 
                 })
-                .catch((error) =>{
+                .catch((error) => {
                     console.error("에러 발생: ", error);
                 })
         }
@@ -196,7 +197,9 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep}: Signu
                           onPrevStep={onPrevStep}
                           isStepValid={isStepValid}
                           handleErrorMessages={handleErrorMessages}
-                          validateStep={validateStep}/>
+                          validateStep={validateStep}
+                          setIsLoading = {setIsLoading}
+            />
         </StyledSignupForm>
     )
 }

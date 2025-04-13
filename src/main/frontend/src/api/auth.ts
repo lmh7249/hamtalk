@@ -1,4 +1,5 @@
 import {userLogin} from "../services/auth-service";
+import toast from "react-hot-toast";
 
 
 
@@ -13,9 +14,14 @@ export const sendEmailVerificationApi = async (email : string) => {
             body: JSON.stringify({ "email": email }),
         })
 
+        const data = await response.json();
+
         if(response.ok) {
             alert("이메일 인증번호 전송 성공");
             return true;
+        } else if(response.status === 400) {
+            toast.error(data.errorMessage);
+            return false;
         }
 
     } catch (error) {

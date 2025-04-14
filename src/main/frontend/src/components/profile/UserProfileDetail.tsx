@@ -4,8 +4,8 @@ import TestImage from "../../assets/images/img.png";
 import BackGroundImageSample from "../../assets/images/background.jpg";
 import ModalButton from "../common/ModalButton";
 import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
-import {useEffect, useState} from "react";
-import {getUserProfileById} from "../../services/user-service";
+import React, {useEffect, useRef, useState} from "react";
+import {getUserProfileById, updateUserProfileImage} from "../../services/user-service";
 import {addFriend, checkFriendship} from "../../services/friend-service";
 import toast from "react-hot-toast";
 import {useSelector} from "react-redux";
@@ -119,7 +119,11 @@ const ProfileImageWrapper = styled.div`
     height: 150px;
 `;
 
-const ProfileImageEditButton = () => {
+interface ProfileImageEditButtonProps {
+    onClick: () => void;
+}
+
+const ProfileImageEditButton = ({onClick}: ProfileImageEditButtonProps) => {
     return (
         <button style={{
             position: "absolute",
@@ -134,6 +138,7 @@ const ProfileImageEditButton = () => {
             alignItems: "center",
             justifyContent: "center",
         }}
+                onClick={onClick}
                 onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = "#f0f0f0";
                 }}
@@ -195,6 +200,12 @@ const UserProfileDetail = () => {
     const searchUserProfileId = useSelector((state: RootState) => state.detailContent.payload?.userId);
     const loginUserId = useSelector((state: RootState) => state.user.id);
     const isMyUserId: boolean = searchUserProfileId === loginUserId;
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+    const handleClickEditImage = () => {
+        fileInputRef.current?.click();
+    }
 
     useEffect(() => {
         if (searchUserProfileId > 0) {
@@ -226,6 +237,27 @@ const UserProfileDetail = () => {
             console.error("친구 추가 실패:", error);
         }
     }
+
+    const handleImageChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if(!file) return;
+
+        try {
+            const newImageUrl = await updateUserProfileImage(file);
+            setSearchUserProfile((prev) =>
+                prev ? {...prev, profileImageUrl: newImageUrl} : prev
+            );
+            toast.success("프로필 이미지가 변경되었어요!");
+        } catch(error) {
+            if(error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("알 수 없는 오류가 발생했어요.");
+            }
+        }
+
+    }
+
     return (
         <StyledUserProfileDetail>
             <StyledBackGroundImageWrapper>
@@ -240,7 +272,14 @@ const UserProfileDetail = () => {
                 <StyledAbsoluteUserPosition>
                     <ProfileImageWrapper>
                         <UserProfileImage src={searchUserProfile?.profileImageUrl}/>
-                        {isMyUserId && <ProfileImageEditButton/>}
+                        {isMyUserId && <ProfileImageEditButton onClick={handleClickEditImage}/>}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            style={{display: "none"}}
+                            onChange={handleImageChange}
+                        />
                     </ProfileImageWrapper>
                     <StyledUserInfo>
                         <UserNameAndEmailWrapper>

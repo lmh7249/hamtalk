@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import {ApiResponse} from "../../types/api-response";
 
 export const checkDuplicateEmailApi = async (email: string) => {
     try {
@@ -39,7 +40,7 @@ export const getMyProfileApi = async () => {
 
 export const getUserProfileByEmailApi = async (email: string) => {
     const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`api/users?email=${email}`, {
+    const response = await fetch(`/api/users?email=${email}`, {
         method: "get",
         headers: {
             "Content-Type": "application/json",
@@ -51,7 +52,7 @@ export const getUserProfileByEmailApi = async (email: string) => {
 
 export const getUserProfileByIdApi = async (id: number) => {
     const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`api/users/${id}`, {
+    const response = await fetch(`/api/users/${id}`, {
         method: "get",
         headers: {
             "Content-Type": "application/json",
@@ -59,4 +60,27 @@ export const getUserProfileByIdApi = async (id: number) => {
         }
     });
     return response.json();
+}
+
+
+export const updateUserProfileImageApi = async (imageFile: File): Promise<ApiResponse<string>> => {
+    const accessToken = localStorage.getItem("accessToken");
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    const response = await fetch('/api/profiles/me/image', {
+        method: "PATCH",
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+        },
+        body: formData,
+    })
+
+    // HTTP 응답코드를 통해 필터링을 먼저하기.
+    if (!response.ok) {
+        const errorData = await response.json(); // body에 errorMessage 들어있음
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+
+    return await response.json(); // status === "success"
 }

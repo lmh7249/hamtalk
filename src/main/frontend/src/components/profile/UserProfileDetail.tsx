@@ -8,10 +8,11 @@ import React, {useEffect, useRef, useState} from "react";
 import {getUserProfileById, updateUserProfileImage} from "../../services/user-service";
 import {addFriend, checkFriendship} from "../../services/friend-service";
 import toast from "react-hot-toast";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {FaCamera} from 'react-icons/fa';
 import {FiEdit} from "react-icons/fi";
+import {updateProfileImageUrl} from "../../store/userSlice";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -196,12 +197,12 @@ interface searchUserProfileData {
 const UserProfileDetail = () => {
     const [searchUserProfile, setSearchUserProfile] = useState<searchUserProfileData>();
     const [isFriend, setIsFriend] = useState<boolean>(false);
-
     const searchUserProfileId = useSelector((state: RootState) => state.detailContent.payload?.userId);
     const loginUserId = useSelector((state: RootState) => state.user.id);
     const isMyUserId: boolean = searchUserProfileId === loginUserId;
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    const myProfile = useSelector((state:RootState) => state.user);
+    const dispatch = useDispatch();
 
     const handleClickEditImage = () => {
         fileInputRef.current?.click();
@@ -244,9 +245,8 @@ const UserProfileDetail = () => {
 
         try {
             const newImageUrl = await updateUserProfileImage(file);
-            setSearchUserProfile((prev) =>
-                prev ? {...prev, profileImageUrl: newImageUrl} : prev
-            );
+            dispatch(updateProfileImageUrl({ profileImageUrl: newImageUrl }));
+            console.log(myProfile.profileImageUrl);
             toast.success("프로필 이미지가 변경되었어요!");
         } catch(error) {
             if(error instanceof Error) {
@@ -271,7 +271,7 @@ const UserProfileDetail = () => {
                 </ProfileMenuIconWrapper>
                 <StyledAbsoluteUserPosition>
                     <ProfileImageWrapper>
-                        <UserProfileImage src={searchUserProfile?.profileImageUrl}/>
+                        <UserProfileImage src={isMyUserId ? myProfile.profileImageUrl ?? searchUserProfile?.profileImageUrl : searchUserProfile?.profileImageUrl}/>
                         {isMyUserId && <ProfileImageEditButton onClick={handleClickEditImage}/>}
                         <input
                             type="file"
@@ -283,12 +283,12 @@ const UserProfileDetail = () => {
                     </ProfileImageWrapper>
                     <StyledUserInfo>
                         <UserNameAndEmailWrapper>
-                            <StyledNickName>{searchUserProfile?.nickname} </StyledNickName>
+                            <StyledNickName>{isMyUserId ? myProfile.nickname : searchUserProfile?.nickname} </StyledNickName>
                             ｜
-                            <StyledEmail>{searchUserProfile?.email}</StyledEmail>
+                            <StyledEmail>{isMyUserId ? myProfile.email: searchUserProfile?.email}</StyledEmail>
                         </UserNameAndEmailWrapper>
                         <StatusMessageWrapper>
-                            <StyledStateMessage>{searchUserProfile?.statusMessage}</StyledStateMessage>
+                            <StyledStateMessage>{isMyUserId ? myProfile.stateMessage : searchUserProfile?.statusMessage}</StyledStateMessage>
                             {isMyUserId && <ProfileStatusEditButton/>}
                         </StatusMessageWrapper>
                     </StyledUserInfo>

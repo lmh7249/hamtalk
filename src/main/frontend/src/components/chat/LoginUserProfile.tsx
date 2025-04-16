@@ -4,6 +4,9 @@ import UserInfoText from "./UserInfoText";
 import {useEffect, useState} from "react";
 import {getMyProfile} from "../../services/user-service";
 import testImage from "../../assets/images/img.png";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../store";
+import {updateProfile} from "../../store/userSlice";
 
 const StyledUserProfile = styled.div`
     height: 200px;
@@ -37,16 +40,19 @@ interface MyProfile {
     profileImageUrl: string;
 }
 
-//TODO: 로그인 한 유저의 프로필 정보 api 호출, 추후 Redux로 관리할지, 이대로 사용할지 고민해보기.
-// TODO: 유저 프로필 이미지 가져오기 수정해야함. -> 추후에 AWS S3에서 기본 이미지 or 유저프로필 이미지 링크 불러와서 삽입
 const LoginUserProfile = () => {
-    const [myProfile, setMyProfile] = useState<MyProfile|null>(null);
+    const myProfile = useSelector((state: RootState) => state.user);
+    const dispatch = useDispatch();
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                let myProfile = await getMyProfile(); // 비동기 호출
-                if (myProfile && myProfile.data) {
-                    setMyProfile(myProfile.data);
+                let response  = await getMyProfile(); // 비동기 호출
+                if (response  && response.data) {
+                    dispatch(updateProfile({
+                        nickname : response.data.nickname,
+                        profileImageUrl: response.data.profileImageUrl,
+                        stateMessage: response.data.stateMessage
+                    }))
                 }
             } catch (error) {
                 console.error("프로필 로딩 실패:", error);
@@ -61,8 +67,8 @@ const LoginUserProfile = () => {
             </ProfileTitle>
             {myProfile ?
                 <StyledUserProfileDetail>
-                    <StyledImage src={myProfile.profileImageUrl} alt="유저이미지"/>
-                    <UserInfoText nickName={myProfile.nickname} statusMessage={myProfile.stateMessage}
+                    <StyledImage src={myProfile.profileImageUrl ?? ''} alt="유저이미지"/>
+                    <UserInfoText nickName={myProfile.nickname ?? ''} statusMessage={myProfile.stateMessage ?? ''}
                                   email={myProfile.email} isMe={true}/>
                 </StyledUserProfileDetail>
                 :

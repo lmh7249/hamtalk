@@ -28,4 +28,8 @@ public class UserProfile extends BaseEntity{
     public void updateProfileImage(String imageUrl) {
         this.profileImageUrl = imageUrl;
     }
+
+    public void updateStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+    }
 }

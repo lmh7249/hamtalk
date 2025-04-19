@@ -5,14 +5,15 @@ import BackGroundImageSample from "../../assets/images/background.jpg";
 import ModalButton from "../common/ModalButton";
 import ProfileMenuIcon from "../../assets/icons/profile-menu-icon.svg";
 import React, {useEffect, useRef, useState} from "react";
-import {getUserProfileById, updateUserProfileImage} from "../../services/user-service";
+import {getUserProfileById, updateUserProfileImage, updateUserStatusMessage} from "../../services/user-service";
 import {addFriend, checkFriendship} from "../../services/friend-service";
 import toast from "react-hot-toast";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {FaCamera} from 'react-icons/fa';
 import {FiEdit} from "react-icons/fi";
-import {updateProfileImageUrl} from "../../store/userSlice";
+import {updateProfileImageUrl, updateStateMessage} from "../../store/userSlice";
+import {updateUserStatusMessageApi} from "../../api/user";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -124,6 +125,77 @@ interface ProfileImageEditButtonProps {
     onClick: () => void;
 }
 
+
+const InputWrapper = styled.div`
+    position: relative;
+    width: 300px;
+`;
+
+const StyledInput = styled.input`
+    padding: 8px 50px 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:focus {
+        border-color: #aaa;
+    }
+`;
+
+const StatusFooter = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+`;
+
+const CharCount = styled.span`
+    font-size: 12px;
+    color: #888;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+`;
+
+const SaveButton = styled.button`
+    background-color: #FFCE00;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    &:hover {
+        background-color: #e6ba00;
+    }
+`;
+
+const CancelButton = styled.button`
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #555;
+    transition: background-color 0.2s;
+    &:hover {
+        background-color: #eaeaea;
+    }
+`;
+
+const EditingWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+`
+
 const ProfileImageEditButton = ({onClick}: ProfileImageEditButtonProps) => {
     return (
         <button style={{
@@ -157,7 +229,12 @@ const StatusMessageWrapper = styled.div`
     gap: 6px; // 버튼과 메시지 사이 여백
 `;
 
-const ProfileStatusEditButton = () => {
+interface ProfileStatusEditButtonProps {
+    onClick: () => void;
+
+}
+
+const ProfileStatusEditButton = ({onClick}: ProfileImageEditButtonProps) => {
     return (
         <button style={{
             backgroundColor: "white",
@@ -172,13 +249,13 @@ const ProfileStatusEditButton = () => {
             padding: 0,
             transition: "background-color 0.2s ease-in-out",
         }}
+                onClick={onClick}
                 onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = "#f0f0f0";
                 }}
                 onMouseOut={(e) => {
                     e.currentTarget.style.backgroundColor = "white";
                 }}
-
         >
             <FiEdit size={18} color="#333"/>
         </button>
@@ -201,8 +278,11 @@ const UserProfileDetail = () => {
     const loginUserId = useSelector((state: RootState) => state.user.id);
     const isMyUserId: boolean = searchUserProfileId === loginUserId;
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const myProfile = useSelector((state:RootState) => state.user);
+    const myProfile = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [statusMessageInputValue, setStatusMessageInputValue] = useState<string>(myProfile.stateMessage || "");
+    const maxLength = 25;
 
     const handleClickEditImage = () => {
         fileInputRef.current?.click();
@@ -224,6 +304,10 @@ const UserProfileDetail = () => {
         }
     }, [searchUserProfileId]);
 
+    useEffect(() => {
+        setStatusMessageInputValue(myProfile.stateMessage || "");
+    }, [myProfile.stateMessage]);
+
     const handleAddFriend = async (toUserId: number | undefined) => {
         if (toUserId === undefined) {
             toast.error("유효하지 않은 사용자입니다.");
@@ -239,24 +323,54 @@ const UserProfileDetail = () => {
         }
     }
 
-    const handleImageChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if(!file) return;
+        if (!file) return;
 
         try {
             const newImageUrl = await updateUserProfileImage(file);
-            dispatch(updateProfileImageUrl({ profileImageUrl: newImageUrl }));
+            dispatch(updateProfileImageUrl({profileImageUrl: newImageUrl}));
             console.log(myProfile.profileImageUrl);
             toast.success("프로필 이미지가 변경되었어요!");
-        } catch(error) {
-            if(error instanceof Error) {
+        } catch (error) {
+            if (error instanceof Error) {
                 toast.error(error.message);
             } else {
                 toast.error("알 수 없는 오류가 발생했어요.");
             }
         }
-
     }
+
+    const handleEditClick = () => {
+        setIsEditing(true);
+    }
+
+    const handleCancelClick = () => {
+        setIsEditing(false);
+        setStatusMessageInputValue(myProfile.stateMessage || "");
+    };
+
+    const handleSaveClick = async () => {
+        if (statusMessageInputValue.length > 25) {
+            alert("상태메세지는 최대 25자까지 가능합니다.");
+            return;
+        }
+
+        try {
+            const newStatusMessage = await updateUserStatusMessage(statusMessageInputValue);
+            console.log(newStatusMessage);
+            dispatch(updateStateMessage({stateMessage: newStatusMessage}));
+            setIsEditing(false);
+            toast.success("상태메세지가 변경되었어요!");
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("알 수 없는 오류가 발생했어요.");
+            }
+        }
+    };
+
 
     return (
         <StyledUserProfileDetail>
@@ -271,7 +385,8 @@ const UserProfileDetail = () => {
                 </ProfileMenuIconWrapper>
                 <StyledAbsoluteUserPosition>
                     <ProfileImageWrapper>
-                        <UserProfileImage src={isMyUserId ? myProfile.profileImageUrl ?? searchUserProfile?.profileImageUrl : searchUserProfile?.profileImageUrl}/>
+                        <UserProfileImage
+                            src={isMyUserId ? myProfile.profileImageUrl ?? searchUserProfile?.profileImageUrl : searchUserProfile?.profileImageUrl}/>
                         {isMyUserId && <ProfileImageEditButton onClick={handleClickEditImage}/>}
                         <input
                             type="file"
@@ -285,11 +400,32 @@ const UserProfileDetail = () => {
                         <UserNameAndEmailWrapper>
                             <StyledNickName>{isMyUserId ? myProfile.nickname : searchUserProfile?.nickname} </StyledNickName>
                             ｜
-                            <StyledEmail>{isMyUserId ? myProfile.email: searchUserProfile?.email}</StyledEmail>
+                            <StyledEmail>{isMyUserId ? myProfile.email : searchUserProfile?.email}</StyledEmail>
                         </UserNameAndEmailWrapper>
                         <StatusMessageWrapper>
-                            <StyledStateMessage>{isMyUserId ? myProfile.stateMessage : searchUserProfile?.statusMessage}</StyledStateMessage>
-                            {isMyUserId && <ProfileStatusEditButton/>}
+                            {isEditing ? (
+                                <EditingWrapper>
+                                    <InputWrapper>
+                                        <StyledInput
+                                            type="text"
+                                            value={statusMessageInputValue}
+                                            onChange={(e) => setStatusMessageInputValue(e.target.value)}
+                                            maxLength={maxLength}
+                                        />
+                                        <CharCount>{Math.min(statusMessageInputValue.length, maxLength)} / {maxLength}</CharCount>
+
+                                    </InputWrapper>
+                                    <StatusFooter>
+                                        <SaveButton onClick={handleSaveClick}>저장</SaveButton>
+                                        <CancelButton onClick={handleCancelClick}>취소</CancelButton>
+                                    </StatusFooter>
+                                </EditingWrapper>
+                            ) : (
+                                <>
+                                    <StyledStateMessage>{isMyUserId ? myProfile.stateMessage : searchUserProfile?.statusMessage}</StyledStateMessage>
+                                    {isMyUserId && <ProfileStatusEditButton onClick={handleEditClick}/>}
+                                </>
+                            )}
                         </StatusMessageWrapper>
                     </StyledUserInfo>
                     <ButtonWrapper>

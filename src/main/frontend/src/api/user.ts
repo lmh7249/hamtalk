@@ -62,7 +62,7 @@ export const getUserProfileByIdApi = async (id: number) => {
     return response.json();
 }
 
-
+//TODO: 이 구조로 api 호출 방식 전부 변경하기.
 export const updateUserProfileImageApi = async (imageFile: File): Promise<ApiResponse<string>> => {
     const accessToken = localStorage.getItem("accessToken");
     const formData = new FormData();
@@ -83,4 +83,23 @@ export const updateUserProfileImageApi = async (imageFile: File): Promise<ApiRes
     }
 
     return await response.json(); // status === "success"
+}
+
+export const updateUserStatusMessageApi = async (statusMessage: string): Promise<ApiResponse<string>> => {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch('/api/profiles/me/status-message', {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+            statusMessage : statusMessage
+        })
+    })
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
 }

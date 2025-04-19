@@ -3,7 +3,7 @@ import {
     getMyProfileApi,
     getUserProfileByEmailApi,
     getUserProfileByIdApi,
-    updateUserProfileImageApi
+    updateUserProfileImageApi, updateUserStatusMessageApi
 } from "../api/user";
 
 export const checkDuplicateEmail = async (email: string) => {
@@ -35,5 +35,16 @@ export const updateUserProfileImage = async (image:File): Promise<string> => {
     }
     throw new Error(response.errorMessage || "이미지 업로드 실패");
 };
+
+export const updateUserStatusMessage = async (statusMessage: string): Promise<string> => {
+    const response = await updateUserStatusMessageApi(statusMessage);
+
+    if(response.status === "success" && response.data) {
+        return response.data;
+    }
+
+    throw new Error(response.errorMessage || "");
+
+}
 
 

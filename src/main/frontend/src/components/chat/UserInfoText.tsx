@@ -14,6 +14,8 @@ const StyledUserNickName = styled.div<UserInfoProps>`
 
 const StyledUserStatusMessage = styled.div<UserInfoProps>`
     font-size: 14px;
+    text-overflow: ellipsis;
+    overflow: hidden;
     color: ${(props) => (props.isMe ? "rgba(255, 255, 255, 0.7)" : "#555")};
 `;
 
@@ -33,10 +35,16 @@ interface UserInfoProps {
 }
 
 const UserInfoText = ({nickName, statusMessage, email, isMe}: UserInfoTextProps) => {
+    const maxLength: number = 9;
+
+    const displayStatusMessage = statusMessage.length > maxLength
+        ? `${statusMessage.slice(0, maxLength)}...`
+        : statusMessage;
+
     return (
         <StyledUserInfo>
             <StyledUserNickName isMe={isMe}>{nickName}</StyledUserNickName>
-            <StyledUserStatusMessage isMe={isMe}>{statusMessage}</StyledUserStatusMessage>
+            <StyledUserStatusMessage isMe={isMe}>{displayStatusMessage}</StyledUserStatusMessage>
             <StyledUserEmail isMe={isMe}>{email}</StyledUserEmail>
         </StyledUserInfo>
     )

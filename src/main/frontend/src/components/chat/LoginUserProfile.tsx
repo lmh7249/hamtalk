@@ -7,6 +7,7 @@ import testImage from "../../assets/images/img.png";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {updateProfile} from "../../store/userSlice";
+import dayjs from "../../utils/dayjs";
 
 const StyledUserProfile = styled.div`
     height: 200px;
@@ -43,6 +44,7 @@ interface MyProfile {
 const LoginUserProfile = () => {
     const myProfile = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {

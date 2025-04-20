@@ -1,3 +1,0 @@
-interface LoginGuideProps {
-    children: string;
-}

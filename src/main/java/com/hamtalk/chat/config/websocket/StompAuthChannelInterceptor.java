@@ -1,6 +1,6 @@
 package com.hamtalk.chat.config.websocket;
 
-import com.hamtalk.chat.jwt.JwtUtil;
+import com.hamtalk.chat.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompAuthChannelInterceptor implements ChannelInterceptor {
 
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
     // STOMP가 CONNECT, SUBSCRIBE, SEND, DISCONNECT 될 때 실행.
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {

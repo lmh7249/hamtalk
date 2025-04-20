@@ -1,6 +1,6 @@
 package com.hamtalk.chat.controller.api;
 
-import com.hamtalk.chat.jwt.JwtUtil;
+import com.hamtalk.chat.jwt.JWTUtil;
 import com.hamtalk.chat.model.request.EmailVerificationCodeRequest;
 import com.hamtalk.chat.service.EmailService;
 import com.hamtalk.chat.model.request.EmailAuthRequest;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final EmailService emailService;
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
     private final ReissueService reissueService;
 
 

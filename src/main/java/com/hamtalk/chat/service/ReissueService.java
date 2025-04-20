@@ -1,7 +1,7 @@
 package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.config.jwt.JwtProperties;
-import com.hamtalk.chat.jwt.JwtUtil;
+import com.hamtalk.chat.jwt.JWTUtil;
 import com.hamtalk.common.exeption.ErrorCode;
 import com.hamtalk.common.exeption.custom.InvalidRefreshTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ReissueService {
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
     private final RedisService redisService;
     private final JwtProperties jwtProperties;
 

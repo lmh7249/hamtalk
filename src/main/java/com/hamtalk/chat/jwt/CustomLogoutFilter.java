@@ -18,7 +18,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomLogoutFilter extends GenericFilterBean {
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
     private final RedisService redisService;
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

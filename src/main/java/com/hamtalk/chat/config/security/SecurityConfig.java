@@ -2,8 +2,8 @@ package com.hamtalk.chat.config.security;
 
 import com.hamtalk.chat.config.jwt.JwtProperties;
 import com.hamtalk.chat.jwt.CustomLogoutFilter;
-import com.hamtalk.chat.jwt.JwtFilter;
-import com.hamtalk.chat.jwt.JwtUtil;
+import com.hamtalk.chat.jwt.JWTFilter;
+import com.hamtalk.chat.jwt.JWTUtil;
 import com.hamtalk.chat.jwt.LoginFilter;
 import com.hamtalk.chat.service.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +37,7 @@ public class SecurityConfig {
     //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
     private final JwtProperties jwtProperties;
     private final RedisService redisService;
 
@@ -124,7 +124,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
         http
-                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         LoginFilter loginFilter = new LoginFilter(
                 authenticationManager(authenticationConfiguration),
                 jwtUtil,

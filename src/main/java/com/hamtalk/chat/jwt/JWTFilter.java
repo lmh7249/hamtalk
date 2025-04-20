@@ -23,8 +23,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
-public class JwtFilter extends OncePerRequestFilter {
-    private final JwtUtil jwtUtil;
+public class JWTFilter extends OncePerRequestFilter {
+    private final JWTUtil jwtUtil;
     // Authentication 객체를 만드는 필터
 
     @Override

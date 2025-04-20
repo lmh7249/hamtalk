@@ -1,9 +1,10 @@
 import toast from "react-hot-toast";
 import {ApiResponse} from "../../types/api-response";
+import {customFetch} from "./customFetch";
 
 export const checkDuplicateEmailApi = async (email: string) => {
     try {
-        const response = await fetch(`/api/users/email-check?email=${email}`, {
+        const response = await customFetch(`/api/users/email-check?email=${email}`, {
             method: "get",
         });
         const data = await response.json();
@@ -24,13 +25,8 @@ export const checkDuplicateEmailApi = async (email: string) => {
 };
 
 export const getMyProfileApi = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch("api/profiles/me", {
+    const response = await customFetch("api/profiles/me", {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
     });
     if (!response.ok) {
         throw new Error("프로필 받아오기 실패")
@@ -39,42 +35,29 @@ export const getMyProfileApi = async () => {
 }
 
 export const getUserProfileByEmailApi = async (email: string) => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`/api/users?email=${email}`, {
+    const response = await customFetch(`/api/users?email=${email}`, {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
     });
     return response.json();
 }
 
 export const getUserProfileByIdApi = async (id: number) => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`/api/users/${id}`, {
+    const response = await customFetch(`/api/users/${id}`, {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
     });
     return response.json();
 }
 
 //TODO: 이 구조로 api 호출 방식 전부 변경하기.
 export const updateUserProfileImageApi = async (imageFile: File): Promise<ApiResponse<string>> => {
-    const accessToken = localStorage.getItem("accessToken");
     const formData = new FormData();
     formData.append("image", imageFile);
 
-    const response = await fetch('/api/profiles/me/image', {
+    const response = await customFetch('/api/profiles/me/image', {
         method: "PATCH",
-        headers: {
-            "Authorization": `Bearer ${accessToken}`,
-        },
         body: formData,
-    })
+
+    },true,true);
 
     // HTTP 응답코드를 통해 필터링을 먼저하기.
     if (!response.ok) {
@@ -86,13 +69,8 @@ export const updateUserProfileImageApi = async (imageFile: File): Promise<ApiRes
 }
 
 export const updateUserStatusMessageApi = async (statusMessage: string): Promise<ApiResponse<string>> => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch('/api/profiles/me/status-message', {
+    const response = await customFetch('/api/profiles/me/status-message', {
         method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`,
-        },
         body: JSON.stringify({
             statusMessage : statusMessage
         })

@@ -155,7 +155,7 @@ const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
     return (
         <StyledChatMessageMineContainer>
             <StyledMessageInfo>
-                {/*<StyledUnreadCount>1</StyledUnreadCount>*/}
+                <StyledUnreadCount>1</StyledUnreadCount>
                 <StyledTime>{formatTime(createdAt)}</StyledTime>
             </StyledMessageInfo>
             <StyledBubbleMine>
@@ -262,6 +262,7 @@ const ChatRoomBody = () => {
 
                 return (
                     <React.Fragment key={message.messageId}>
+
                         {isFirstMessageOfDay && <ChatDateDivider date={currentDate} />}
                         {loginUserId === message.senderId ? (
                             <ChatMessageMine {...message} />

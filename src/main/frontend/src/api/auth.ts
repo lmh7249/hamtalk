@@ -2,8 +2,7 @@ import {userLogin} from "../services/auth-service";
 import toast from "react-hot-toast";
 
 
-
-
+//TODO: 액세스토큰 사용하지 않는 api는 customFetch 사용 x
 export const sendEmailVerificationApi = async (email : string) => {
     try {
         const response = await fetch("/api/auth/email-verification/code", {

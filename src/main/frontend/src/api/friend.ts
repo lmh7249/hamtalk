@@ -1,11 +1,9 @@
+import {customFetch} from "./customFetch";
+
 export const getMyFriendListApi = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch("/api/friends", {
+    const response = await customFetch("/api/friends", {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
+
     });
     if(!response.ok) {
         throw new Error("친구 목록 api 호출 실패")
@@ -14,13 +12,9 @@ export const getMyFriendListApi = async () => {
 }
 
 export const addFriendApi = async (toUserId:number) => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`api/friends/${toUserId}`, {
+    const response = await customFetch(`api/friends/${toUserId}`, {
         method:"post",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
+
     });
     if(!response.ok) {
         throw new Error("친구 추가 api 호출 실패");
@@ -29,13 +23,8 @@ export const addFriendApi = async (toUserId:number) => {
 }
 
 export const checkFriendshipApi = async (toUserId:number) => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`api/friends/${toUserId}`, {
+    const response = await customFetch(`api/friends/${toUserId}`, {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
     });
     if(!response.ok) {
         throw new Error("친구 추가 api 호출 실패");

@@ -111,7 +111,7 @@ public class SecurityConfig {
                                 "/api/auth/email-verification/code",
                                 "/api/auth/email-verification/code/verify",
                                 "/api/auth/login",
-                                "/api/auth/refresh",
+                                "/api/auth/reissue",
                                 "/ws-chat/**", // 웹소켓 핸드셰이크 엔드포인트는 허용
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**" // swagger-ui 허용

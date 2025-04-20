@@ -125,7 +125,7 @@ const ChatRoomItem = ({
         <StyledChattingRoomItem onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
             <div style={{display: "flex", gap: "5px"}}>
             <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
-                <StyledImage src={profileImage} alt={"채팅방 이미지"}></StyledImage>
+                <StyledImage src={profileImage ?? undefined} alt={"채팅방 이미지"}></StyledImage>
             </ImageWrapper>
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>

@@ -1,11 +1,13 @@
 package com.hamtalk.chat.controller.api;
 
+import com.hamtalk.chat.model.request.StatusMessageUpdateRequest;
 import com.hamtalk.chat.model.response.MyProfileResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.UserProfileService;
 import com.hamtalk.common.model.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +30,7 @@ public class UserProfileController {
     }
 
     @PatchMapping("/me/image")
-    @Operation(summary = "내 프로필 이미지 변경하기", description = "프로필 이미지를 AWS S3에 보관하고 해당 이미지의 URL을 반환합니다.")
+    @Operation(summary = "내 프로필 이미지 수정하기", description = "프로필 이미지를 AWS S3에 보관하고 해당 이미지의 URL을 반환합니다.")
     //TODO: multipart/form-data 방식은 requestParam으로 받음.
     public ResponseEntity<ApiResponse<String>> updateMyProfileImage(@RequestParam("image") MultipartFile image,
                                                                     @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -38,4 +40,12 @@ public class UserProfileController {
         log.info(imageUrl);
         return ResponseEntity.ok(ApiResponse.ok(imageUrl));
     }
+
+    @PatchMapping("/me/status-message")
+    @Operation(summary =  "내 상태메세지 수정하기", description = "내 상태메세지를 변경합니다.")
+    public ResponseEntity<ApiResponse<String>> updateMyStatusMessage(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody StatusMessageUpdateRequest request) {
+        String result = userProfileService.updateMyStatusMessage(customUserDetails.getId(), request.getStatusMessage());
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
 }

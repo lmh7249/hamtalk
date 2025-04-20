@@ -1,6 +1,8 @@
 package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.domain.entity.UserProfile;
+import com.hamtalk.chat.model.projection.UserProfileProjection;
+import com.hamtalk.chat.model.request.StatusMessageUpdateRequest;
 import com.hamtalk.chat.model.response.MyProfileResponse;
 import com.hamtalk.chat.repository.UserProfileRepository;
 import com.hamtalk.common.exeption.custom.FileUploadException;
@@ -43,4 +45,12 @@ public class UserProfileService {
         }
     }
 
+    @Transactional
+    public String updateMyStatusMessage(Long userId, String statusMessage) {
+        //TODO: 상태메세지 글자수 제한 로직 필요.
+        UserProfile userProfile = userProfileRepository.findEntityByUserId(userId).orElseThrow(UserProfileNotFoundException::new);
+        userProfile.updateStatusMessage(statusMessage);
+        userProfileRepository.save(userProfile);
+        return statusMessage;
+    }
 }

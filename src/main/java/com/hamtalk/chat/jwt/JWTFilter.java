@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -32,6 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         log.info("요청 URI: {}", requestURI);
         String bearerToken  = request.getHeader("Authorization");
+        log.info("bearerToken 값은? : " + bearerToken);
         String accessToken = null;
         // 토큰이 없다면 다음 필터로 넘김
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -84,4 +86,5 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }

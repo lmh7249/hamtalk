@@ -46,19 +46,19 @@ export const NEXT = {
     BUTTON: {
         DEFAULT: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#2196F3',
+            BACKGROUND: '#36d7b7',
         },
         HOVER: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#1E88E5',
+            BACKGROUND: '#2bb2a0',
         },
         PRESSED: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#1976D2',
+            BACKGROUND: '#24968a',
         },
         DISABLED: {
             COLOR: '#A9A9A9',
-            BACKGROUND: '#BBDEFB',
+            BACKGROUND: '#E0F2F1',
         },
     },
 };
@@ -67,15 +67,15 @@ export const PREV = {
     BUTTON: {
         DEFAULT: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#FF9800',
+            BACKGROUND: '#FF6F61',
         },
         HOVER: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#FB8C00',
+            BACKGROUND: '#FF5722',
         },
         PRESSED: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#F57C00',
+            BACKGROUND: '#FF7043',
         },
         DISABLED: {
             COLOR: '#A9A9A9',

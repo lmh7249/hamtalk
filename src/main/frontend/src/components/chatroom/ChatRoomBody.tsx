@@ -8,6 +8,7 @@ import {formatTime} from "../../utils/formatTime";
 import {subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
 import {Participant} from "../chat/ContentList";
 import testImage from "../../assets/images/UserDefaultImage.png";
+import dayjs from "../../utils/dayjs";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -137,10 +138,14 @@ const StyledMessageRow = styled.div`
     display: flex;
 `;
 
-const ChatDateDivider = () => {
+interface ChatDateDividerProps {
+    date: string
+}
+
+const ChatDateDivider = ({date}: ChatDateDividerProps) => {
     return (
         <StyledDateContainer>
-            <StyledDateText>2025년 4월 5일</StyledDateText>
+            <StyledDateText>{date}</StyledDateText>
         </StyledDateContainer>
     )
 }
@@ -150,7 +155,7 @@ const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
     return (
         <StyledChatMessageMineContainer>
             <StyledMessageInfo>
-                {/*<StyledUnreadCount>1</StyledUnreadCount>*/}
+                <StyledUnreadCount>1</StyledUnreadCount>
                 <StyledTime>{formatTime(createdAt)}</StyledTime>
             </StyledMessageInfo>
             <StyledBubbleMine>
@@ -202,7 +207,9 @@ const ChatRoomBody = () => {
     const chatRoomBodyRef = useRef<HTMLDivElement>(null);
     // 채팅방 유저 목록을 상태관리하기.
     const [participants, setParticipants] = useState<Participant[]>([]);
-
+    const formatDate = (dateString: string) => {
+        return dayjs(dateString).format('YYYY년 M월 D일');
+    };
 
 
     useEffect(() => {
@@ -210,17 +217,17 @@ const ChatRoomBody = () => {
             setMessages([]);
             return;
         }
-
         let chatSubscription: any = null;
-
         const fetchMessages = async () => {
             const response = await getChatMessageList(chatRoomId);
             setLoginUserId(response.loginUserId);
             console.log(response);
             setMessages(response.messages);
         }
+
         fetchMessages();
         notifyEnterChatRoom(chatRoomId);
+
         // 채팅방 구독로직.
         if(chatRoomId) {
             chatSubscription = subscribeToChatRoom(chatRoomId, (receivedMessage) => {
@@ -228,6 +235,7 @@ const ChatRoomBody = () => {
                 setMessages((prevMessages) =>[...prevMessages, receivedMessage]);
             })
         }
+
         return () => {
             // 채팅방 구독 해제.
             if(chatSubscription) {
@@ -236,7 +244,6 @@ const ChatRoomBody = () => {
             // 채팅방을 나갈때도, 접속 시간을 업데이트 해야 최신정보를 유지 가능.
             notifyEnterChatRoom(chatRoomId);
         };
-
     }, [chatRoomId]);
 
     // 내가 보낸 메시지일 경우에만 스크롤을 하단으로 이동
@@ -246,18 +253,27 @@ const ChatRoomBody = () => {
         }
     }, [messages]);  // 메시지가 추가될 때마다 확인
 
-
     return (
-
         <StyledChatRoomBodyWrapper ref={chatRoomBodyRef}>
-            <ChatDateDivider/>
-            {messages.map((message) =>
-                loginUserId === message.senderId ?
-                    <ChatMessageMine key={message.messageId} {...message}/> :
+            {messages.map((message, index) => {
+                const currentDate = formatDate(message.createdAt);
+                const prevDate = index > 0 ? formatDate(messages[index - 1].createdAt) : null;
+                const isFirstMessageOfDay = currentDate !== prevDate;
 
-                    <ChatMessageOther key={message.messageId} {...message}/>
-            )}
+                return (
+                    <React.Fragment key={message.messageId}>
+
+                        {isFirstMessageOfDay && <ChatDateDivider date={currentDate} />}
+                        {loginUserId === message.senderId ? (
+                            <ChatMessageMine {...message} />
+                        ) : (
+                            <ChatMessageOther {...message} />
+                        )}
+                    </React.Fragment>
+                );
+            })}
         </StyledChatRoomBodyWrapper>
+
     )
 }
 export default ChatRoomBody;

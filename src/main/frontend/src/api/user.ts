@@ -1,15 +1,19 @@
+import toast from "react-hot-toast";
+import {ApiResponse} from "../../types/api-response";
+import {customFetch} from "./customFetch";
+
 export const checkDuplicateEmailApi = async (email: string) => {
     try {
-        const response = await fetch(`/api/users/email-check?email=${email}`, {
+        const response = await customFetch(`/api/users/email-check?email=${email}`, {
             method: "get",
         });
+        const data = await response.json();
+        console.log("응답 데이터:", data);
 
         if (response.ok) {
-            console.log("사용 가능한 이메일");
-            // 이메일 인증번호 전송하는 api 호출 -> return true 반환해서 true일때 다른 api 또 호출하게 만들기?
             return true;
         } else if (response.status === 409) {
-            alert("이미 사용중인 이메일입니다. 다른 이메일을 사용해주세요.");
+            toast.error(data.errorMessage);
             return false;
         }
     } catch (error) {
@@ -21,13 +25,8 @@ export const checkDuplicateEmailApi = async (email: string) => {
 };
 
 export const getMyProfileApi = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch("api/profiles/me", {
+    const response = await customFetch("api/profiles/me", {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
     });
     if (!response.ok) {
         throw new Error("프로필 받아오기 실패")
@@ -36,25 +35,49 @@ export const getMyProfileApi = async () => {
 }
 
 export const getUserProfileByEmailApi = async (email: string) => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`api/users?email=${email}`, {
+    const response = await customFetch(`/api/users?email=${email}`, {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
     });
     return response.json();
 }
 
 export const getUserProfileByIdApi = async (id: number) => {
-    const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(`api/users/${id}`, {
+    const response = await customFetch(`/api/users/${id}`, {
         method: "get",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        }
     });
     return response.json();
+}
+
+//TODO: 이 구조로 api 호출 방식 전부 변경하기.
+export const updateUserProfileImageApi = async (imageFile: File): Promise<ApiResponse<string>> => {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    const response = await customFetch('/api/profiles/me/image', {
+        method: "PATCH",
+        body: formData,
+
+    },true,true);
+
+    // HTTP 응답코드를 통해 필터링을 먼저하기.
+    if (!response.ok) {
+        const errorData = await response.json(); // body에 errorMessage 들어있음
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+
+    return await response.json(); // status === "success"
+}
+
+export const updateUserStatusMessageApi = async (statusMessage: string): Promise<ApiResponse<string>> => {
+    const response = await customFetch('/api/profiles/me/status-message', {
+        method: "PATCH",
+        body: JSON.stringify({
+            statusMessage : statusMessage
+        })
+    })
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
 }

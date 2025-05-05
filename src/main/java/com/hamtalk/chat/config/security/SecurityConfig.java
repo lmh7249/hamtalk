@@ -114,7 +114,8 @@ public class SecurityConfig {
                                 "/api/auth/reissue",
                                 "/ws-chat/**", // 웹소켓 핸드셰이크 엔드포인트는 허용
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**" // swagger-ui 허용
+                                "/v3/api-docs/**", // swagger-ui 허용
+                                "/test" // EC2 배포 테스트용
                         ).permitAll()
 
                         // POST 방식 /api/users는 인증 없이 허용 (회원가입)

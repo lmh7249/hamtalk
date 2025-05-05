@@ -66,7 +66,7 @@ const ButtonWrapper = styled.div`
 interface UserProfileDataProps {
     id: number;
     nickname: string;
-    profile_image_url: string;
+    profileImageUrl: string;
 }
 
 interface UserProfileProps {
@@ -78,8 +78,7 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ userProfileData, handleAddFriend, handleViewProfile }) => {
     return (
         <>
-            {/*userProfileData.profile_image_url -> 이거 이미지쪽에 넣기.*/}
-            <StyledProfileImage src={testImage} alt="유저 프로필 사진" />
+            <StyledProfileImage src={userProfileData.profileImageUrl} alt="유저 프로필 사진" />
             <StyledUserNickName>{userProfileData.nickname}</StyledUserNickName>
             <ButtonWrapper>
                 <ModalButton backgroundColor={"#d3d3d3"} hoverColor={"#b0b0b0"} color={"black"} onClick={() => handleViewProfile(userProfileData.id)}>

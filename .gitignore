@@ -31,6 +31,10 @@ out/
 src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
 
+# React 환경 변수 파일 무시
+src/main/frontend/.env*
+
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 //TODO: 액세스토큰 사용하지 않는 api는 customFetch 사용 x
 export const sendEmailVerificationApi = async (email : string) => {
     try {
-        const response = await fetch("/api/auth/email-verification/code", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/email-verification/code`, {
             method:"post",
             headers: {
                 "Content-Type": "application/json"
@@ -30,7 +30,7 @@ export const sendEmailVerificationApi = async (email : string) => {
 
 export const verifyEmailVerificationCodeApi = async (email : string, verificationCode: string) => {
     try {
-        const response = await fetch("/api/auth/email-verification/code/verify", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/email-verification/code/verify`, {
             method: "post",
             headers: {
                 "Content-Type": "application/json"
@@ -39,6 +39,7 @@ export const verifyEmailVerificationCodeApi = async (email : string, verificatio
                 "email"  : email,
                 "verificationCode" : verificationCode
             })
+
         })
         const data = await response.json();
 
@@ -72,12 +73,13 @@ export interface LoginCredentials {
 
 export const userLoginApi = async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-        const response =await fetch("/api/auth/login", {
+        const response =await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
             method:"post",
             headers: {
                "Content-Type": "application/json"
             },
             body: JSON.stringify(credentials),
+            credentials: "include"
         })
         const loginUserData = await response.json();
         // 헤더에서 access 토큰 가져오기
@@ -99,7 +101,7 @@ export const userLoginApi = async (credentials: LoginCredentials): Promise<Login
 
 export const userLogoutApi = async () => {
     try {
-        const response = await fetch("/api/auth/logout", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {
             method: "post",
             credentials: "include",
         })

@@ -12,7 +12,7 @@ export const getMyFriendListApi = async () => {
 }
 
 export const addFriendApi = async (toUserId:number) => {
-    const response = await customFetch(`api/friends/${toUserId}`, {
+    const response = await customFetch(`/api/friends/${toUserId}`, {
         method:"post",
 
     });
@@ -23,7 +23,7 @@ export const addFriendApi = async (toUserId:number) => {
 }
 
 export const checkFriendshipApi = async (toUserId:number) => {
-    const response = await customFetch(`api/friends/${toUserId}`, {
+    const response = await customFetch(`/api/friends/${toUserId}`, {
         method: "get",
     });
     if(!response.ok) {

@@ -28,6 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.multipart.support.MultipartFilter;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -74,18 +75,20 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                        configuration.setAllowedOrigins(Arrays.asList(
+                                "http://localhost:3000",
+                                "https://hamtalk.shop",
+                                "https://www.hamtalk.shop"
+                        ));
                         configuration.setAllowedMethods(Collections.singletonList("*")); // 모든 HTTP 메서드 허용
                         configuration.setAllowCredentials(true); // 자격증명 허용
                         configuration.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더값 허용
-                        configuration.setMaxAge(3600L);
-
                         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                        configuration.setMaxAge(3600L);
 
                         return configuration;
                     }
                 })));
-
 
         //csrf disable
         http

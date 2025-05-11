@@ -19,7 +19,7 @@ export const customFetch = async (
         headers["Content-Type"] = "application/json";
     }
 
-    const response = await fetch(url, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
         ...options,
         headers,  // 수정된 headers 객체 사용
         credentials: "include",
@@ -28,7 +28,7 @@ export const customFetch = async (
     if(response.status === 401 && retry) {
         //401 에러 발생: 액세스 토큰 만료됨. 리프레시 토큰으로 재발급 시도
         // accessToken 만료 → refresh 요청
-        const refreshRes = await fetch("/api/auth/reissue", {
+        const refreshRes = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/reissue`, {
             method: "POST",
             credentials: "include",
         })

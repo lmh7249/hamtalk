@@ -25,7 +25,7 @@ export const checkDuplicateEmailApi = async (email: string) => {
 };
 
 export const getMyProfileApi = async () => {
-    const response = await customFetch("api/profiles/me", {
+    const response = await customFetch("/api/profiles/me", {
         method: "get",
     });
     if (!response.ok) {

@@ -24,7 +24,7 @@ import java.io.IOException;
 @Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
     private final JwtProperties jwtProperties;
     private final RedisService redisService;
 

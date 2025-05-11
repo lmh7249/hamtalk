@@ -8,7 +8,7 @@ import PrivateRoute from "../auth/PrivateRoute";
 import {Toaster} from "react-hot-toast";
 
 const AppRoutes = () => {
-
+    console.log("API URL: ", process.env.REACT_APP_API_URL);  // 환경 변수 로그 출력
     return (
         <>
             <Toaster position={"top-center"}/>

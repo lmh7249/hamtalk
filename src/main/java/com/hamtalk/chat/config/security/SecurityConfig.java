@@ -2,8 +2,8 @@ package com.hamtalk.chat.config.security;
 
 import com.hamtalk.chat.config.jwt.JwtProperties;
 import com.hamtalk.chat.jwt.CustomLogoutFilter;
-import com.hamtalk.chat.jwt.JwtFilter;
-import com.hamtalk.chat.jwt.JwtUtil;
+import com.hamtalk.chat.jwt.JWTFilter;
+import com.hamtalk.chat.jwt.JWTUtil;
 import com.hamtalk.chat.jwt.LoginFilter;
 import com.hamtalk.chat.service.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.multipart.support.MultipartFilter;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -37,7 +38,7 @@ public class SecurityConfig {
     //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
     private final JwtProperties jwtProperties;
     private final RedisService redisService;
 
@@ -74,18 +75,20 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                        configuration.setAllowedOrigins(Arrays.asList(
+                                "http://localhost:3000",
+                                "https://hamtalk.shop",
+                                "https://www.hamtalk.shop"
+                        ));
                         configuration.setAllowedMethods(Collections.singletonList("*")); // 모든 HTTP 메서드 허용
                         configuration.setAllowCredentials(true); // 자격증명 허용
                         configuration.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더값 허용
-                        configuration.setMaxAge(3600L);
-
                         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                        configuration.setMaxAge(3600L);
 
                         return configuration;
                     }
                 })));
-
 
         //csrf disable
         http
@@ -114,7 +117,8 @@ public class SecurityConfig {
                                 "/api/auth/reissue",
                                 "/ws-chat/**", // 웹소켓 핸드셰이크 엔드포인트는 허용
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**" // swagger-ui 허용
+                                "/v3/api-docs/**", // swagger-ui 허용
+                                "/test" // EC2 배포 테스트용
                         ).permitAll()
 
                         // POST 방식 /api/users는 인증 없이 허용 (회원가입)
@@ -124,7 +128,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
         http
-                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         LoginFilter loginFilter = new LoginFilter(
                 authenticationManager(authenticationConfiguration),
                 jwtUtil,

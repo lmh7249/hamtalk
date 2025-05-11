@@ -2,11 +2,12 @@ package com.hamtalk.chat.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-public class MainController {
-    @GetMapping("/{path:[^\\.]*}")
+@RestController
+public class TestController {
+    @GetMapping("/test")
     public String redirect() {
-        return "index.html";
+        return "도커 테스트입니다.11";
     }
 }

@@ -26,12 +26,11 @@ public class ApiResponse<T> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String errorMessage;
-
-
-
-    // 성공 응답 생성
-    // TODO: 앞쪽 <T> -> 이 메세드에서 사용할 제네릭 타입 선언
+// TODO: 앞쪽 <T> -> 이 메세드에서 사용할 제네릭 타입 선언
     // TODO: 뒤쪽 <T> -> 반환할 ApiResponse 객체의 타입을 지정.
+
+
+    // 1. 성공 응답 생성
     public static <T> ApiResponse<T> ok(T data) {
         return  ApiResponse.<T>builder()
                 .status(SUCCESS)
@@ -39,7 +38,7 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    // 클라이언트 요청 실패 응답
+    // 2. 클라이언트 요청 실패 응답
     public static <T> ApiResponse<T> fail(String errorCode, String errorMessage) {
         return ApiResponse.<T>builder()
                 .status(FAIL)
@@ -48,7 +47,7 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    // 서버 오류 응답
+    // 3. 서버 오류 응답
     public static <T> ApiResponse<T> error(String errorCode, String errorMessage) {
         return ApiResponse.<T>builder()
                 .status(ERROR)
@@ -57,3 +56,4 @@ public class ApiResponse<T> {
                 .build();
     }
 }
+

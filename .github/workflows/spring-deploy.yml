@@ -24,6 +24,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+
+      - name: gradlew에 실행 권한 추가
+        run: chmod +x ./gradlew
+
       # resources 하위 경로가 전부 .gitignore 상태라서 폴더를 생성해줘야 에러 발생 x
       - name: application.yml 파일 만들기
         run: | 

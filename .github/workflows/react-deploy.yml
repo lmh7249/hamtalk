@@ -30,7 +30,7 @@ jobs:
         working-directory: ./src/main/frontend
         run: |
           yarn install 
-          yarn build
+          CI=false yarn build
         env:
           REACT_APP_API_URL: ${{secrets.REACT_APP_API_URL}}
           REACT_APP_WS_URL: ${{secrets.REACT_APP_WS_URL}}

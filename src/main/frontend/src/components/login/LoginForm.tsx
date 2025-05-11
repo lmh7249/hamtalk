@@ -119,7 +119,7 @@ const LoginForm = () => {
 
     return (
         <StyledLoginForm onSubmit={handleSubmit}>
-            <StyledEmailLabel htmlFor="email">이메일 주소 2</StyledEmailLabel>
+            <StyledEmailLabel htmlFor="email">이메일 주소 3</StyledEmailLabel>
             <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} maxLength={255} onChange={handleEmailChange}/>
             <StyledErrorText>{emailError || "\u00A0"}</StyledErrorText>
 

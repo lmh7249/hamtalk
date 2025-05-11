@@ -1,0 +1,45 @@
+# S3 + CloudFront -> React 배포용
+name: react-deploy
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed  # PR이 닫혔을 때만 실행됨 (merge 포함)
+    paths:
+      - 'src/main/frontend/**' # 리액트 관련 파일에 변경이 있을 때만 트리거
+
+jobs:
+  React-Deploy:
+    if: github.event.pull_request.merged == true  # '닫힘' 중에서도 실제로 merge된 경우에만 실행
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
+        uses: aws-actions/configure-aws-credential@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{secrets.REACT_AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.REACT_AWS_SECRET_ACCESS_KEY}}
+
+      - name: 리액트 프로젝트 디렉토리로 이동 후 의존성 설치 및 빌드
+        working-directory: ./src/main/frontend
+        run: |
+          yarn install 
+          yarn build
+        env:
+          REACT_APP_API_URL: ${{secrets.REACT_APP_API_URL}}
+          REACT_APP_WS_URL: ${{secrets.REACT_APP_WS_URL}}
+
+      # recursive : 폴더 안까지 재귀적으로 돌면서 폴더 다 찾고 해당 파일 모두 삭제
+      - name: S3 기존 파일 전체 삭제 후 build 결과물 업로드
+        run: |
+          aws s3 rm --recursive s3://hamtalk-chat-web-page        
+          aws s3 cp ./src/main/frontend/build s3://hamtalk-chat-web-page/ --recursive
+
+      - name: Cloudfront 캐시 무효화
+        run: aws cloudfront create-invalidation --distribution-id EQKYCQSGOBICM --paths "/*"

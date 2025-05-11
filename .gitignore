@@ -18,6 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
+src/main/resources/application.yml
 .idea
 *.iws
 *.iml
@@ -25,6 +26,14 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+# 환경별 설정 파일들 무시
+src/main/resources/application-dev.yml
+src/main/resources/application-prod.yml
+
+# React 환경 변수 파일 무시
+src/main/frontend/.env*
+
 
 ### NetBeans ###
 /nbproject/private/

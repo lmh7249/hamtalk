@@ -34,15 +34,18 @@
 📦 **파일 업로드 및 S3 이미지 관리**
   - AWS S3를 활용한 프로필 이미지 업로드
   - 기본 프로필 이미지 및 사용자별 디렉토리 구조 설정
-  - S3 접근 권한 설정 및 URL 반환 처리
     
 💬 **SPA 기반 커뮤니티 UI**
   - React + React Router 기반 싱글 페이지 앱
   - Redux Toolkit을 이용한 상태 관리
     
-🐳 **Docker 기반 배포 환경 구성**  
-  - Spring Boot & React 애플리케이션을 Docker 이미지로 빌드
-  - Nginx를 활용한 프론트엔드 정적 파일 서빙 및 리버스 프록시 설정
+🌐 **S3, CloudFront를 활용한 프론트엔드 배포**
+  - React 빌드 파일을 AWS S3에 정적 호스팅
+  - CloudFront를 통해 빌드 파일을 빠르게 전달할 수 있도록 CDN 구성 및 HTTPS 적용
+  
+🐳 **Docker 기반 백엔드 배포 환경 구성**  
+  - Spring Boot 서버를 Docker 이미지로 빌드
+  - Nginx, Certbot을 이용한 HTTPS 적용 및 리버스 프록시 설정
     
 ⚙️ **CI/CD 자동화**
   - GitHub Actions + AWS CodeDeploy 기반의 배포 자동화

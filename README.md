@@ -41,7 +41,12 @@
 💬 SPA 기반 커뮤니티 UI
   - React + React Router 기반 싱글 페이지 앱
   - Redux Toolkit을 이용한 상태 관리
-
+🐳 Docker 기반 배포 환경 구성
+  - Spring Boot & React 애플리케이션을 Docker 이미지로 빌드
+  - Nginx를 활용한 프론트엔드 정적 파일 서빙 및 리버스 프록시 설정
+⚙️ CI/CD 자동화
+  - GitHub Actions + AWS CodeDeploy 기반의 배포 자동화
+  - main 브랜치에 PR Merge 시, 자동 배포되도록 구성
 
 ## 🏆 기술적 성과
 -

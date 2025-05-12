@@ -15,8 +15,8 @@
 | **Backend**    | 	Java 17, Spring Boot 3.3.4, Spring Security, JWT, JPA                           |
 | **Frontend**   |  React 18, TypeScript, Styled-Components, Redux Toolkit, React Router            |
 | **Database**   |  MySQL 8.0, Redis 7.4, MongoDB 8.0.6                                             |
-| **DevOps**     |  AWS(S3)                                                                         |
-| **Tools**      |  IntelliJ,IntelliJ, Gradle, Git, GitHub, Swagger, DataGrip                        |
+| **DevOps**     |  AWS(S3, RDS, EC2, CloudFront, Route53, ECR, CodeDeploy), Docker, Github Actions |
+| **Tools**      |  IntelliJ,IntelliJ, Gradle, Git, GitHub, Swagger, DataGrip                       |
 
 ## 🗺️ 서버 구조
 

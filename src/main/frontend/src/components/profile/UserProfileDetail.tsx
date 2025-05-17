@@ -422,7 +422,7 @@ const UserProfileDetail = () => {
                                 </EditingWrapper>
                             ) : (
                                 <>
-                                    <StyledStateMessage>{isMyUserId ? myProfile.stateMessage : searchUserProfile?.statusMessage}</StyledStateMessage>
+                                    <StyledStateMessage>{isMyUserId ? (myProfile.stateMessage ?? "상태메세지를 입력해보세요!") : searchUserProfile?.statusMessage}</StyledStateMessage>
                                     {isMyUserId && <ProfileStatusEditButton onClick={handleEditClick}/>}
                                 </>
                             )}

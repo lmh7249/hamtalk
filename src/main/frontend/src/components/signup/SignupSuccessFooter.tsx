@@ -10,7 +10,7 @@ const SignupSuccessFooter = () => {
     }
 
     return (
-        <Button type="LOGIN" onClick={handleLoginPageRedirect}>로그인 이동</Button>
+        <Button $variant="LOGIN" type={"button"} onClick={handleLoginPageRedirect}>로그인 이동</Button>
     )
 }
 export default SignupSuccessFooter

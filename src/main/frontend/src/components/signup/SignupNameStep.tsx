@@ -3,15 +3,20 @@ import React from "react";
 import FloatingInput from "./FloatingInput";
 import FloatingSelect from "./FloatingSelect";
 import {StyledErrorText} from "../common/ErrorText";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../store";
+import {updateField} from "../../store/signupSlice";
+import FloatingLabelSelect from "../common/FloatingLabelSelect";
+import FloatingLabelInput from "../common/FloatingLabelInput";
 
 const SignupNameWrapper = styled.div`
     display: flex;
     flex-direction: column;
     position: absolute; // 절대 위치
     max-width: 350px; /* 폼 최대 크기 제한 */
-    box-sizing: border-box; 
-    gap:30px;
-    
+    box-sizing: border-box;
+    gap: 15px;
+
 `
 const StyledBirthday = styled.div`
     display: flex;
@@ -19,18 +24,9 @@ const StyledBirthday = styled.div`
 `
 
 interface SignupNameStepProps {
-    formData: FormData;
-    handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    errorMessage: {[key:string]: string};
+    errorMessage: { [key: string]: string };
 }
 
-interface FormData {
-    name: string;
-    birthYear: string;
-    birthMonth: string;
-    birthDay: string;
-    gender: string;
-}
 
 const genderOptions = [
     {value: "M", label: "남성"},
@@ -52,24 +48,42 @@ const monthOptions = [
     {value: '12', label: '12월'}
 ];
 
-const SignupNameStep = ({formData, handleInputChange, errorMessage}: SignupNameStepProps) => {
+const SignupNameStep = ({errorMessage}: SignupNameStepProps) => {
+    const dispatch = useDispatch();
+    const formData = useSelector((state: RootState) => state.signup);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const {name, value} = e.target;
+        dispatch(updateField({field: name as keyof typeof formData, value}));
+    };
 
     return (
         <SignupNameWrapper>
-            <FloatingInput type="text" placeholder="이름" name="name" value={formData.name} onChange={handleInputChange}/>
-            {errorMessage && errorMessage.name && <StyledErrorText>{errorMessage.name}</StyledErrorText>}
-                    <StyledBirthday>
-                <FloatingInput type="number" placeholder="년(4자)" name="birthYear" value={formData.birthYear} min={1900} max={new Date().getFullYear()}
-                               onChange={handleInputChange}/>
-                <FloatingSelect placeholder="월" value={formData.birthMonth} name="birthMonth" options={monthOptions}
+            <FloatingLabelInput type="text" placeholder="이름" name="name" value={formData.name}
                                 onChange={handleInputChange}/>
-                        <FloatingInput type="number" placeholder="일" value={formData.birthDay} name ="birthDay" min={1} max={31}
-                               onChange={handleInputChange}/>
-                    </StyledBirthday>
-            {errorMessage && errorMessage.birthDate && <StyledErrorText>{errorMessage.birthDate}</StyledErrorText>}
-            <FloatingSelect placeholder="성별" value={formData.gender} options={genderOptions} name="gender"
-                            onChange={handleInputChange}/>
-            {errorMessage && errorMessage.gender && <StyledErrorText>{errorMessage.gender}</StyledErrorText>}
+            <StyledErrorText>
+                {errorMessage && errorMessage.name ? errorMessage.name : " "}
+            </StyledErrorText>
+            <StyledBirthday>
+                <FloatingLabelInput type="number" placeholder="년(4자)" name="birthYear" value={formData.birthYear}
+                                    min={1900}
+                                    max={new Date().getFullYear()}
+                                    onChange={handleInputChange}/>
+                <FloatingLabelSelect options={monthOptions} placeholder="월" value={formData.birthMonth}
+                                     name="birthMonth" onChange={handleInputChange}/>
+
+                <FloatingLabelInput type="number" placeholder="일" value={formData.birthDay} name="birthDay" min={1}
+                                    max={31}
+                                    onChange={handleInputChange}/>
+            </StyledBirthday>
+            <StyledErrorText>
+                {errorMessage && errorMessage.birthDate ? errorMessage.birthDate : " "}
+            </StyledErrorText>
+            <FloatingLabelSelect options={genderOptions} placeholder="성별" value={formData.gender} name="gender"
+                                 onChange={handleInputChange}/>
+            <StyledErrorText>
+                {errorMessage && errorMessage.gender ? errorMessage.gender : " "}
+            </StyledErrorText>
         </SignupNameWrapper>
     )
 }

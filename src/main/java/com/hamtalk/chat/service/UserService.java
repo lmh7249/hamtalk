@@ -2,9 +2,11 @@ package com.hamtalk.chat.service;
 
 
 import com.hamtalk.chat.domain.entity.User;
+import com.hamtalk.chat.domain.entity.UserProfile;
 import com.hamtalk.chat.model.request.UserSignupRequest;
 import com.hamtalk.chat.model.response.UserProfileByEmailResponse;
 import com.hamtalk.chat.model.response.UserProfileByIdResponse;
+import com.hamtalk.chat.repository.UserProfileRepository;
 import com.hamtalk.chat.repository.UserRepository;
 import com.hamtalk.common.exeption.custom.EmailAlreadyExistsException;
 import com.hamtalk.common.exeption.custom.InvalidEmailFormatException;
@@ -21,16 +23,24 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private static final String DEFAULT_PROFILE_IMAGE_URL = "https://hamtalk-static-files.s3.ap-northeast-2.amazonaws.com/profile-image/UserDefaultImage.png";
 
     @Transactional
     public String signup(UserSignupRequest dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistsException();
         }
-
         dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
         User save = userRepository.save(dto.toUserEntity());
+        UserProfile userProfile = UserProfile.builder()
+                .userId(save.getId())
+                .nickname(save.getName())
+                .profileImageUrl(DEFAULT_PROFILE_IMAGE_URL)
+                .build();
+        userProfileRepository.save(userProfile);
+
         return save.getName();
     }
 
@@ -42,7 +52,7 @@ public class UserService {
         }
 
         if(userRepository.existsByEmail(email)) {
-           throw new EmailAlreadyExistsException();
+            throw new EmailAlreadyExistsException();
         }
     }
 

@@ -25,19 +25,19 @@ export const COMPLETE = {
     BUTTON: {
         DEFAULT: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#ffb6c1',
+            BACKGROUND: '#36d7b7',
         },
         HOVER: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#ff527a',
+            BACKGROUND: '#2bb2a0',
         },
         PRESSED: {
             COLOR: '#FFFFFF',
-            BACKGROUND: '#e04e6f',
+            BACKGROUND: '#24968a',
         },
         DISABLED: {
-            COLOR: '#FFFFFF',
-            BACKGROUND: '#f8c2d1',
+            COLOR: '#A9A9A9',
+            BACKGROUND: '#E0F2F1',
         },
     },
 };

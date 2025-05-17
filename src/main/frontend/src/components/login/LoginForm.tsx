@@ -15,21 +15,21 @@ const StyledLoginForm = styled.form`
     flex-direction: column;
     gap: 5px;
     width: 100%;
-`
+`;
 const StyledEmailLabel = styled.label<{error?:boolean}>`
     font-weight: bold;
     color: ${(props) => (props.error ? "#f15746" : "black")};
-`
+`;
 const StyledPasswordLabel = styled.label<{error?:boolean}>`
     font-weight: bold;
     color: ${(props) => (props.error ? "#f15746" : "black")};
-`
+`;
 const StyledErrorText = styled.p`
     font-size: 13px;
     color: #f15746;
     margin: 5px 0 5px 0;
     line-height: 1px;
-`
+`;
 const validateEmail = (email: string): string | null => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{1,}$/;
     if(!emailRegex.test(email)) {
@@ -120,14 +120,14 @@ const LoginForm = () => {
     return (
         <StyledLoginForm onSubmit={handleSubmit}>
             <StyledEmailLabel htmlFor="email">이메일 주소</StyledEmailLabel>
-            <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} maxLength={255} onChange={handleEmailChange}/>
+            <LoginInput id="email" type="email" placeholder="예) hamtalk@hamtalk.com" value={email} maxLength={255} onChange={handleEmailChange}  autoComplete="email"/>
             <StyledErrorText>{emailError || "\u00A0"}</StyledErrorText>
 
             <StyledPasswordLabel htmlFor="password">비밀번호</StyledPasswordLabel>
             <LoginInput id="password" type="password" placeholder="비밀번호를 입력해주세요." value={password} maxLength={16}
-                        onChange={handlePasswordChange}/>
+                        onChange={handlePasswordChange} autoComplete="current-password"/>
             <StyledErrorText>{passwordError || "\u00A0"}</StyledErrorText>
-            <Button type="LOGIN" disabled={!isFormValid}>로그인</Button>
+            <Button $variant="LOGIN" type={"submit"}  disabled={!isFormValid} >로그인</Button>
         </StyledLoginForm>
     )
 }

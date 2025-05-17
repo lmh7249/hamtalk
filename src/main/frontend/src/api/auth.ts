@@ -44,7 +44,6 @@ export const verifyEmailVerificationCodeApi = async (email : string, verificatio
         const data = await response.json();
 
         if(data.status == "success") {
-            alert("인증번호 검증 통과")
             return {success: true, errorMessage : undefined};
         } else {
             // 인증번호가 틀린 경우

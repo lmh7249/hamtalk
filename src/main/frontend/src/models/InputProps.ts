@@ -9,5 +9,6 @@ export interface InputProps {
     max ?: number;
     onChange : (e: React.ChangeEvent<HTMLInputElement>) => void;
     onFocus ?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    autoComplete?: string;
 }
 

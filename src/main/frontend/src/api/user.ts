@@ -4,7 +4,7 @@ import {customFetch} from "./customFetch";
 
 export const checkDuplicateEmailApi = async (email: string) => {
     try {
-        const response = await customFetch(`/api/users/email-check?email=${email}`, {
+        const response = await  fetch(`${process.env.REACT_APP_API_URL}/api/users/email-check?email=${email}`, {
             method: "get",
         });
         const data = await response.json();

@@ -24,7 +24,6 @@ public class UserProfile extends BaseEntity{
     @Column(name ="status_message")
     private String statusMessage;
 
-
     public void updateProfileImage(String imageUrl) {
         this.profileImageUrl = imageUrl;
     }

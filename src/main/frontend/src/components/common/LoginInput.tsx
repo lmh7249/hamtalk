@@ -25,9 +25,10 @@ interface LoginInputProps{
     value: string;
     maxLength: number;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
+    autoComplete: string;
 }
 
-export const LoginInput = ({type, id, placeholder, value, maxLength, onChange}: LoginInputProps) => {
+export const LoginInput = ({type, id, placeholder, value, maxLength, onChange, autoComplete}: LoginInputProps) => {
     return (
         <StyledInput
             type={type}
@@ -36,6 +37,7 @@ export const LoginInput = ({type, id, placeholder, value, maxLength, onChange}: 
             value={value}
             maxLength={maxLength}
             onChange={onChange}
+            autoComplete = {autoComplete}
         />
     );
 };

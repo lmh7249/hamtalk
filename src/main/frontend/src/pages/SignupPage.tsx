@@ -1,10 +1,11 @@
 import {AuthPageLayouts} from "../styles/layouts/PageLayouts";
 import SignupContainer from "../containers/SignupContainer";
 import ProgressIndicator from "../components/signup/ProgressIndicator";
-import questions from '../data/signupQuestions.json'
 import React, {useState} from "react";
 import {BarLoader} from "react-spinners";
 import styled from "styled-components";
+import {useSelector} from "react-redux";
+import {RootState} from "../store";
 
 const LoaderContainer = styled.div`
     display: flex;
@@ -18,6 +19,14 @@ const LoaderContainer = styled.div`
 const SignupPage = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+
+    const questions = [
+        { title: '기본 정보 입력', desc: '이름, 생년월일, 성별을 입력해주세요.' },
+        { title: '이메일 입력', desc: '사용하실 이메일을 입력해주세요.' },
+        { title: '이메일 인증', desc: '발송된 인증번호를 입력해주세요.' },
+        { title: '비밀번호 설정', desc: '비밀번호를 입력하고 확인해주세요.' }
+    ];
+
     const maxSteps = questions.length;
 
     // 현재 step이 유효하지 않으면 0 리셋
@@ -54,6 +63,7 @@ const SignupPage = () => {
                              onNextStep={handleNextStep}
                              onPrevStep={handlePrevStep}
                              setIsLoading={setIsLoading}
+                             questions={questions}
             />
         </AuthPageLayouts>
     )

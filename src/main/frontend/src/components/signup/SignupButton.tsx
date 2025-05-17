@@ -5,6 +5,8 @@ import {isValidEmail, isValidPassword} from "../../utils/signupValidation";
 import React from "react";
 import {checkDuplicateEmail} from "../../services/user-service";
 import {sendEmailVerification, verifyEmailVerificationCode} from "../../services/auth-service";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
 
 const ButtonWrapper = styled.div`
     position: absolute;
@@ -17,7 +19,6 @@ const ButtonWrapper = styled.div`
 interface SignupButtonProps {
     currentStep: number;
     questionLength: number;
-    formData: FormData;
     onNextStep: () => void;
     onPrevStep: () => void;
     isStepValid: boolean;
@@ -29,7 +30,6 @@ interface SignupButtonProps {
 const SignupButton = ({
                           currentStep,
                           questionLength,
-                          formData,
                           onNextStep,
                           onPrevStep,
                           isStepValid,
@@ -38,6 +38,7 @@ const SignupButton = ({
                           setIsLoading
                       }: SignupButtonProps) => {
     const isLast = (questionLength - 1 === currentStep);
+    const formData = useSelector((state:RootState) => state.signup);
 
     const handleNext = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -96,9 +97,9 @@ const SignupButton = ({
 
     return (
         <ButtonWrapper>
-            {currentStep !== 0 && <Button type="PREV" onClick={handlePrev}>이전</Button>}
-            {isLast ? <Button type="COMPLETE">가입하기</Button> :
-                <Button type="NEXT" onClick={handleNext}>다음</Button>}
+            {currentStep !== 0 && <Button $variant ="PREV"  type="button" onClick={handlePrev}>이전</Button>}
+            {isLast ? <Button $variant ="COMPLETE"  type="submit">가입하기</Button> :
+                <Button $variant ="NEXT" type="submit" onClick={handleNext}>다음</Button>}
         </ButtonWrapper>
     )
 }

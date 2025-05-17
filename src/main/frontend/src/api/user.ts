@@ -1,14 +1,15 @@
 import toast from "react-hot-toast";
 import {ApiResponse} from "../../types/api-response";
 import {customFetch} from "./customFetch";
+import {SignupData} from "../store/signupSlice";
 
 export const checkDuplicateEmailApi = async (email: string) => {
     try {
-        const response = await customFetch(`/api/users/email-check?email=${email}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/email-check?email=${email}`, {
             method: "get",
         });
         const data = await response.json();
-        console.log("응답 데이터:", data);
+        //   console.log("응답 데이터:", data);
 
         if (response.ok) {
             return true;
@@ -57,7 +58,7 @@ export const updateUserProfileImageApi = async (imageFile: File): Promise<ApiRes
         method: "PATCH",
         body: formData,
 
-    },true,true);
+    }, true, true);
 
     // HTTP 응답코드를 통해 필터링을 먼저하기.
     if (!response.ok) {
@@ -72,12 +73,30 @@ export const updateUserStatusMessageApi = async (statusMessage: string): Promise
     const response = await customFetch('/api/profiles/me/status-message', {
         method: "PATCH",
         body: JSON.stringify({
-            statusMessage : statusMessage
+            statusMessage: statusMessage
         })
     })
-    if(!response.ok) {
+    if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
+}
+
+
+export const signupUserApi = async (signupData: SignupData): Promise<ApiResponse<string>> => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users`, {
+        method: "post",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(signupData)
+        // json 문자열로 변환해서 body에 전송할 데이터 포함.
+    })
+
+    if (!response.ok) {
+        const errorData = await response.json(); // body에 errorMessage 들어있음
+        throw new Error(errorData.errorMessage || "회원가입 요청에 실패했어요.");
     }
     return await response.json();
 }

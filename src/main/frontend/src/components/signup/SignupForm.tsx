@@ -13,6 +13,11 @@ import {
     isValidPassword,
 } from "../../utils/signupValidation";
 import {useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../store";
+import {signupUser} from "../../services/user-service";
+import toast from "react-hot-toast";
+import {resetForm} from "../../store/signupSlice";
 
 const StyledSignupForm = styled.form`
     display: flex;
@@ -43,27 +48,14 @@ export interface FormData {
 
 const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep, setIsLoading}: SignupFormProps) => {
     // 1~4단계 모든 데이터 관리
-    const [formData, setFormData] = useState<FormData>({
-        name: '',
-        birthYear: '',
-        birthMonth: '',
-        birthDay: '',
-        gender: '',
-        // 1단계
-        email: '',
-        // 2단계
-        verificationCode: '',
-        // 3단계
-        password: '',
-        confirmPassword: ''
-        // 4단계
-    });
     const navigate = useNavigate();
     const [isStepValid, setIsStepValid] = useState(false);
     const [errorMessages, setErrorMessages] = useState<{ [key: string]: string }>({});
     const handleErrorMessages = (messages: { [key: string]: string }) => {
         setErrorMessages(messages);
     };
+    const formData = useSelector((state:RootState) => state.signup);
+    const dispatch = useDispatch();
 
 
     const validateStep = (step: number) => {
@@ -117,29 +109,15 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep, setIsL
         return {isValid: Object.keys(errorMessages).length === 0, errorMessages};
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const {name, value} = e.target;
-        // e.target의 타입을 명확히 처리
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
-
     useEffect(() => {
         const validationResult = validateStep(currentStep);
         setIsStepValid(validationResult.isValid);
-        console.log(formData); // 최신 formData를 출력
-        console.log("useEffect 유효성 검사중 ...", validationResult.isValid);
-        console.log("에러 메시지:", validationResult.errorMessages);
     }, [formData, currentStep]);  // formData가 변경될 때마다 실행
 
-    const handleSubmit = (e: React.FormEvent): void => {
+    const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
         const passwordValidation = isValidPassword(formData.password, formData.confirmPassword);
         if (!passwordValidation.isValid) {
-            alert(passwordValidation.errorMessage);
-            console.log("핸들서브밋 함수 호출");
             handleErrorMessages({password: passwordValidation.errorMessage});
         } else {
             const birthDate = new Date(
@@ -154,45 +132,31 @@ const SignupForm = ({currentStep, questionLength, onNextStep, onPrevStep, setIsL
                 birthDate: birthDate,
                 gender: formData.gender
             }
-            fetch("api/users", {
-                method: "post",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(signupData)
-                // json 문자열로 변환해서 body에 전송할 데이터 포함.
-            }).then((response) => {
-                if (!response.ok) {
-                    throw new Error("회원가입 요청 실패");
-                }
-                return response.json();
-                // 다음 then 블록으로 결과 전달.
-            })
-                .then((data) => {
-                    console.log("회원가입 성공: ", data);
-                    // 성공페이지로 이동 예정.
-                    navigate("/signup-success", {state: {name: data.data}});
 
-                })
-                .catch((error) => {
-                    console.error("에러 발생: ", error);
-                })
+            try {
+                //TODO: 여기에 회원가입 api 호출
+                const userName = await signupUser(signupData);
+                dispatch(resetForm());
+                // 회원가입 성공 시, 성공 페이지로 이동.
+                navigate("/signup-success", {state: {name: userName}});
+            } catch (error) {
+                if (error instanceof Error) {
+                    toast.error(error.message);
+                } else {
+                    toast.error("알 수 없는 오류가 발생했어요.");
+                }
+            }
         }
     }
 
     return (
         <StyledSignupForm method="post" onSubmit={handleSubmit}>
-            {currentStep === 0 && <SignupNameStep formData={formData} handleInputChange={handleInputChange}
-                                                  errorMessage={errorMessages}/>}
-            {currentStep === 1 && <SignupEmailStep formData={formData} handleInputChange={handleInputChange}
-                                                   errorMessage={errorMessages}/>}
-            {currentStep === 2 && <SignupEmailVerificationStep formData={formData} handleInputChange={handleInputChange}
-                                                               errorMessage={errorMessages}/>}
-            {currentStep === 3 && <SignupPasswordStep formData={formData} handleInputChange={handleInputChange}
-                                                      errorMessage={errorMessages}/>}
+            {currentStep === 0 && <SignupNameStep errorMessage={errorMessages}/>}
+            {currentStep === 1 && <SignupEmailStep errorMessage={errorMessages}/>}
+            {currentStep === 2 && <SignupEmailVerificationStep errorMessage={errorMessages}/>}
+            {currentStep === 3 && <SignupPasswordStep errorMessage={errorMessages}/>}
             <SignupButton currentStep={currentStep}
                           questionLength={questionLength}
-                          formData={formData}
                           onNextStep={onNextStep}
                           onPrevStep={onPrevStep}
                           isStepValid={isStepValid}

@@ -29,7 +29,7 @@ public class EmailService {
             throw new InvalidEmailFormatException();
         }
         String authCode = createAuthCode();
-        // 레디스에 authCode 저장, TTL 3분
+        // 레디스에 authCode 저장, TTL 5분
         try {
             redisService.saveAuthCode(email, authCode);
         } catch (Exception e) {

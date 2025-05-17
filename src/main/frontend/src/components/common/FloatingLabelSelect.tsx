@@ -6,35 +6,50 @@ const SelectContainer = styled.div`
     width: 100%;
 `;
 
-const SelectField = styled.select<{ hasValue: boolean }>`
+const SelectField = styled.select<{ $hasValue: boolean }>`
     width: 100%;
-    height: 60px;
-    padding: 0 10px; /* padding-top 대신 line-height 사용 */
-    font-size: 16px;
-    border: 1px solid #86868b;
-    border-radius: 12px;
+    height: 56px;
+    padding: 25px 15px 5px; /* Floating input과 동일하게 */
+    font-size: 18px;
+    border: 1px solid #a6a6a6;
+    border-radius: 5px;
     outline: none;
     background: #fffc;
     appearance: none;
     cursor: pointer;
-    color: ${({ hasValue }) => (hasValue ? "#000" : "#888")}; /* 선택 전 회색 */
-    line-height: 60px; /* 기본값이 중앙에 정렬되도록 */
+    box-sizing: border-box;
+    
+    color: ${({ $hasValue }) => ($hasValue ? "#000" : "#888")}; /* 선택 전 회색 */
+    //line-height: 60px; /* 기본값이 중앙에 정렬되도록 */
+
+    &:focus {
+        border-color: #ffb6c1;
+        outline: none;
+    }
 `;
 
-const SelectLabel = styled.label<{ isActive: boolean }>`
+const SelectLabel = styled.label<{ $isActive: boolean }>`
     position: absolute;
-    left: 10px;
-    top: ${({ isActive }) => (isActive ? "1px" : "50%")};
-    transform: translateY(${({ isActive }) => (isActive ? "0" : "-55%")});
-    font-size: ${({ isActive }) => (isActive ? "12px" : "16px")};
-    color: ${({ isActive }) => (isActive ? "#000" : "#888")};
-    transition: all 0.3s ease;
+    left: 15px;
+    top: ${({ $isActive }) => ($isActive ? "1px" : "50%")};
+    transform: translateY(${({ $isActive }) => ($isActive ? "1px" : "-50%")});
+    font-size: ${({ $isActive }) => ($isActive ? "14px" : "18px")};
+    color: ${({ $isActive }) => ($isActive ? "#ff527a" : "#888")};
+    transition: 0.2s ease all;
     pointer-events: none;
+    
 `;
+
+interface SelectProps {
+    options: Array<{ value: string; label: string }> | string[];
+    placeholder: string;
+    name: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; //TODO : input 아니고 select 메모.
+}
 
 //TODO: 추후 회원가입 필드 해당 컴포넌트로 변경하는 리팩토링 진행.
-const FloatingLabelSelect: React.FC = () => {
-    const [value, setValue] = useState("");
+const FloatingLabelSelect = ({options, placeholder, name, value, onChange} : SelectProps) => {
     const [isFocused, setIsFocused] = useState(false);
 
     const handleBlur = () => {
@@ -43,19 +58,28 @@ const FloatingLabelSelect: React.FC = () => {
 
     return (
         <SelectContainer>
-            <SelectLabel isActive={isFocused || !!value}>성별</SelectLabel>
+            <SelectLabel $isActive={isFocused || !!value}>{placeholder}</SelectLabel>
             <SelectField
                 value={value}
-                hasValue={!!value}
-                onChange={(e) => setValue(e.target.value)}
+                $hasValue={!!value}
+                name={name}
+                onChange={onChange}
                 onFocus={() => setIsFocused(true)}
                 onBlur={handleBlur}
             >
                 {/* 빈 옵션을 항상 첫 번째로 두기 */}
                 <option value="" disabled hidden></option>
-                <option value="male">남성</option>
-                <option value="female">여성</option>
-                <option value="other">기타</option>
+                {options.map((option, index) => (
+                    typeof option === 'string' ? (
+                        <option key={index} value={option}>
+                            {option}
+                        </option>
+                    ) : (
+                        <option key={index} value={option.value}>
+                            {option.label}
+                        </option>
+                    )
+                ))}
             </SelectField>
         </SelectContainer>
     );

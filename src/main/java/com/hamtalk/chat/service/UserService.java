@@ -26,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private static final String DEFAULT_PROFILE_IMAGE_URL = "https://hamtalk-static-files.s3.ap-northeast-2.amazonaws.com/profile-image/UserDefaultImage.png";
 
     @Transactional
     public String signup(UserSignupRequest dto) {

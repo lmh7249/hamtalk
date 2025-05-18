@@ -116,5 +116,3 @@ export const signupUserApi = async (signupData: SignupData): Promise<ApiResponse
     return await response.json();
 }
 
-
-

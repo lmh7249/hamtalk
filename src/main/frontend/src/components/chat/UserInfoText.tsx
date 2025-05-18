@@ -28,14 +28,15 @@ interface UserInfoTextProps extends UserInfoProps{
     nickName: string;
     statusMessage: string;
     email: string | null;
+    statusLength: number;
 }
 
 interface UserInfoProps {
     $isMe: boolean;
 }
 
-const UserInfoText = ({nickName, statusMessage, email, $isMe}: UserInfoTextProps) => {
-    const maxLength: number = 9;
+const UserInfoText = ({nickName, statusMessage, email, $isMe, statusLength}: UserInfoTextProps) => {
+    const maxLength: number = statusLength;
 
     const displayStatusMessage = statusMessage.length > maxLength
         ? `${statusMessage.slice(0, maxLength)}...`

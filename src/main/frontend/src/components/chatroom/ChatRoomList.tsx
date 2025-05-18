@@ -25,8 +25,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({chatRooms}) => {
             await Promise.all(chatRooms.map(async (chatRoom) => {
                 try {
                     const response = await getUnreadMessageCount(chatRoom.chatRoomId);
-                    console.log("읽지 않은 메세지 수");
-                    console.log(response);
                     counts[chatRoom.chatRoomId] = response ?? 0;
                 } catch (error) {
                     console.error("읽지 않은 메시지 수 불러오기 실패", error);

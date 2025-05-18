@@ -1,6 +1,6 @@
 import BaseModal from "../common/BaseModal";
 import styled from "styled-components";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {FaCamera} from "react-icons/fa";
 import FloatingLabelInput from "../common/FloatingLabelInput";
 import {useDispatch, useSelector} from "react-redux";
@@ -163,6 +163,12 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
 
     const nicknameMaxLength = 20;
     const statusMaxLength = 25;
+
+    // useEffect(() => {
+    //     if (myProfile.nickname) {
+    //         setNicknameInputValue(myProfile.nickname);
+    //     }
+    // }, [myProfile.nickname]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

@@ -38,9 +38,11 @@ public class UserProfileService {
         // 1. 유저 프로필 조회
         UserProfile userProfile = userProfileRepository.findEntityByUserId(userId).orElseThrow(UserProfileNotFoundException::new);
         // 2. 변경 사항 세팅
+
         if(request.getNickname() != null && request.getNickname().trim().isEmpty()) {
             throw new IllegalArgumentException("닉네임은 공백일 수 없습니다.");
         }
+
         userProfile.updateProfile(request);
         log.info("세팅한 userProfile Entity: {}", userProfile);
 

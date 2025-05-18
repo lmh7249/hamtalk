@@ -164,12 +164,6 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
     const nicknameMaxLength = 20;
     const statusMaxLength = 25;
 
-    // useEffect(() => {
-    //     if (myProfile.nickname) {
-    //         setNicknameInputValue(myProfile.nickname);
-    //     }
-    // }, [myProfile.nickname]);
-
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {

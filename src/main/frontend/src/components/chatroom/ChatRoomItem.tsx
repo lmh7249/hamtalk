@@ -15,14 +15,13 @@ const StyledChattingRoomItem = styled.div`
     &:hover {
         background-color: #f1f1f1;
     }
-`
+`;
 
 const StyledImage = styled.img`
     object-fit: cover; /* 이미지 비율을 유지하면서 부모 요소에 맞게 조정 */
     border-radius: 50%;
-    width: 50px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
-    max-height: 50px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
-    padding: 3px;
+    width: 60px; /* 부모 요소의 너비를 초과하지 않도록 설정 */
+    max-height: 60px; /* 부모 요소의 높이를 초과하지 않도록 설정 */
 `;
 
 const ChatMainInfo = styled.div`
@@ -73,8 +72,7 @@ const ImageWrapper = styled.div`
     align-items: center;
     border: 1px black solid;
     border-radius: 50%;
-    padding: 3px;
-    height: 50px;
+    height: 60px;
 `;
 
 interface ChattingRoomItemProps {
@@ -103,7 +101,7 @@ const ChatRoomItem = ({
 
     const handleChatRoomDoubleClick = async (chatRoomId: number, chatRoomName: string, participantIds: number[], creatorId: number) => {
 
-        alert(chatRoomId);
+   //     alert(chatRoomId);
 
         dispatch(setChatRoom({
             chatRoomId: chatRoomId,
@@ -117,7 +115,7 @@ const ChatRoomItem = ({
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
     const handleProfileImageClick = (e: React.MouseEvent, participantIds: number) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
-        alert(participantIds);
+        // alert(participantIds);
         dispatch(setUserProfile({userId: participantIds}));
     }
 

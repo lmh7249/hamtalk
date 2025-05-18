@@ -30,7 +30,7 @@ const StyledDateContainer = styled.div`
         display: block;
         position: absolute;
         top: 50%;
-        width: 40%;
+        width: calc(50% - 100px);
         height: 1px;
         background-color: rgb(114, 123, 131);
     }

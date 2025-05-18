@@ -98,11 +98,13 @@ const ChatRoomItem = ({
                           participantIds
                       }: ChattingRoomItemProps) => {
     const dispatch = useDispatch();
+    const maxLength: number = 14;
+
+    const displayLastMessage = lastMessage.length > maxLength
+        ? `${lastMessage.slice(0, maxLength)}...`
+        : lastMessage;
 
     const handleChatRoomDoubleClick = async (chatRoomId: number, chatRoomName: string, participantIds: number[], creatorId: number) => {
-
-   //     alert(chatRoomId);
-
         dispatch(setChatRoom({
             chatRoomId: chatRoomId,
             creatorId: creatorId,
@@ -111,7 +113,6 @@ const ChatRoomItem = ({
             friendId: participantIds[0]
         }));
     }
-
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
     const handleProfileImageClick = (e: React.MouseEvent, participantIds: number) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
@@ -127,7 +128,7 @@ const ChatRoomItem = ({
             </ImageWrapper>
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
-                    <LastMessage>{lastMessage}</LastMessage>
+                    <LastMessage>{displayLastMessage}</LastMessage>
                 </ChatMainInfo>
             </div>
 

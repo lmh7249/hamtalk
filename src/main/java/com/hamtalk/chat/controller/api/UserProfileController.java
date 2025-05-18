@@ -33,7 +33,7 @@ public class UserProfileController {
 
     @PatchMapping("/me")
     @Operation(summary = "내 프로필 데이터 수정하기", description = "닉네임, 상태메세지, 프로필 이미지를 수정합니다. 수정된 사용자 정보를 반환합니다")
-    public ResponseEntity<ApiResponse<UpdateProfileResponse>> updateMyProfile(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<ApiResponse<UpdateProfileResponse>> updateMyProfile(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody UpdateProfileRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(userProfileService.updateMyProfile(customUserDetails.getId(), request)));
     }
 

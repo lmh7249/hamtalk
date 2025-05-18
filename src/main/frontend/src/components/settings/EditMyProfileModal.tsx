@@ -187,6 +187,12 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
             return;
         }
 
+        // 닉네임이 빈값일 경우 에러 처리 추가
+        if (nicknameInputValue.trim() === "") {
+            toast.error("닉네임은 빈 값일 수 없습니다.");
+            return;
+        }
+
         if (nicknameInputValue.length > nicknameMaxLength) {
             toast.error("닉네임은 최대 20자까지 가능합니다.");
             return;
@@ -220,6 +226,7 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
             // 4. dispatch로 전역변수에서 관리되는 로그인 유저의 데이터 변경해주기.
             dispatch(updateProfile(profileUpdatePayload));
             toast.success("프로필이 성공적으로 수정되었어요.");
+            modalClose();
         } catch (error) {
             if (error instanceof Error) {
                 toast.error(error.message);

@@ -5,6 +5,8 @@ import FriendAddModal from "../components/friends/FriendAddModal";
 import {useEffect, useState} from "react";
 import ChatRoomAddModal from "../components/chatroom/ChatRoomAddModal";
 import {getFilteredFriendList} from "../services/friend-service";
+import BaseModal from "../components/common/BaseModal";
+import EditMyProfileModal from "../components/settings/EditMyProfileModal";
 
 const MainContentWrapper = styled.div`
     display: flex;
@@ -20,7 +22,7 @@ export interface getFilteredFriendListProps {
 }
 
 //TODO: 모달 추가 시, 여기에 모달 타입명을 추가
-export type ModalType = null | "friend" | "chat";
+export type ModalType = null | "friend" | "chat" | "editMyProfile";
 
 const ChatMainContainer = () => {
     const[modalType, setModalType] = useState<ModalType>(null);
@@ -55,6 +57,7 @@ const ChatMainContainer = () => {
             </MainContentWrapper>
             {modalType === "friend" && <FriendAddModal modalClose ={closeModal}/>}
             {modalType === "chat" && <ChatRoomAddModal modalClose ={closeModal} friendList={friendList}/>}
+            {modalType === "editMyProfile" && <EditMyProfileModal modalClose ={closeModal}/>}
         </>
     )
 }

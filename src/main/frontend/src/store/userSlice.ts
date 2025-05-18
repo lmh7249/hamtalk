@@ -5,7 +5,7 @@ interface UserState {
     email: string | null;
     roleId: number | null;
     nickname: string | null;
-    stateMessage: string | null;
+    statusMessage: string | null;
     profileImageUrl: string | null;
 }
 
@@ -14,7 +14,7 @@ const initialState: UserState = {
     email: null,
     roleId: null,
     nickname: null,
-    stateMessage: null,
+    statusMessage: null,
     profileImageUrl: null,
 };
 
@@ -24,10 +24,10 @@ interface LoginPayload {
     roleId: number;
 }
 
-interface ProfileUpdatePayload {
+export interface ProfileUpdatePayload {
     nickname?: string;
     profileImageUrl?: string;
-    stateMessage?: string;
+    statusMessage?: string;
 }
 
 const userSlice = createSlice({
@@ -50,19 +50,20 @@ const userSlice = createSlice({
         updateProfileImageUrl: (state, action) => {
             state.profileImageUrl = action.payload.profileImageUrl;
         },
-        updateStateMessage: (state, action) => {
-            state.stateMessage = action.payload.stateMessage;
+        updateStatusMessage: (state, action) => {
+            state.statusMessage = action.payload.statusMessage;
         },
 
+
         updateProfile: (state, action: PayloadAction<ProfileUpdatePayload>) => {
-            const { nickname, profileImageUrl, stateMessage } = action.payload;
+            const { nickname, profileImageUrl, statusMessage } = action.payload;
             if (nickname !== undefined) state.nickname = nickname;
             if (profileImageUrl !== undefined) state.profileImageUrl = profileImageUrl;
-            if (stateMessage !== undefined) state.stateMessage = stateMessage;
+            if (statusMessage !== undefined) state.statusMessage = statusMessage;
         },
 
     },
 });
 
-export const {login, logout, updateNickname , updateStateMessage, updateProfileImageUrl, updateProfile} = userSlice.actions;
+export const {login, logout, updateNickname , updateStatusMessage, updateProfileImageUrl, updateProfile} = userSlice.actions;
 export default userSlice.reducer;

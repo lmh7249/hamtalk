@@ -12,7 +12,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {FaCamera} from 'react-icons/fa';
 import {FiEdit} from "react-icons/fi";
-import {updateProfileImageUrl, updateStateMessage} from "../../store/userSlice";
+import {updateProfileImageUrl, updateStatusMessage} from "../../store/userSlice";
 import {updateUserStatusMessageApi} from "../../api/user";
 
 const StyledUserProfileDetail = styled.div`
@@ -65,7 +65,7 @@ const StyledNickName = styled.p`
     margin: 0;
 `;
 
-const StyledStateMessage = styled.p`
+const StyledStatusMessage = styled.p`
     font-size: 16px;
     color: #555;
     font-style: italic;
@@ -170,6 +170,7 @@ const SaveButton = styled.button`
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.2s;
+
     &:hover {
         background-color: #e6ba00;
     }
@@ -185,6 +186,7 @@ const CancelButton = styled.button`
     font-weight: 600;
     color: #555;
     transition: background-color 0.2s;
+
     &:hover {
         background-color: #eaeaea;
     }
@@ -281,7 +283,7 @@ const UserProfileDetail = () => {
     const myProfile = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [statusMessageInputValue, setStatusMessageInputValue] = useState<string>(myProfile.stateMessage || "");
+    const [statusMessageInputValue, setStatusMessageInputValue] = useState<string>(myProfile.statusMessage || "");
     const maxLength = 25;
 
     const handleClickEditImage = () => {
@@ -305,8 +307,8 @@ const UserProfileDetail = () => {
     }, [searchUserProfileId]);
 
     useEffect(() => {
-        setStatusMessageInputValue(myProfile.stateMessage || "");
-    }, [myProfile.stateMessage]);
+        setStatusMessageInputValue(myProfile.statusMessage || "");
+    }, [myProfile.statusMessage]);
 
     const handleAddFriend = async (toUserId: number | undefined) => {
         if (toUserId === undefined) {
@@ -347,7 +349,7 @@ const UserProfileDetail = () => {
 
     const handleCancelClick = () => {
         setIsEditing(false);
-        setStatusMessageInputValue(myProfile.stateMessage || "");
+        setStatusMessageInputValue(myProfile.statusMessage || "");
     };
 
     const handleSaveClick = async () => {
@@ -359,7 +361,7 @@ const UserProfileDetail = () => {
         try {
             const newStatusMessage = await updateUserStatusMessage(statusMessageInputValue);
             console.log(newStatusMessage);
-            dispatch(updateStateMessage({stateMessage: newStatusMessage}));
+            dispatch(updateStatusMessage({statusMessage: newStatusMessage}));
             setIsEditing(false);
             toast.success("상태메세지가 변경되었어요!");
         } catch (error) {
@@ -422,7 +424,8 @@ const UserProfileDetail = () => {
                                 </EditingWrapper>
                             ) : (
                                 <>
-                                    <StyledStateMessage>{isMyUserId ? (myProfile.stateMessage ?? "상태메세지를 입력해보세요!") : searchUserProfile?.statusMessage}</StyledStateMessage>
+                                    <StyledStatusMessage>{isMyUserId ? (myProfile.statusMessage || "상태메세지를 입력해보세요!")
+                                        : searchUserProfile?.statusMessage}</StyledStatusMessage>
                                     {isMyUserId && <ProfileStatusEditButton onClick={handleEditClick}/>}
                                 </>
                             )}

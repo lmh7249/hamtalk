@@ -67,6 +67,7 @@ public class ReissueService {
         redisService.saveRefreshToken(email, newRefreshToken);
         log.info("✅ [6단계] Redis에 새로운 리프레시 토큰 저장 완료");
 
+        response.setHeader("Access-Control-Expose-Headers", "Authorization, access");
         response.setHeader("access", "Bearer " + newAccessToken);
         addRefreshTokenCookie(response, newRefreshToken);
         log.info("✅ [6단계] 응답에 access 헤더, refresh 쿠키 설정 완료");

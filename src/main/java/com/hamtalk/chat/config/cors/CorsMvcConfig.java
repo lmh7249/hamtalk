@@ -18,7 +18,7 @@ public class CorsMvcConfig implements WebMvcConfigurer {
                         "http://localhost:3000"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                .exposedHeaders("Authorization")
+                .exposedHeaders("Authorization", "access") //TODO: reissue api 호출 시, access도 헤더 응답에 추가.
                 .allowedHeaders("*")  // 모든 헤더 허용
                 .allowCredentials(true);  // 쿠키 포함 요청 허용
     }

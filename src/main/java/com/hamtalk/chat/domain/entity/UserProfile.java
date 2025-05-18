@@ -1,5 +1,6 @@
 package com.hamtalk.chat.domain.entity;
 
+import com.hamtalk.chat.model.request.UpdateProfileRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -30,5 +31,18 @@ public class UserProfile extends BaseEntity{
 
     public void updateStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
+    }
+
+    //TODO: 변수 중, 변경 사항이 없으면 request에 null이 매핑되니, null이 업데이트 되지 않도록 주의.
+    public void updateProfile(UpdateProfileRequest request) {
+        if (request.getNickname() != null) {
+            this.nickname = request.getNickname();
+        }
+        if (request.getStatusMessage() != null) {
+            this.statusMessage = request.getStatusMessage();
+        }
+        if (request.getProfileImageUrl() != null) {
+            this.profileImageUrl = request.getProfileImageUrl();
+        }
     }
 }

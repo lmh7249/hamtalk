@@ -8,6 +8,7 @@ import com.hamtalk.chat.model.response.UserProfileByEmailResponse;
 import com.hamtalk.chat.model.response.UserProfileByIdResponse;
 import com.hamtalk.chat.repository.UserProfileRepository;
 import com.hamtalk.chat.repository.UserRepository;
+import com.hamtalk.common.constant.DefaultProfileImageUrl;
 import com.hamtalk.common.exeption.custom.EmailAlreadyExistsException;
 import com.hamtalk.common.exeption.custom.InvalidEmailFormatException;
 import com.hamtalk.common.exeption.custom.UserProfileNotFoundException;
@@ -34,13 +35,28 @@ public class UserService {
         }
         dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
         User save = userRepository.save(dto.toUserEntity());
+        String profileImageUrl;
+
+        switch (save.getGender()) {
+            case "M":
+                profileImageUrl = DefaultProfileImageUrl.MALE;
+                break;
+            case "F":
+                profileImageUrl = DefaultProfileImageUrl.FEMALE;
+                break;
+            case "O":
+                profileImageUrl = DefaultProfileImageUrl.OTHER;
+                break;
+            default:
+                throw new IllegalArgumentException("성별 형식이 다릅니다. : " + save.getGender());
+        }
+
         UserProfile userProfile = UserProfile.builder()
                 .userId(save.getId())
                 .nickname(save.getName())
-                .profileImageUrl(DEFAULT_PROFILE_IMAGE_URL)
+                .profileImageUrl(profileImageUrl)
                 .build();
         userProfileRepository.save(userProfile);
-
         return save.getName();
     }
 

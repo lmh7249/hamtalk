@@ -2,6 +2,7 @@ import toast from "react-hot-toast";
 import {ApiResponse} from "../../types/api-response";
 import {customFetch} from "./customFetch";
 import {SignupData} from "../store/signupSlice";
+import {ProfileUpdatePayload} from "../store/userSlice";
 
 export const checkDuplicateEmailApi = async (email: string) => {
     try {
@@ -47,6 +48,20 @@ export const getUserProfileByIdApi = async (id: number) => {
         method: "get",
     });
     return response.json();
+}
+
+export const updateUserProfileApi = async (params: ProfileUpdatePayload): Promise<ApiResponse<ProfileUpdatePayload>> => {
+    const response = await customFetch('/api/profiles/me', {
+        method: "PATCH",
+        body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json(); // body에 errorMessage 들어있음
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+
+    return await response.json();
 }
 
 //TODO: 이 구조로 api 호출 방식 전부 변경하기.
@@ -100,3 +115,4 @@ export const signupUserApi = async (signupData: SignupData): Promise<ApiResponse
     }
     return await response.json();
 }
+

@@ -2,11 +2,12 @@ import {
     checkDuplicateEmailApi,
     getMyProfileApi,
     getUserProfileByEmailApi,
-    getUserProfileByIdApi, signupUserApi,
+    getUserProfileByIdApi, signupUserApi, updateUserProfileApi,
     updateUserProfileImageApi, updateUserStatusMessageApi
 } from "../api/user";
 import {SignupData} from "../store/signupSlice";
 import {ApiResponse} from "../../types/api-response";
+import {ProfileUpdatePayload} from "../store/userSlice";
 
 export const checkDuplicateEmail = async (email: string) => {
     return await checkDuplicateEmailApi(email);
@@ -27,6 +28,15 @@ export const getUserProfileById = async (id: number) => {
         }
         return null;
 }
+
+export const updateUserProfile =  async (params: ProfileUpdatePayload): Promise<ProfileUpdatePayload> => {
+    const response = await updateUserProfileApi(params);
+    if(response.status === "success" && response.data) {
+        return response.data;
+    }
+    throw new Error(response.errorMessage || "프로필 업데이트 실패");
+}
+
 
 export const updateUserProfileImage = async (image:File): Promise<string> => {
     const response = await updateUserProfileImageApi(image);

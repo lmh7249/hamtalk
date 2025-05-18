@@ -35,7 +35,6 @@ const ImageWrapper = styled.div`
     align-items: center;
     border: 1px black solid;
     border-radius: 50%;
-    padding: 3px;
     width: 60px;
     height: 60px;
     overflow: hidden; 

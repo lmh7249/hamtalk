@@ -1,7 +1,9 @@
 package com.hamtalk.chat.controller.api;
 
 import com.hamtalk.chat.model.request.StatusMessageUpdateRequest;
+import com.hamtalk.chat.model.request.UpdateProfileRequest;
 import com.hamtalk.chat.model.response.MyProfileResponse;
+import com.hamtalk.chat.model.response.UpdateProfileResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.UserProfileService;
 import com.hamtalk.common.model.response.ApiResponse;
@@ -27,6 +29,12 @@ public class UserProfileController {
     @Operation(summary = "내 프로필 조회하기", description = "JWT에서 추출한 로그인 유저 ID로 User, UserProfile Join")
     public ResponseEntity<ApiResponse<MyProfileResponse>> getMyProfile(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(ApiResponse.ok(userProfileService.getMyProfile(customUserDetails.getId())));
+    }
+
+    @PatchMapping("/me")
+    @Operation(summary = "내 프로필 데이터 수정하기", description = "닉네임, 상태메세지, 프로필 이미지를 수정합니다. 수정된 사용자 정보를 반환합니다")
+    public ResponseEntity<ApiResponse<UpdateProfileResponse>> updateMyProfile(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody UpdateProfileRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(userProfileService.updateMyProfile(customUserDetails.getId(), request)));
     }
 
     @PatchMapping("/me/image")

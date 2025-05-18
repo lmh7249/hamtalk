@@ -36,7 +36,7 @@ const ProfileTitle = styled.h3`
 
 interface MyProfile {
     nickname: string;
-    stateMessage: string;
+    statusMessage: string;
     email: string;
     profileImageUrl: string;
 }
@@ -53,7 +53,7 @@ const LoginUserProfile = () => {
                     dispatch(updateProfile({
                         nickname : response.data.nickname,
                         profileImageUrl: response.data.profileImageUrl,
-                        stateMessage: response.data.stateMessage
+                        statusMessage: response.data.statusMessage
                     }))
                 }
             } catch (error) {
@@ -70,7 +70,7 @@ const LoginUserProfile = () => {
             {myProfile ?
                 <StyledUserProfileDetail>
                     <StyledImage src={myProfile.profileImageUrl ?? ''} alt="유저이미지"/>
-                    <UserInfoText nickName={myProfile.nickname ?? ''} statusMessage={myProfile.stateMessage ?? ''}
+                    <UserInfoText nickName={myProfile.nickname ?? ''} statusMessage={myProfile.statusMessage ?? ''}
                                   email={myProfile.email} isMe={true}/>
                 </StyledUserProfileDetail>
                 :

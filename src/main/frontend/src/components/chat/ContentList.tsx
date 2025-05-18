@@ -174,7 +174,7 @@ const ContentList = ({openModal}: ContentListProps) => {
                 </>
             )}
 
-            {selectedMenu.key === "settings" && <SettingList />}
+            {selectedMenu.key === "settings" && <SettingList openModal={openModal} />}
         </StyledContentList>
     );
 }

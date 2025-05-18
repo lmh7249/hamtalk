@@ -116,13 +116,11 @@ const ContentList = ({openModal}: ContentListProps) => {
             if (selectedMenu.key === "friends") {
                 const response = await getMyFriendList();
                 if(response.status === 'success') {
-                    console.log("친구 목록 api 호출: " + response.data);
                     setFriends(response.data);
                 }
             } else if (selectedMenu.key === "chats") {
                 const response = await getMyChatRoomList();
                 if(response.status === 'success') {
-                    console.log("채팅방 목록 api 호출: " + response.data)
                     setChatRooms(response.data);
                 }
             }

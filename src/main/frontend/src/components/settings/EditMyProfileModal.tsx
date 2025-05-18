@@ -1,6 +1,8 @@
 import BaseModal from "../common/BaseModal";
 import styled from "styled-components";
-import React, {useRef, useState} from "react";
+
+import React, {useEffect, useRef, useState} from "react";
+
 import {FaCamera} from "react-icons/fa";
 import FloatingLabelInput from "../common/FloatingLabelInput";
 import {useDispatch, useSelector} from "react-redux";

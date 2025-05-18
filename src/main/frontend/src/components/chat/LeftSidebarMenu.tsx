@@ -58,8 +58,6 @@ const LeftSidebarMenu = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log("현재 선택된 메뉴:", selectedMenu.key);
-        console.log("현재 선택된 메뉴:", selectedMenu.label);
     }, [selectedMenu]);
 
     const handleLogout = async () => {

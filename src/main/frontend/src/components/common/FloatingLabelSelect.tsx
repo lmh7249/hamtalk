@@ -21,7 +21,7 @@ const SelectField = styled.select<{ $hasValue: boolean }>`
     
     color: ${({ $hasValue }) => ($hasValue ? "#000" : "#888")}; /* 선택 전 회색 */
     //line-height: 60px; /* 기본값이 중앙에 정렬되도록 */
-
+  
     &:focus {
         border-color: #ffb6c1;
         outline: none;
@@ -48,7 +48,6 @@ interface SelectProps {
     onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; //TODO : input 아니고 select 메모.
 }
 
-//TODO: 추후 회원가입 필드 해당 컴포넌트로 변경하는 리팩토링 진행.
 const FloatingLabelSelect = ({options, placeholder, name, value, onChange} : SelectProps) => {
     const [isFocused, setIsFocused] = useState(false);
 

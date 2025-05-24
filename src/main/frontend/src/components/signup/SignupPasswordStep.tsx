@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import FloatingInput from "./FloatingInput";
 import {StyledErrorText} from "../common/ErrorText";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";

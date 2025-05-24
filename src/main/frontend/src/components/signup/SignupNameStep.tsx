@@ -1,7 +1,5 @@
 import styled from "styled-components";
 import React from "react";
-import FloatingInput from "./FloatingInput";
-import FloatingSelect from "./FloatingSelect";
 import {StyledErrorText} from "../common/ErrorText";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
@@ -16,12 +14,12 @@ const SignupNameWrapper = styled.div`
     max-width: 350px; /* 폼 최대 크기 제한 */
     box-sizing: border-box;
     gap: 15px;
+`;
 
-`
 const StyledBirthday = styled.div`
     display: flex;
     gap: 15px;
-`
+`;
 
 interface SignupNameStepProps {
     errorMessage: { [key: string]: string };
@@ -69,6 +67,7 @@ const SignupNameStep = ({errorMessage}: SignupNameStepProps) => {
                                     min={1900}
                                     max={new Date().getFullYear()}
                                     onChange={handleInputChange}/>
+
                 <FloatingLabelSelect options={monthOptions} placeholder="월" value={formData.birthMonth}
                                      name="birthMonth" onChange={handleInputChange}/>
 
@@ -81,6 +80,7 @@ const SignupNameStep = ({errorMessage}: SignupNameStepProps) => {
             </StyledErrorText>
             <FloatingLabelSelect options={genderOptions} placeholder="성별" value={formData.gender} name="gender"
                                  onChange={handleInputChange}/>
+
             <StyledErrorText>
                 {errorMessage && errorMessage.gender ? errorMessage.gender : " "}
             </StyledErrorText>

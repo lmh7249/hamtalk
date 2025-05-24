@@ -9,6 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class UpdateProfileRequest {
+
     private String nickname;
     private String statusMessage;
     private String profileImageUrl;

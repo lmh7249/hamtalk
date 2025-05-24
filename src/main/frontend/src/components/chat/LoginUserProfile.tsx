@@ -11,6 +11,7 @@ import dayjs from "../../utils/dayjs";
 
 const StyledUserProfile = styled.div`
     height: 200px;
+    width: 100%;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* 연한 테두리 */
 `
 const StyledUserProfileDetail = styled.div`
@@ -71,9 +72,7 @@ const LoginUserProfile = () => {
                 <StyledUserProfileDetail>
                     <StyledImage src={myProfile.profileImageUrl ?? ''} alt="유저이미지"/>
                     <UserInfoText nickName={myProfile.nickname ?? ''} statusMessage={myProfile.statusMessage ?? ''}
-
-                                  email={myProfile.email} $isMe={true}/>
-
+                                  email={myProfile.email} $isMe={true} statusLength={13}/>
                 </StyledUserProfileDetail>
                 :
                 <div>프로필 불러오기 실패</div>

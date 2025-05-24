@@ -6,6 +6,7 @@ import {Friend} from "../chat/ContentList";
 const StyledFriendListWrapper = styled.div`
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 `;
 
 interface FriendListProps {

@@ -8,6 +8,7 @@ import {getUnreadMessageCount} from "../../services/chat-service";
 const StyledChattingRoomListWrapper = styled.div`
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 `;
 
 interface ChatRoomListProps {

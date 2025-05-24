@@ -81,7 +81,7 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
             <ImageWrapper onClick={(e: React.MouseEvent) => handleImageClick(e, userId)}>
                 <StyledImage src={profileImageUrl} alt="유저이미지"/>
             </ImageWrapper>
-            <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} $isMe={false}/>
+            <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} $isMe={false} statusLength={23}/>
         </StyledFriendProfile>
     )
 }

@@ -42,6 +42,7 @@ export const customFetch = async (
            }
         } else {
             localStorage.removeItem("accessToken");
+            alert("로그인이 만료되었어요. 다시 로그인해주세요.");
             window.location.href = "/login";
             throw new Error("로그인이 만료되었어요. 다시 로그인해주세요.");
         }

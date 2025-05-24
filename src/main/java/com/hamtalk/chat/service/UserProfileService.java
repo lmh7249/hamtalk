@@ -43,7 +43,6 @@ public class UserProfileService {
             throw new IllegalArgumentException("닉네임은 공백일 수 없습니다.");
         }
 
-
         userProfile.updateProfile(request);
         log.info("세팅한 userProfile Entity: {}", userProfile);
 

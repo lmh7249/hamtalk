@@ -12,6 +12,7 @@ const StyledChattingRoomItem = styled.div`
     // 드래그 방지
     user-select: none;
     justify-content: space-between;
+
     &:hover {
         background-color: #f1f1f1;
     }
@@ -28,6 +29,10 @@ const ChatMainInfo = styled.div`
     display: flex;
     flex-direction: column;
     gap: 5px;
+    text-overflow: ellipsis; // 잘린 부분에 ... 표시
+    
+    white-space: nowrap; // 텍스트를 줄바꿈하지 않게 만듦 (한 줄로 고정)
+    max-width: 180px;
 `;
 
 const MessageMetaInfo = styled.div`
@@ -98,11 +103,13 @@ const ChatRoomItem = ({
                           participantIds
                       }: ChattingRoomItemProps) => {
     const dispatch = useDispatch();
+    const maxLength: number = 14;
+
+    const displayLastMessage = lastMessage.length > maxLength
+        ? `${lastMessage.slice(0, maxLength)}...`
+        : lastMessage;
 
     const handleChatRoomDoubleClick = async (chatRoomId: number, chatRoomName: string, participantIds: number[], creatorId: number) => {
-
-   //     alert(chatRoomId);
-
         dispatch(setChatRoom({
             chatRoomId: chatRoomId,
             creatorId: creatorId,
@@ -111,7 +118,6 @@ const ChatRoomItem = ({
             friendId: participantIds[0]
         }));
     }
-
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
     const handleProfileImageClick = (e: React.MouseEvent, participantIds: number) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
@@ -120,21 +126,23 @@ const ChatRoomItem = ({
     }
 
     return (
-        <StyledChattingRoomItem onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
+        <StyledChattingRoomItem
+            onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
             <div style={{display: "flex", gap: "10px"}}>
-            <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
-                <StyledImage src={profileImage ?? undefined} alt={"채팅방 이미지"}></StyledImage>
-            </ImageWrapper>
+                <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
+                    <StyledImage src={profileImage ?? undefined} alt={"채팅방 이미지"}></StyledImage>
+                </ImageWrapper>
+
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
-                    <LastMessage>{lastMessage}</LastMessage>
+                    <LastMessage>{displayLastMessage}</LastMessage>
                 </ChatMainInfo>
             </div>
 
-                <MessageMetaInfo>
-                    <LastMessageTime>{formatLastMessageTime(lastMessageTime)}</LastMessageTime>
-                    {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
-                </MessageMetaInfo>
+            <MessageMetaInfo>
+                <LastMessageTime>{formatLastMessageTime(lastMessageTime)}</LastMessageTime>
+                {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
+            </MessageMetaInfo>
 
         </StyledChattingRoomItem>
     )

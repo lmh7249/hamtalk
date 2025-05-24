@@ -132,6 +132,7 @@ const ChatRoomItem = ({
                 <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
                     <StyledImage src={profileImage ?? undefined} alt={"채팅방 이미지"}></StyledImage>
                 </ImageWrapper>
+
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
                     <LastMessage>{displayLastMessage}</LastMessage>

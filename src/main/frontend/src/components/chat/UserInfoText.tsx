@@ -4,6 +4,7 @@ const StyledUserInfo = styled.div`
     display: flex;
     flex-direction: column;
     gap: 4px;
+    max-width: 250px;
 `;
 
 const StyledUserNickName = styled.div<UserInfoProps>`
@@ -14,8 +15,11 @@ const StyledUserNickName = styled.div<UserInfoProps>`
 
 const StyledUserStatusMessage = styled.div<UserInfoProps>`
     font-size: 14px;
-    text-overflow: ellipsis;
-    overflow: hidden;
+
+    text-overflow: ellipsis; // 잘린 부분에 ... 표시
+    overflow: hidden; // 넘치는 텍스트를 잘라냄
+    white-space: nowrap; // 텍스트를 줄바꿈하지 않게 만듦 (한 줄로 고정)
+
     color: ${(props) => (props.$isMe ? "rgba(255, 255, 255, 0.7)" : "#555")};
 `;
 
@@ -28,14 +32,17 @@ interface UserInfoTextProps extends UserInfoProps{
     nickName: string;
     statusMessage: string;
     email: string | null;
+    statusLength: number;
 }
 
 interface UserInfoProps {
     $isMe: boolean;
 }
 
-const UserInfoText = ({nickName, statusMessage, email, $isMe}: UserInfoTextProps) => {
-    const maxLength: number = 9;
+const UserInfoText = ({nickName, statusMessage, email, $isMe, statusLength}: UserInfoTextProps) => {
+    const maxLength: number = statusLength;
+
+
 
     const displayStatusMessage = statusMessage.length > maxLength
         ? `${statusMessage.slice(0, maxLength)}...`

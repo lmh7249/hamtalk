@@ -73,6 +73,7 @@ const LoginUserProfile = () => {
                     <StyledImage src={myProfile.profileImageUrl ?? ''} alt="유저이미지"/>
                     <UserInfoText nickName={myProfile.nickname ?? ''} statusMessage={myProfile.statusMessage ?? ''}
                                   email={myProfile.email} $isMe={true} statusLength={13}/>
+
                 </StyledUserProfileDetail>
                 :
                 <div>프로필 불러오기 실패</div>

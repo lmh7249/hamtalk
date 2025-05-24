@@ -18,6 +18,7 @@ const StyledUserStatusMessage = styled.div<UserInfoProps>`
     text-overflow: ellipsis; // 잘린 부분에 ... 표시
     overflow: hidden; // 넘치는 텍스트를 잘라냄
     white-space: nowrap; // 텍스트를 줄바꿈하지 않게 만듦 (한 줄로 고정)
+
     color: ${(props) => (props.$isMe ? "rgba(255, 255, 255, 0.7)" : "#555")};
 `;
 

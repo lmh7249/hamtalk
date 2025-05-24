@@ -12,6 +12,7 @@ const StyledChattingRoomItem = styled.div`
     // 드래그 방지
     user-select: none;
     justify-content: space-between;
+
     &:hover {
         background-color: #f1f1f1;
     }
@@ -28,6 +29,10 @@ const ChatMainInfo = styled.div`
     display: flex;
     flex-direction: column;
     gap: 5px;
+    text-overflow: ellipsis; // 잘린 부분에 ... 표시
+    
+    white-space: nowrap; // 텍스트를 줄바꿈하지 않게 만듦 (한 줄로 고정)
+    max-width: 180px;
 `;
 
 const MessageMetaInfo = styled.div`
@@ -121,21 +126,22 @@ const ChatRoomItem = ({
     }
 
     return (
-        <StyledChattingRoomItem onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
+        <StyledChattingRoomItem
+            onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
             <div style={{display: "flex", gap: "10px"}}>
-            <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
-                <StyledImage src={profileImage ?? undefined} alt={"채팅방 이미지"}></StyledImage>
-            </ImageWrapper>
+                <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
+                    <StyledImage src={profileImage ?? undefined} alt={"채팅방 이미지"}></StyledImage>
+                </ImageWrapper>
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
                     <LastMessage>{displayLastMessage}</LastMessage>
                 </ChatMainInfo>
             </div>
 
-                <MessageMetaInfo>
-                    <LastMessageTime>{formatLastMessageTime(lastMessageTime)}</LastMessageTime>
-                    {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
-                </MessageMetaInfo>
+            <MessageMetaInfo>
+                <LastMessageTime>{formatLastMessageTime(lastMessageTime)}</LastMessageTime>
+                {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
+            </MessageMetaInfo>
 
         </StyledChattingRoomItem>
     )

@@ -6,7 +6,6 @@ import IconButton from "../common/IconButton";
 import {useDispatch, useSelector} from "react-redux";
 import {setEmpty} from "../../store/contentDetailSlice";
 import {RootState} from "../../store";
-import testImage from "../../assets/images/UserDefaultImage.png";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -22,28 +21,10 @@ const StyledChatRoomParticipantItemWrapper = styled.div`
     gap: 5px;
 `;
 
-const ChatRoomParticipants = () => {
-    return (
-        <ChatRoomParticipantItem/>
-    )
-}
-
 const ParticipantProfileNickName = styled.span`
     font-weight: bold;
     font-size: 12px;
 `;
-
-const ChatRoomParticipantItem = () => {
-    const chatRoom = useSelector((state: RootState) => state.detailContent.payload);
-    const chatRoomName = chatRoom?.chatRoomName || chatRoom?.nickName || "알수 없음";
-    console.log("Redux에서 가져온 chatRoom:", chatRoom);
-    return (
-        <StyledChatRoomParticipantItemWrapper>
-            <ParticipantProfileImage src={testImage}/>
-            <ParticipantProfileNickName>{chatRoomName}</ParticipantProfileNickName>
-        </StyledChatRoomParticipantItemWrapper>
-    )
-}
 
 export const ParticipantProfileImage = styled.img`
     width: 30px;
@@ -56,10 +37,34 @@ const ChatRoomButtonWrapper = styled.div`
     align-items: center;
 `;
 
+const ChatRoomParticipants = () => {
+    return (
+        <ChatRoomParticipantItem/>
+    )
+}
 
+const ChatRoomParticipantItem = () => {
+    const chatRoom = useSelector((state: RootState) => state.detailContent.payload);
+    const chatRoom2 = useSelector((state:RootState) => state.chatRooms.chatRooms.find(room => room.chatRoomId === chatRoom.chatRoomId));
+    // const chatRoomName = chatRoom?.chatRoomName || chatRoom?.nickName || "알수 없음";
+    console.log("Redux에서 가져온 chatRoom:", chatRoom);
+
+    if (!chatRoom2) return null;
+
+    const chatRoomName = chatRoom2.chatRoomName
+        ? chatRoom2.chatRoomName // 채팅방 이름이 설정되어 있으면 그대로 사용
+        : chatRoom2.participants.map(participant => participant.nickname).join(", "); // 참여자들 이름 합치기
+
+    return (
+        <StyledChatRoomParticipantItemWrapper>
+            <ParticipantProfileImage src={chatRoom.chatRoomImageUrl}/>
+            <ParticipantProfileNickName>{chatRoomName}</ParticipantProfileNickName>
+        </StyledChatRoomParticipantItemWrapper>
+    )
+}
 
 const ChatRoomActions = () => {
-    let dispatch = useDispatch();
+    const dispatch = useDispatch();
 
     const handleClose = () => {
         dispatch(setEmpty());
@@ -74,17 +79,13 @@ const ChatRoomActions = () => {
     )
 }
 
-
-
 const ChatRoomHeader = () => {
     return (
         <StyledChatRoomHeaderWrapper>
             <ChatRoomParticipants/>
             <ChatRoomActions/>
         </StyledChatRoomHeaderWrapper>
-
     )
-
 }
 
 export default ChatRoomHeader;

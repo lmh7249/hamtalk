@@ -56,7 +56,7 @@ public class ChatRoomService {
     // 수정 안해도 됨.
     @Transactional(readOnly = true)
     public List<ChatRoomListResponse> getChatRoomsWithLastMessage(Long userId) {
-        // 1. MySQL에서 로그인한 유저의 채팅방 목록 조회
+        // 1. 로그인한 유저의 채팅방 목록 조회
         List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
 
         // 2. 채팅방 ID 기준으로 데이터 그룹화

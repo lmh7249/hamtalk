@@ -4,7 +4,7 @@ import ChattingRoomPlusIcon from "../../assets/icons/chatting-room-plus.svg";
 import FriendList from "../friends/FriendList";
 import SearchIcon from "../../assets/icons/search.svg"
 import ChattingRoomList from "../chatroom/ChatRoomList";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {MenuState, MenuType} from "../../store/menuSlice";
 import {useEffect, useState} from "react";
@@ -12,6 +12,9 @@ import {getMyFriendList} from "../../services/friend-service";
 import {ModalType} from "../../containers/ChatMainContainer";
 import {getMyChatRoomList} from "../../services/chat-service";
 import SettingList from "./SettingList";
+import toast from "react-hot-toast";
+import {setChatRooms} from "../../store/chatRoomsSlice";
+import {setKeyword} from "../../store/searchSlice";
 
 const StyledContentList = styled.div`
     min-width: 350px;
@@ -104,24 +107,32 @@ export interface ChatRoom {
 const ContentList = ({openModal}: ContentListProps) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const [friends, setFriends] = useState<Friend[]>([]);
-    const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
     const [searchKeyword, setSearchKeyword] = useState("");
+    const keyword = useSelector((state: RootState) => state.search.keyword);
 
-    //TODO: 새로고침 시에만 친구목록, 채팅방 목록 api 호출할 지 고민하기
+    //TODO: chatRooms -> 리덕스로 대체하는 작업 시작
+    const chatRoomList = useSelector((state:RootState) => state.chatRooms.chatRooms);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         // 메뉴가 변경 될 때마다 적절한 API 호출
         const fetchData = async () => {
 
             if (selectedMenu.key === "friends") {
-                const response = await getMyFriendList();
-                if(response.status === 'success') {
-                    setFriends(response.data);
+                try {
+                    const response = await getMyFriendList();
+                    setFriends(response);
+                } catch (error) {
+                    if (error instanceof Error) {
+                        toast.error(error.message);
+                    } else {
+                        toast.error("알 수 없는 오류가 발생했어요.");
+                    }
                 }
             } else if (selectedMenu.key === "chats") {
                 const response = await getMyChatRoomList();
                 if(response.status === 'success') {
-                    setChatRooms(response.data);
+                    dispatch(setChatRooms(response.data));
                 }
             }
             setSearchKeyword("");
@@ -132,16 +143,6 @@ const ContentList = ({openModal}: ContentListProps) => {
     const filteredFriends = friends.filter(friend =>
         (friend.nickname || "").toLowerCase().includes(searchKeyword.toLowerCase())
     );
-
-    const filteredChatRooms = chatRooms.filter(chatRoom => {
-        const roomName = chatRoom.chatRoomName || "";
-        const participants = (chatRoom.participants || [])
-            .map(p => p.nickname || "") // 닉네임만 추출
-            .join(", ");
-        const target = (roomName + participants).toLowerCase();
-        return target.toLowerCase().includes(searchKeyword.toLowerCase());
-    });
-
 
     return (
         <StyledContentList>
@@ -164,11 +165,10 @@ const ContentList = ({openModal}: ContentListProps) => {
                     <SearchInput
                         type="text"
                         placeholder="참여자 또는 채팅방명을 검색하세요."
-                        value = {searchKeyword}
-                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        value = {keyword}
+                        onChange={(e) => dispatch(setKeyword(e.target.value))}
                     />
-                    <div> 채팅방 {filteredChatRooms.length} </div>
-                    <ChattingRoomList chatRooms={filteredChatRooms} />
+                    <ChattingRoomList/>
                 </>
             )}
 

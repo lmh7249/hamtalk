@@ -11,10 +11,7 @@ const SignUpLink = styled(Link)`
         color: black;
         text-decoration: underline;
     }
-    
-
-`
-
+`;
 const LoginFooter = () => {
     return (
         <>
@@ -22,5 +19,4 @@ const LoginFooter = () => {
         </>
     )
 }
-
 export default LoginFooter

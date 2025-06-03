@@ -4,7 +4,7 @@ import styled from "styled-components";
 import FriendAddModal from "../components/friends/FriendAddModal";
 import {useEffect, useState} from "react";
 import ChatRoomAddModal from "../components/chatroom/ChatRoomAddModal";
-import {getFilteredFriendList} from "../services/friend-service";
+// import {getFilteredFriendList} from "../services/friend-service";
 import BaseModal from "../components/common/BaseModal";
 import EditMyProfileModal from "../components/settings/EditMyProfileModal";
 
@@ -39,11 +39,11 @@ const ChatMainContainer = () => {
 
     useEffect(() => {
         if(modalType === "chat") {
-            const fetchFilteredFriendList = async () => {
-                const response = await getFilteredFriendList();
-                setFriendList(response);
-            };
-            fetchFilteredFriendList();
+            // const fetchFilteredFriendList = async () => {
+            //     const response = await getFilteredFriendList();
+            //     setFriendList(response);
+            // };
+            // fetchFilteredFriendList();
         }
     }, [modalType]);
 

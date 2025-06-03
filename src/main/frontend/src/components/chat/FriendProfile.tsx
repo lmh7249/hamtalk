@@ -56,16 +56,19 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
     const handleProfileDoubleClick = async () => {
         //TODO: profileImageUrl 함께 반환하기.
         const response = await findDirectChatRoom(userId);
+
         if (response === undefined || response === null) {
             dispatch(setChatRoom({userId, nickName}));
             return;
-        }
+               }
+
         dispatch(setChatRoom({
             chatRoomId: response.chatRoomId,
             creatorId: response.creatorId,
             //TODO: null or undefined일 경우, 오른쪽 값 반환.
             chatRoomName: response.chatRoomName ?? nickName,
-            friendId: response.friendId
+            friendId: response.friendId,
+            chatRoomImageUrl: profileImageUrl
         }));
 
 

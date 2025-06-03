@@ -7,9 +7,7 @@ import { isValidEmail } from "../../utils/signupValidation";
 import toast from "react-hot-toast";
 import {addFriend} from "../../services/friend-service";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../store";
 import {setUserProfile} from "../../store/contentDetailSlice";
-import testImage from "../../assets/images/UserDefaultImage.png";
 
 const Title = styled.h3`
     margin-top: 0;

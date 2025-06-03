@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -34,8 +33,13 @@ public class ChatWebSocketController {
         log.info("User ID: {}", userId);
         ChatMessageResponse chatMessageResponse = chatMessageService.saveChatMessage(userId, chatRoomId, chatMessageRequest);
         // 채팅방 Redis 채널 구독 (최초 메시지 전송 시)
-        redisService.subscribe(chatRoomId);
+        redisService.subscribeChatRoom(chatRoomId);
+        redisService.subscribeGlobalNotification(chatMessageRequest.getReceiverId());
         // Redis 발행
+        // 1. 채팅방 채널에 발행 → 채팅방 열려있으면 실시간 메시지 수신
         redisPublisher.publish("chatRoom:" +chatRoomId, chatMessageResponse);
+        // 2. 상대방의 알림 채널에 발행 → 리스트에서 실시간 반영 가능
+        log.info("받는사람: {}", chatMessageRequest.getReceiverId());
+        redisPublisher.publish("userNotify:" + chatMessageRequest.getReceiverId(), chatMessageResponse);
     }
 }

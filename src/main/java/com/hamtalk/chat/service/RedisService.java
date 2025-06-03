@@ -57,14 +57,22 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
-    public void subscribe(Long chatRoomId) {
+    public void subscribeChatRoom(Long chatRoomId) {
         String topicName = "chatRoom:" + chatRoomId;
         // 중복 구독 방지
         if(!subscribedChannels.contains(topicName)) {
             container.addMessageListener(listenerAdapter, new ChannelTopic(topicName));
             subscribedChannels.add(topicName);
         }
+    }
 
+    public void subscribeGlobalNotification(Long userId) {
+        String topicName = "userNotify:" + userId;
+        // 중복 구독 방지
+        if(!subscribedChannels.contains(topicName)) {
+            container.addMessageListener(listenerAdapter, new ChannelTopic(topicName));
+            subscribedChannels.add(topicName);
+        }
     }
 
 

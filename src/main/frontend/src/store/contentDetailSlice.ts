@@ -13,6 +13,7 @@ export interface ChatRoomPayload {
     creatorId: number;
     chatRoomName?: string | null;
     friendId: number;
+    chatRoomImageUrl: string | null;
 }
 
 interface UserProfilePayload {

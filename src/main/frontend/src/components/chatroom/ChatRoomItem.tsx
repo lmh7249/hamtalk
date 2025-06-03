@@ -2,8 +2,9 @@ import styled from "styled-components";
 import React from "react";
 import {findDirectChatRoom} from "../../services/chat-service";
 import {setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {formatLastMessageTime} from "../../utils/formatTime";
+import {RootState} from "../../store";
 
 const StyledChattingRoomItem = styled.div`
     display: flex;
@@ -81,59 +82,52 @@ const ImageWrapper = styled.div`
 `;
 
 interface ChattingRoomItemProps {
-    chatRoomName: string;
     chatRoomId: number;
-    creatorId: number;
-    profileImage: string | null;
-    lastMessage: string;
-    lastMessageTime: string;
-    //TODO: 추후에 Date로 바꿀지 고민
-    unreadCount: number;
-    participantIds: number[];
 }
 
-const ChatRoomItem = ({
-                          chatRoomName,
-                          chatRoomId,
-                          creatorId,
-                          profileImage,
-                          lastMessage,
-                          lastMessageTime,
-                          unreadCount,
-                          participantIds
-                      }: ChattingRoomItemProps) => {
+const ChatRoomItem = ({chatRoomId}: ChattingRoomItemProps) => {
     const dispatch = useDispatch();
+    const chatRoom = useSelector((state: RootState) => state.chatRooms.chatRooms.find(room => room.chatRoomId === chatRoomId));
     const maxLength: number = 14;
 
-    const displayLastMessage = lastMessage.length > maxLength
-        ? `${lastMessage.slice(0, maxLength)}...`
-        : lastMessage;
+    if (!chatRoom) return null;
 
-    const handleChatRoomDoubleClick = async (chatRoomId: number, chatRoomName: string, participantIds: number[], creatorId: number) => {
+    // 채팅방 이름이 설정되어 있으면 그대로 사용하고, 설정되어 있지 않으면 참여자들의 이름을 합침
+    const chatRoomName = chatRoom.chatRoomName
+        ? chatRoom.chatRoomName // 채팅방 이름이 설정되어 있으면 그대로 사용
+        : chatRoom.participants.map(participant => participant.nickname).join(", "); // 참여자들 이름 합치기
+
+
+
+    const displayLastMessage = chatRoom.lastMessage && chatRoom.lastMessage.length > maxLength
+        ? `${chatRoom.lastMessage.slice(0, maxLength)}...`
+        : chatRoom.lastMessage ?? "";
+
+    const handleChatRoomDoubleClick = async () => {
         dispatch(setChatRoom({
             chatRoomId: chatRoomId,
-            creatorId: creatorId,
+            creatorId: chatRoom.creatorId,
             //TODO: null or undefined일 경우, 오른쪽 값 반환.
-            chatRoomName: chatRoomName,
-            friendId: participantIds[0]
+            chatRoomName: chatRoom.chatRoomName,
+            friendId: chatRoom.participants[0].userId,
+            chatRoomImageUrl: chatRoom.participants[0].profileImageUrl,
         }));
     }
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
-    const handleProfileImageClick = (e: React.MouseEvent, participantIds: number) => {
+    const handleProfileImageClick = (e: React.MouseEvent) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
         // alert(participantIds);
-        dispatch(setUserProfile({userId: participantIds}));
+        dispatch(setUserProfile({userId: chatRoom.participants[0].userId}));
     }
 
     return (
 
         <StyledChattingRoomItem
-            onDoubleClick={() => handleChatRoomDoubleClick(chatRoomId, chatRoomName, participantIds, creatorId)}>
+            onDoubleClick={() => handleChatRoomDoubleClick()}>
             <div style={{display: "flex", gap: "10px"}}>
-                <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e, participantIds[0])}>
-                    <StyledImage src={profileImage ?? undefined} alt={"채팅방 이미지"}></StyledImage>
+                <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e)}>
+                    <StyledImage src={chatRoom.participants[0].profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
                 </ImageWrapper>
-
 
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
@@ -142,8 +136,8 @@ const ChatRoomItem = ({
             </div>
 
             <MessageMetaInfo>
-                <LastMessageTime>{formatLastMessageTime(lastMessageTime)}</LastMessageTime>
-                {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
+                <LastMessageTime> {chatRoom.lastMessageTime ? formatLastMessageTime(chatRoom.lastMessageTime) : ""}</LastMessageTime>
+                {/*{unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}*/}
             </MessageMetaInfo>
 
         </StyledChattingRoomItem>

@@ -25,6 +25,7 @@ export const isSameDay = (date1: string, date2: string): boolean => {
 
 // 채팅방 마지막 메세지 날짜 변환 함수
 export function formatLastMessageTime(dateString: string): string {
+
     const messageDate = new Date(dateString);
     const now = new Date();
 

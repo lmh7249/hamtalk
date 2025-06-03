@@ -24,15 +24,24 @@ public class RedisSubscriber implements MessageListener {
         String body = new String(message.getBody());
         try {
             ChatMessageResponse chatMessage = objectMapper.readValue(body, ChatMessageResponse.class);
+            // Redis 채널 이름 추출
+            String channel = new String(message.getChannel());
+            log.info("🔥 Redis 채널 이름: {}", channel); // userNotify:23 이 되어야 함
+            log.info("📦 Redis 메시지 본문: {}", body);
 
-            // 채팅방 ID 기준으로 WebSocket 브로드캐스트
-            String destination = "/topic/chat/" + chatMessage.getChatRoomId();
-            // WebSocket 브로드캐스트
-            messagingTemplate.convertAndSend(destination, chatMessage);
-
+            if (channel.startsWith("chatRoom:")) {
+                // 채팅방 실시간 메시지
+                String destination = "/topic/chat/" + chatMessage.getChatRoomId();
+                log.info("📡 채팅방 실시간 메세지 전송: {}", destination);
+                messagingTemplate.convertAndSend(destination, chatMessage);
+            } else if (channel.startsWith("userNotify:")) {
+                // 유저 전역 알림 (채팅방 리스트 갱신 등)
+                String destination = "/topic/user/" + chatMessage.getReceiverId() + "/chat-notifications";
+                log.info("📡 유저 전역 알림 전송: {}", destination);
+                messagingTemplate.convertAndSend(destination, chatMessage);
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

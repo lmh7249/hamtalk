@@ -19,7 +19,6 @@ const AppRoutes = () => {
                 <Route element={<PrivateRoute/>}>
                     <Route path="/chat" element={<ChatMainPage/>}/>
                 </Route>
-
                 {/* 이외에 모든 경로 이동 시, 로그인 페이지로 이동 */}
                 {/*TODO:  replace 옵션  브라우저 히스토리에 남지 않아서 뒤로 가기 했을 때 이상한 동작을 방지 */}
                 <Route path="*" element={<Navigate to="/login" replace />} />

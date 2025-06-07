@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import {addFriend} from "../../services/friend-service";
 import {useDispatch, useSelector} from "react-redux";
 import {setUserProfile} from "../../store/contentDetailSlice";
+import {useAddFriendMutation} from "../../hooks/useAddFriendMutation";
 
 const Title = styled.h3`
     margin-top: 0;
@@ -143,6 +144,7 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
     const [searchResultState, setSearchResultState] = useState<SearchResultStateProps>("INIT");
     const [userProfileData, setUserProfileData] = useState<UserProfileDataProps | null>(null);
     const dispatch = useDispatch();
+    const {mutate: addFriendMutate} = useAddFriendMutation(modalClose);
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -170,15 +172,8 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
     };
 
     const handleAddFriend = useCallback(async (toUserId: number) => {
-        try {
-            let message = await addFriend(toUserId);
-            toast.success(message.data);
-            modalClose();
-        } catch (error) {
-            toast.error("친구 추가에 실패했습니다.");
-            console.error("친구 추가 실패:", error);
-        }
-    }, [modalClose]);
+       addFriendMutate(toUserId);
+    }, [addFriendMutate]);
 
     // 유저 프로필 보기 함수.
     const handleViewProfile = (userId: number) => {

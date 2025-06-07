@@ -14,6 +14,7 @@ import {FaCamera} from 'react-icons/fa';
 import {FiEdit} from "react-icons/fi";
 import {updateProfileImageUrl, updateStatusMessage} from "../../store/userSlice";
 import {updateUserStatusMessageApi} from "../../api/user";
+import {useAddFriendMutation} from "../../hooks/useAddFriendMutation";
 
 const StyledUserProfileDetail = styled.div`
     display: flex;
@@ -285,6 +286,7 @@ const UserProfileDetail = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [statusMessageInputValue, setStatusMessageInputValue] = useState<string>(myProfile.statusMessage || "");
     const maxLength = 25;
+    const {mutate: addFriendMutate} = useAddFriendMutation(() => setIsFriend(true));
 
     const handleClickEditImage = () => {
         fileInputRef.current?.click();
@@ -315,14 +317,7 @@ const UserProfileDetail = () => {
             toast.error("유효하지 않은 사용자입니다.");
             return;
         }
-        try {
-            let message = await addFriend(toUserId);
-            toast.success(message.data);
-            setIsFriend(true);
-        } catch (error) {
-            toast.error("친구 추가에 실패했습니다.");
-            console.error("친구 추가 실패:", error);
-        }
+        addFriendMutate(toUserId);
     }
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

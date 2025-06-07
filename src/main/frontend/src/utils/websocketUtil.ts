@@ -1,8 +1,6 @@
 
 import SockJS from 'sockjs-client';
 import {Stomp} from "@stomp/stompjs";
-import {useDispatch} from "react-redux";
-import {Dispatch} from "redux";
 import {ChatNotificationPayload} from "../pages/ChatMainPage";
 
 let stompClient: any = null;
@@ -17,7 +15,7 @@ export const connectWebSocket = (url: string, token: string | null, userId: numb
         { Authorization: `Bearer ${token}` }, // 헤더에 Authorization 토큰 추가
         (frame: string) => {
             console.log('Connected: ' + frame);
-            // 연결 성공 시 처리할 로직 추가 (예: 전역 알림 구독)
+            // 연결 성공 시 loginUserId로 전역 알림 구독
             subscribeToChatListNotifications(userId, (notificationData) => {
                 dispatchChatListUpdate(notificationData);
                 // console.log('알림 데이터 받았어요~:', notificationData);

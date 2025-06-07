@@ -21,7 +21,6 @@ const initialState: FriendsState = {
     error: null,
 }
 
-
 const friendsSlice = createSlice({
     name: "friends",
     initialState,

@@ -15,6 +15,8 @@ import SettingList from "./SettingList";
 import toast from "react-hot-toast";
 import {setChatRooms} from "../../store/chatRoomsSlice";
 import {setKeyword} from "../../store/searchSlice";
+import {useQuery} from "@tanstack/react-query";
+import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
 
 const StyledContentList = styled.div`
     min-width: 350px;
@@ -37,35 +39,6 @@ const IconButton = styled.button`
     background-color: transparent;
 `;
 
-
-const ContentListTopState = ({
-                                 selectedMenu,
-                                 openModal
-                             }: {
-    selectedMenu: {
-        key: MenuType;
-        label: string;
-    };
-    openModal: (type: ModalType) => void;
-}) => {
-
-    return (
-        <StyledContentListTopState>
-            <h3>{selectedMenu.label}</h3>
-            {selectedMenu.key === "friends" &&
-                <IconButton onClick={() => openModal("friend")}>
-                    <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
-                </IconButton>
-            }
-            {selectedMenu.key === "chats" &&
-                <IconButton onClick={() => openModal("chat")}>
-                    <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>
-                </IconButton>
-            }
-        </StyledContentListTopState>
-    )
-}
-
 const SearchInput = styled.input`
     background-color: #DFDFDF;
     border: none;
@@ -76,6 +49,7 @@ const SearchInput = styled.input`
     background-size: 20px 20px;
     border-radius: 5px;
 `;
+
 export interface Friend {
     toUserId: number,
     friendStatusId: number,
@@ -104,63 +78,65 @@ export interface ChatRoom {
     lastMessageTime: string;
 }
 
+const ContentListTopState = ({selectedMenu, openModal}: { selectedMenu: { key: MenuType; label: string; }; openModal: (type: ModalType) => void; }) =>
+{
+    return (
+        <StyledContentListTopState>
+            <h3>{selectedMenu.label}</h3>
+            {selectedMenu.key === "friends" &&
+                <IconButton onClick={() => openModal("friend")}>
+                    <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
+                </IconButton>
+            }
+            {selectedMenu.key === "chats" &&
+                <IconButton onClick={() => openModal("chat")}>
+                    <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>
+                </IconButton>
+            }
+        </StyledContentListTopState>
+    )
+}
+
 const ContentList = ({openModal}: ContentListProps) => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
-    const [friends, setFriends] = useState<Friend[]>([]);
-    const [searchKeyword, setSearchKeyword] = useState("");
     const keyword = useSelector((state: RootState) => state.search.keyword);
-
-    //TODO: chatRooms -> 리덕스로 대체하는 작업 시작
-    const chatRoomList = useSelector((state:RootState) => state.chatRooms.chatRooms);
     const dispatch = useDispatch();
+    const isFriendsTab = selectedMenu.key === "friends";
+    const isChatsTab = selectedMenu.key === "chats";
+    const isSettingsTab = selectedMenu.key === "settings";
+
+
 
     useEffect(() => {
         // 메뉴가 변경 될 때마다 적절한 API 호출
         const fetchData = async () => {
-
-            if (selectedMenu.key === "friends") {
-                try {
-                    const response = await getMyFriendList();
-                    setFriends(response);
-                } catch (error) {
-                    if (error instanceof Error) {
-                        toast.error(error.message);
-                    } else {
-                        toast.error("알 수 없는 오류가 발생했어요.");
-                    }
-                }
-            } else if (selectedMenu.key === "chats") {
+            if (isChatsTab) {
                 const response = await getMyChatRoomList();
                 if(response.status === 'success') {
                     dispatch(setChatRooms(response.data));
                 }
             }
-            setSearchKeyword("");
+            dispatch(setKeyword(""))
         };
         fetchData();
     }, [selectedMenu]);
 
-    const filteredFriends = friends.filter(friend =>
-        (friend.nickname || "").toLowerCase().includes(searchKeyword.toLowerCase())
-    );
 
     return (
         <StyledContentList>
             <ContentListTopState selectedMenu={selectedMenu} openModal={openModal} />
-            {selectedMenu.key === "friends" && (
+            {isFriendsTab && (
                 <>
                     <SearchInput
                         type="text"
                         placeholder="이름 또는 이메일을 입력하세요."
-                        value ={searchKeyword}
-                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        value ={keyword}
+                        onChange={(e) => dispatch(setKeyword(e.target.value))}
                     />
-                    <div> 친구 {filteredFriends.length} </div>
-                    <FriendList friends={filteredFriends} />
+                    <FriendList/>
                 </>
             )}
-
-            {selectedMenu.key === "chats" && (
+            {isChatsTab && (
                 <>
                     <SearchInput
                         type="text"
@@ -171,8 +147,7 @@ const ContentList = ({openModal}: ContentListProps) => {
                     <ChattingRoomList/>
                 </>
             )}
-
-            {selectedMenu.key === "settings" && <SettingList openModal={openModal} />}
+            {isSettingsTab && <SettingList openModal={openModal} />}
         </StyledContentList>
     );
 }

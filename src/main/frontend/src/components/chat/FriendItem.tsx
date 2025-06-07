@@ -9,6 +9,7 @@ import {findDirectChatRoomApi} from "../../api/chat";
 import {findDirectChatRoom} from "../../services/chat-service";
 import {subscribeToChatRoom} from "../../utils/websocketUtil";
 import testImg from "../../assets/images/img.png"
+import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
 
 const StyledFriendProfile = styled.div`
     display: flex;
@@ -44,21 +45,24 @@ const ImageWrapper = styled.div`
 
 interface FriendProfileProps {
     userId: number;
-    nickName: string;
-    statusMessage: string;
-    email: string;
-    profileImageUrl: string;
 }
 
-const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}: FriendProfileProps) => {
+const FriendItem = ({userId}: FriendProfileProps) => {
     const dispatch = useDispatch();
+    const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
+    const isFriendsTab = selectedMenu.key === "friends";
+    const {data: friends = [], isLoading, error} = useMyFriendsQuery(isFriendsTab);
+    //TODO: Map으로 미리 변환해두면 더 빠름 (예: id -> friend)
+    const friend = friends.find(friend => friend.toUserId === userId);
+    if (!friend) return null;
 
     const handleProfileDoubleClick = async () => {
         //TODO: profileImageUrl 함께 반환하기.
         const response = await findDirectChatRoom(userId);
 
         if (response === undefined || response === null) {
-            dispatch(setChatRoom({userId, nickName}));
+            const nickname = friend.nickname;
+            dispatch(setChatRoom({userId, nickname}));
             return;
                }
 
@@ -66,12 +70,10 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
             chatRoomId: response.chatRoomId,
             creatorId: response.creatorId,
             //TODO: null or undefined일 경우, 오른쪽 값 반환.
-            chatRoomName: response.chatRoomName ?? nickName,
+            chatRoomName: response.chatRoomName ?? friend.nickname,
             friendId: response.friendId,
-            chatRoomImageUrl: profileImageUrl
+            chatRoomImageUrl: friend.profileImageUrl
         }));
-
-
     }
 
     const handleImageClick = (e: React.MouseEvent, userId: number) => {
@@ -82,11 +84,11 @@ const FriendProfile = ({userId, nickName, statusMessage, email, profileImageUrl}
     return (
         <StyledFriendProfile onDoubleClick={() => handleProfileDoubleClick()}>
             <ImageWrapper onClick={(e: React.MouseEvent) => handleImageClick(e, userId)}>
-                <StyledImage src={profileImageUrl} alt="유저이미지"/>
+                <StyledImage src={friend.profileImageUrl} alt="유저이미지"/>
             </ImageWrapper>
-            <UserInfoText nickName={nickName} statusMessage={statusMessage} email={email} $isMe={false} statusLength={23}/>
+            <UserInfoText nickName={friend.nickname} statusMessage={friend.statusMessage} email={friend.email} $isMe={false} statusLength={23}/>
         </StyledFriendProfile>
     )
 }
 
-export default FriendProfile
+export default FriendItem

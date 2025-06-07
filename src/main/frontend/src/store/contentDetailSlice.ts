@@ -18,7 +18,7 @@ export interface ChatRoomPayload {
 
 interface UserProfilePayload {
     userId: number;
-    nickName: string;
+    nickname: string;
 }
 
 const initialState : ContentDetailState = {

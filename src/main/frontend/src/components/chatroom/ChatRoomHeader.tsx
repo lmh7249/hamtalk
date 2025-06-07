@@ -49,15 +49,19 @@ const ChatRoomParticipantItem = () => {
     // const chatRoomName = chatRoom?.chatRoomName || chatRoom?.nickName || "알수 없음";
     console.log("Redux에서 가져온 chatRoom:", chatRoom);
 
-    if (!chatRoom2) return null;
+    // if (!chatRoom2) return null;
 
-    const chatRoomName = chatRoom2.chatRoomName
-        ? chatRoom2.chatRoomName // 채팅방 이름이 설정되어 있으면 그대로 사용
-        : chatRoom2.participants.map(participant => participant.nickname).join(", "); // 참여자들 이름 합치기
+    const chatRoomName = chatRoom2?.chatRoomName
+        ?? chatRoom2?.participants?.map(p => p.nickname).join(", ")
+        ?? chatRoom.chatRoomName
+        ?? chatRoom.nickname
+        ?? "알 수 없음";
+
+    const imageUrl = chatRoom.chatRoomImageUrl || chatRoom.chatRoomImageUrl || "";
 
     return (
         <StyledChatRoomParticipantItemWrapper>
-            <ParticipantProfileImage src={chatRoom.chatRoomImageUrl}/>
+            <ParticipantProfileImage src={imageUrl}/>
             <ParticipantProfileNickName>{chatRoomName}</ParticipantProfileNickName>
         </StyledChatRoomParticipantItemWrapper>
     )

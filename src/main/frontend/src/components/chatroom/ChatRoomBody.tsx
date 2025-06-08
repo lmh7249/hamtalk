@@ -6,7 +6,6 @@ import {RootState} from "../../store";
 import {getChatMessageList, notifyEnterChatRoom} from "../../services/chat-service";
 import {formatTime} from "../../utils/formatTime";
 import {subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
-import {Participant} from "../chat/ContentList";
 import dayjs from "../../utils/dayjs";
 
 const StyledChatRoomBodyWrapper = styled.div`
@@ -205,8 +204,6 @@ const ChatRoomBody = () => {
     const chatRoomId = currentChatRoom?.chatRoomId ?? null;
     // 채팅창 스크롤바 위치를 위한 ref
     const chatRoomBodyRef = useRef<HTMLDivElement>(null);
-    // 채팅방 유저 목록을 상태관리하기.
-    const [participants, setParticipants] = useState<Participant[]>([]);
     const formatDate = (dateString: string) => {
         return dayjs(dateString).format('YYYY년 M월 D일');
     };
@@ -223,7 +220,6 @@ const ChatRoomBody = () => {
             console.log(response);
             setMessages(response.messages);
         }
-
         fetchMessages();
         notifyEnterChatRoom(chatRoomId);
 
@@ -231,10 +227,19 @@ const ChatRoomBody = () => {
         if(chatRoomId) {
             chatSubscription = subscribeToChatRoom(chatRoomId, (receivedMessage) => {
                 console.log("전달된 메세지: ", receivedMessage);
-                setMessages((prevMessages) =>[...prevMessages, receivedMessage]);
+                setMessages((prevMessages) =>{
+                    // messageId로만 중복 체크 (내용이 아닌 고유 ID로)
+                    const isAlreadyExists = prevMessages.some(msg =>
+                        msg.messageId === receivedMessage.messageId
+                    );
+
+                    if (isAlreadyExists) {
+                        return prevMessages;
+                    }
+
+                   return [...prevMessages, receivedMessage]});
             })
         }
-
         return () => {
             // 채팅방 구독 해제.
             if(chatSubscription) {
@@ -261,7 +266,6 @@ const ChatRoomBody = () => {
 
                 return (
                     <React.Fragment key={message.messageId}>
-
                         {isFirstMessageOfDay && <ChatDateDivider date={currentDate} />}
                         {loginUserId === message.senderId ? (
                             <ChatMessageMine {...message} />

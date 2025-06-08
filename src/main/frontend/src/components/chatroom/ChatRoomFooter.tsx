@@ -65,6 +65,7 @@ const ChatRoomFooter = () => {
     const friendProfileImageUrl = currentChatRoom.participants[0].profileImageUrl;
     // 메세지 전송
     const sendMessage = async () => {
+        console.log("sendMessage 호출됨", new Date().getTime());
         if(!message.trim()) return;
         // TODO: 만약 채팅방이 없다면, 채팅방 id를 먼저 생성(내 id와 친구 id), 채팅방 id를 통해 값 삽입.
         console.log("채팅방이 존재할때는 상대방 id를 friendId로 조회: ", friendId);
@@ -131,11 +132,9 @@ const ChatRoomFooter = () => {
         }
         setMessage("");
     }
-
     const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setMessage(e.target.value);
     }
-
     // Enter 키로 메시지 전송
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.ctrlKey) {

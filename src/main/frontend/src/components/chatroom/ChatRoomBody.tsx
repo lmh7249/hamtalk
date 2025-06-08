@@ -7,7 +7,6 @@ import {getChatMessageList, notifyEnterChatRoom} from "../../services/chat-servi
 import {formatTime} from "../../utils/formatTime";
 import {subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
 import {Participant} from "../chat/ContentList";
-import testImage from "../../assets/images/UserDefaultImage.png";
 import dayjs from "../../utils/dayjs";
 
 const StyledChatRoomBodyWrapper = styled.div`
@@ -200,9 +199,10 @@ interface ChatMessage {
 const ChatRoomBody = () => {
     const [loginUserId, setLoginUserId] = useState<number>(0);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const currentChatRoom = useSelector((state: RootState) => state.chatRooms.currentChatRoom);
+    //TODO: 적절한 null 처리를 어떻게 할지 고민해보기.
 
-    const chatRoomData = useSelector((state: RootState) => state.detailContent.payload);
-    const chatRoomId = chatRoomData.chatRoomId;
+    const chatRoomId = currentChatRoom?.chatRoomId ?? null;
     // 채팅창 스크롤바 위치를 위한 ref
     const chatRoomBodyRef = useRef<HTMLDivElement>(null);
     // 채팅방 유저 목록을 상태관리하기.
@@ -210,7 +210,6 @@ const ChatRoomBody = () => {
     const formatDate = (dateString: string) => {
         return dayjs(dateString).format('YYYY년 M월 D일');
     };
-
 
     useEffect(() => {
         if (!chatRoomId) {

@@ -10,7 +10,7 @@ import {useEffect, useState} from "react";
 import {userLogout} from "../../services/auth-service";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
-import {setEmpty} from "../../store/contentDetailSlice";
+import {closeDetail} from "../../store/contentDetailSlice";
 
 const StyledLeftSidebarMenu = styled.div`
     flex-grow: 1;
@@ -71,7 +71,7 @@ const LeftSidebarMenu = () => {
                 duration: 2000
             })
             // contentDetail 값을 setEmpty로 변경
-            dispatch(setEmpty());
+            dispatch(closeDetail());
             navigate("/login");
         }
     };

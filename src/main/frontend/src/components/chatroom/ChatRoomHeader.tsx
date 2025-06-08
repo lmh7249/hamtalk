@@ -4,7 +4,7 @@ import ChatRoomSearchIcon from "../../assets/icons/search.svg";
 import ChatRoomExitIcon from "../../assets/icons/exit.svg";
 import IconButton from "../common/IconButton";
 import {useDispatch, useSelector} from "react-redux";
-import {setEmpty} from "../../store/contentDetailSlice";
+import {closeDetail} from "../../store/contentDetailSlice";
 import {RootState} from "../../store";
 
 const StyledChatRoomHeaderWrapper = styled.div`
@@ -44,20 +44,14 @@ const ChatRoomParticipants = () => {
 }
 
 const ChatRoomParticipantItem = () => {
-    const chatRoom = useSelector((state: RootState) => state.detailContent.payload);
-    const chatRoom2 = useSelector((state:RootState) => state.chatRooms.chatRooms.find(room => room.chatRoomId === chatRoom.chatRoomId));
-    // const chatRoomName = chatRoom?.chatRoomName || chatRoom?.nickName || "알수 없음";
-    console.log("Redux에서 가져온 chatRoom:", chatRoom);
-
-    // if (!chatRoom2) return null;
-
-    const chatRoomName = chatRoom2?.chatRoomName
-        ?? chatRoom2?.participants?.map(p => p.nickname).join(", ")
-        ?? chatRoom.chatRoomName
-        ?? chatRoom.nickname
+    const currentChatRoomId = useSelector((state: RootState) => state.detailContent.chatRoomId);
+    const currentChatRoom = useSelector((state:RootState) => state.chatRooms.currentChatRoom);
+    const chatRoomName = currentChatRoom?.chatRoomName
+        ?? currentChatRoom?.participants?.map(p => p.nickname).join(", ")
         ?? "알 수 없음";
 
-    const imageUrl = chatRoom.chatRoomImageUrl || chatRoom.chatRoomImageUrl || "";
+    const imageUrl = currentChatRoom?.chatRoomImageUrl || currentChatRoom?.participants[0].profileImageUrl || "알수 없음";
+    console.log("Redux에서 가져온 chatRoomId:", currentChatRoomId);
 
     return (
         <StyledChatRoomParticipantItemWrapper>
@@ -71,7 +65,7 @@ const ChatRoomActions = () => {
     const dispatch = useDispatch();
 
     const handleClose = () => {
-        dispatch(setEmpty());
+        dispatch(closeDetail());
     }
 
     return (

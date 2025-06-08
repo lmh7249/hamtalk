@@ -1,10 +1,11 @@
 import styled from "styled-components";
 import React from "react";
 import {findDirectChatRoom} from "../../services/chat-service";
-import {setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
+import {openChatRoom, openUserProfile} from "../../store/contentDetailSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {formatLastMessageTime} from "../../utils/formatTime";
 import {RootState} from "../../store";
+import {CurrentChatRoom, setCurrentChatRoom} from "../../store/chatRoomsSlice";
 
 const StyledChattingRoomItem = styled.div`
     display: flex;
@@ -97,27 +98,30 @@ const ChatRoomItem = ({chatRoomId}: ChattingRoomItemProps) => {
         ? chatRoom.chatRoomName // 채팅방 이름이 설정되어 있으면 그대로 사용
         : chatRoom.participants.map(participant => participant.nickname).join(", "); // 참여자들 이름 합치기
 
-
+    //TODO: 추후에 채팅방 이미지 추출 방식 변경하기.
+    const chatRoomImageUrl = chatRoom.participants[0].profileImageUrl;
 
     const displayLastMessage = chatRoom.lastMessage && chatRoom.lastMessage.length > maxLength
         ? `${chatRoom.lastMessage.slice(0, maxLength)}...`
         : chatRoom.lastMessage ?? "";
 
     const handleChatRoomDoubleClick = async () => {
-        dispatch(setChatRoom({
-            chatRoomId: chatRoomId,
+        dispatch(openChatRoom(chatRoomId));
+        const currentChatRoom: CurrentChatRoom = {
+            chatRoomId: chatRoom.chatRoomId,
+            chatRoomName: chatRoomName,
             creatorId: chatRoom.creatorId,
-            //TODO: null or undefined일 경우, 오른쪽 값 반환.
-            chatRoomName: chatRoom.chatRoomName,
-            friendId: chatRoom.participants[0].userId,
-            chatRoomImageUrl: chatRoom.participants[0].profileImageUrl,
-        }));
+            participants: chatRoom.participants,
+            chatRoomImageUrl: chatRoomImageUrl,
+        }
+        dispatch(setCurrentChatRoom(currentChatRoom));
     }
+
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
     const handleProfileImageClick = (e: React.MouseEvent) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
         // alert(participantIds);
-        dispatch(setUserProfile({userId: chatRoom.participants[0].userId}));
+        dispatch(openUserProfile(chatRoom.participants[0].userId));
     }
 
     return (

@@ -14,10 +14,9 @@ export const store = configureStore({
         user: userReducer,
         detailContent: contentDetailReducer,
         signup: signupReducer,
-        friends: friendsReducer,
+        // friends: friendsReducer,
         chatRooms: chatRoomsReducer,
         search: SearchReducer,
-
     },
 });
 

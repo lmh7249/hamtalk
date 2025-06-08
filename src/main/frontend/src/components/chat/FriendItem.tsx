@@ -4,12 +4,10 @@ import UserInfoText from "./UserInfoText";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {ChatRoomPayload, setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
-import {findDirectChatRoomApi} from "../../api/chat";
+import {openChatRoom, openUserProfile} from "../../store/contentDetailSlice";
 import {findDirectChatRoom} from "../../services/chat-service";
-import {subscribeToChatRoom} from "../../utils/websocketUtil";
-import testImg from "../../assets/images/img.png"
 import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
+import {CurrentChatRoom, setCurrentChatRoom} from "../../store/chatRoomsSlice";
 
 const StyledFriendProfile = styled.div`
     display: flex;
@@ -61,24 +59,40 @@ const FriendItem = ({userId}: FriendProfileProps) => {
         const response = await findDirectChatRoom(userId);
 
         if (response === undefined || response === null) {
-            const nickname = friend.nickname;
-            dispatch(setChatRoom({userId, nickname}));
+            dispatch(openChatRoom(null));
+            const currentChatRoom: CurrentChatRoom = {
+                chatRoomId: null,
+                chatRoomName: friend.nickname,
+                creatorId: null,
+                participants: [{
+                    userId: friend.toUserId,
+                    nickname: friend.nickname,
+                    profileImageUrl: friend.profileImageUrl,
+                }],
+                chatRoomImageUrl: friend.profileImageUrl,
+            }
+            dispatch(setCurrentChatRoom(currentChatRoom));
             return;
-               }
-
-        dispatch(setChatRoom({
+        }
+        dispatch(openChatRoom(response.chatRoomId));
+        //TODO: 여기도 dispatch로 이동할 채팅방 데이터 세팅하기.
+        const currentChatRoom: CurrentChatRoom = {
             chatRoomId: response.chatRoomId,
+            chatRoomName: response.chatRoomName,
             creatorId: response.creatorId,
-            //TODO: null or undefined일 경우, 오른쪽 값 반환.
-            chatRoomName: response.chatRoomName ?? friend.nickname,
-            friendId: response.friendId,
-            chatRoomImageUrl: friend.profileImageUrl
-        }));
+            participants: [{
+                userId: friend.toUserId,
+                nickname: friend.nickname,
+                profileImageUrl: friend.profileImageUrl,
+            }],
+            chatRoomImageUrl: friend.profileImageUrl,
+        }
+        dispatch(setCurrentChatRoom(currentChatRoom));
     }
 
     const handleImageClick = (e: React.MouseEvent, userId: number) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
-        dispatch(setUserProfile({userId: userId}));
+        dispatch(openUserProfile(userId));
     }
 
     return (

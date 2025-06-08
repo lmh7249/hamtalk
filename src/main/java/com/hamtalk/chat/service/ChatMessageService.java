@@ -6,8 +6,10 @@ import com.hamtalk.chat.model.projection.UserProfileProjection;
 import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
 import com.hamtalk.chat.model.response.ChatRoomMessagesResponse;
+import com.hamtalk.chat.model.response.UnreadMessageCountResponse;
 import com.hamtalk.chat.repository.ChatMessageRepository;
 import com.hamtalk.chat.repository.ChatReadStatusRepository;
+import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.repository.UserProfileRepository;
 import com.hamtalk.common.exeption.custom.ChatRoomNotFoundException;
 import com.hamtalk.common.exeption.custom.UserProfileNotFoundException;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +31,7 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserProfileRepository userProfileRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
+    private final ChatRoomParticipantRepository chatRoomParticipantRepository;
 
     // 메세지 저장
     @Transactional
@@ -55,7 +59,7 @@ public class ChatMessageService {
         List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId);
 
         // 채팅방 존재 유무 검증
-        if(chatMessages == null) {
+        if (chatMessages == null) {
             throw new ChatRoomNotFoundException();
         }
 
@@ -94,12 +98,21 @@ public class ChatMessageService {
                 .build();
     }
 
-    public long countUnreadMessages(Long userId, Long chatRoomId) {
-        ChatReadStatus chatReadStatus = chatReadStatusRepository.findByUserIdAndChatRoomId(userId, chatRoomId).orElse(null);
-
-        if (chatReadStatus == null || chatReadStatus.getLastReadAt() == null) {
-            return chatMessageRepository.countByChatRoomIdAndSenderIdNot(chatRoomId, userId);
+    public List<UnreadMessageCountResponse> countUnreadMessages(Long userId) {
+        List<Long> chatRoomIds = chatRoomParticipantRepository.findChatRoomIdsByUserId(userId);
+        List<UnreadMessageCountResponse> result = new ArrayList<>();
+        for (Long chatRoomId : chatRoomIds) {
+            ChatReadStatus chatReadStatus = chatReadStatusRepository.findByUserIdAndChatRoomId(userId, chatRoomId).orElse(null);
+            long unreadCount;
+            if (chatReadStatus == null || chatReadStatus.getLastReadAt() == null) {
+                unreadCount = chatMessageRepository.countByChatRoomIdAndSenderIdNot(chatRoomId, userId);
+            } else {
+                // 3-2. 마지막 읽은 이후 메시지 개수
+                unreadCount = chatMessageRepository.countByChatRoomIdAndSenderIdNotAndCreatedAtAfter(
+                        chatRoomId, userId, chatReadStatus.getLastReadAt());
+            }
+            result.add(new UnreadMessageCountResponse(chatRoomId, unreadCount));
         }
-        return chatMessageRepository.countByChatRoomIdAndSenderIdNotAndCreatedAtAfter(chatRoomId, userId, chatReadStatus.getLastReadAt());
+        return result;
     }
 }

@@ -6,6 +6,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {formatLastMessageTime} from "../../utils/formatTime";
 import {RootState} from "../../store";
 import {CurrentChatRoom, setCurrentChatRoom} from "../../store/chatRoomsSlice";
+import {useQueryClient} from "@tanstack/react-query";
+import {UnreadCountType} from "../../hooks/useUnreadCountsQuery";
 
 const StyledChattingRoomItem = styled.div`
     display: flex;
@@ -84,12 +86,14 @@ const ImageWrapper = styled.div`
 
 interface ChattingRoomItemProps {
     chatRoomId: number;
+    unreadCount: number;
 }
 
-const ChatRoomItem = ({chatRoomId}: ChattingRoomItemProps) => {
+const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
     const dispatch = useDispatch();
     const chatRoom = useSelector((state: RootState) => state.chatRooms.chatRooms.find(room => room.chatRoomId === chatRoomId));
     const maxLength: number = 14;
+    const queryClient = useQueryClient();
 
     if (!chatRoom) return null;
 
@@ -107,6 +111,7 @@ const ChatRoomItem = ({chatRoomId}: ChattingRoomItemProps) => {
 
     const handleChatRoomDoubleClick = async () => {
         dispatch(openChatRoom(chatRoomId));
+        console.log("채팅방 오픈" + chatRoomId);
         const currentChatRoom: CurrentChatRoom = {
             chatRoomId: chatRoom.chatRoomId,
             chatRoomName: chatRoomName,
@@ -115,7 +120,18 @@ const ChatRoomItem = ({chatRoomId}: ChattingRoomItemProps) => {
             chatRoomImageUrl: chatRoomImageUrl,
         }
         dispatch(setCurrentChatRoom(currentChatRoom));
-    }
+
+        // React Query 캐시에서 해당 채팅방의 unreadCount를 0으로 설정
+        queryClient.setQueryData<UnreadCountType[]>(['unreadCounts'], (old) => {
+            if (!old) return [];
+            return old.map((item) =>
+                item.chatRoomId === chatRoomId
+                    ? { ...item, unreadCount: 0 }
+                    : item
+            );
+        });
+
+    };
 
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
     const handleProfileImageClick = (e: React.MouseEvent) => {
@@ -125,25 +141,21 @@ const ChatRoomItem = ({chatRoomId}: ChattingRoomItemProps) => {
     }
 
     return (
-
         <StyledChattingRoomItem
             onDoubleClick={() => handleChatRoomDoubleClick()}>
             <div style={{display: "flex", gap: "10px"}}>
                 <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e)}>
                     <StyledImage src={chatRoom.participants[0].profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
                 </ImageWrapper>
-
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
                     <LastMessage>{displayLastMessage}</LastMessage>
                 </ChatMainInfo>
             </div>
-
             <MessageMetaInfo>
                 <LastMessageTime> {chatRoom.lastMessageTime ? formatLastMessageTime(chatRoom.lastMessageTime) : ""}</LastMessageTime>
-                {/*{unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}*/}
+                {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
             </MessageMetaInfo>
-
         </StyledChattingRoomItem>
     )
 }

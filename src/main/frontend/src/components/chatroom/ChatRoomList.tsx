@@ -1,10 +1,9 @@
 import styled from "styled-components";
 import ChatRoomItem from "./ChatRoomItem";
-import {ChatRoom} from "../chat/ContentList";
-import React, {useEffect, useState} from "react";
-import {getUnreadMessageCount} from "../../services/chat-service";
+import React, {useMemo} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
+import {useUnreadCountsQuery} from "../../hooks/useUnreadCountsQuery";
 
 const StyledChattingRoomListWrapper = styled.div`
     display: flex;
@@ -13,9 +12,12 @@ const StyledChattingRoomListWrapper = styled.div`
 `;
 
 const ChatRoomList = () => {
-    const [unreadCounts, setUnreadCounts] = useState<{ [chatRoomId: number]: number }>({});
     const chatRoomList = useSelector((state: RootState) => state.chatRooms.chatRooms);
     const keyword = useSelector((state: RootState) => state.search.keyword);
+    const {data: unreadCounts = [], isLoading, error} = useUnreadCountsQuery();
+    const currentChatRoomId = useSelector((state: RootState) => state.detailContent.chatRoomId); // 추가
+
+
 
     const filteredChatRooms = chatRoomList.filter(chatRoom => {
         const roomName = chatRoom.chatRoomName || "";
@@ -26,26 +28,14 @@ const ChatRoomList = () => {
         return target.includes(keyword.toLowerCase());
     });
 
-    useEffect(() => {
-        const fetchUnreadCounts = async () => {
-            const counts: { [chatRoomId: number]: number } = {};
-
-            await Promise.all(chatRoomList.map(async (chatRoom) => {
-                try {
-                    const response = await getUnreadMessageCount(chatRoom.chatRoomId);
-                    counts[chatRoom.chatRoomId] = response ?? 0;
-                } catch (error) {
-                    console.error("읽지 않은 메시지 수 불러오기 실패", error);
-                    counts[chatRoom.chatRoomId] = 0; // 실패 시 0으로 처리
-                }
-            }));
-            setUnreadCounts(counts);
-        };
-
-        if (chatRoomList.length > 0) {
-            fetchUnreadCounts();
-        }
-    }, [chatRoomList]);
+    const unreadMap = useMemo(() => {
+        const map = new Map();
+       unreadCounts?.forEach(item => {
+           const unreadCount = item.chatRoomId === currentChatRoomId ? 0 : item.unreadCount;
+           map.set(item.chatRoomId, unreadCount);
+       });
+       return map;
+    }, [unreadCounts, currentChatRoomId]);
 
     return (
         <>
@@ -57,6 +47,7 @@ const ChatRoomList = () => {
                             <ChatRoomItem
                                 key={chatRoom.chatRoomId}
                                 chatRoomId={chatRoom.chatRoomId}
+                                unreadCount={unreadMap.get(chatRoom.chatRoomId) || 0}
                             />
                         );
                     })

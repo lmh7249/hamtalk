@@ -105,8 +105,6 @@ const ContentList = ({openModal}: ContentListProps) => {
     const isChatsTab = selectedMenu.key === "chats";
     const isSettingsTab = selectedMenu.key === "settings";
 
-
-
     useEffect(() => {
         // 메뉴가 변경 될 때마다 적절한 API 호출
         const fetchData = async () => {

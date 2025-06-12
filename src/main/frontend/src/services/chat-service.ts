@@ -38,7 +38,10 @@ export const notifyEnterChatRoom = async (chatRoomId: number) => {
     const response = await notifyEnterChatRoomApi(chatRoomId);
 }
 
-export const getUnreadMessageCount = async (chatRoomId: number) => {
-    const response = await getUnreadMessageCountApi(chatRoomId);
-    return response.data;
+export const getUnreadMessageCount = async () => {
+    const response = await getUnreadMessageCountApi();
+    if(response.status === "success" && response.data) {
+        return response.data;
+    }
+    throw new Error(response.errorMessage || "");
 }

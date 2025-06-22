@@ -5,8 +5,9 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {getChatMessageList, notifyEnterChatRoom} from "../../services/chat-service";
 import {formatTime} from "../../utils/formatTime";
-import {subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
+import {enterChatRoom, exitChatRoom, subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
 import dayjs from "../../utils/dayjs";
+import toast from "react-hot-toast";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -149,11 +150,11 @@ const ChatDateDivider = ({date}: ChatDateDividerProps) => {
 }
 
 
-const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
+const ChatMessageMine = ({message, createdAt, totalParticipants}: ChatMessage) => {
     return (
         <StyledChatMessageMineContainer>
             <StyledMessageInfo>
-                <StyledUnreadCount>1</StyledUnreadCount>
+                <StyledUnreadCount>{totalParticipants}</StyledUnreadCount>
                 <StyledTime>{formatTime(createdAt)}</StyledTime>
             </StyledMessageInfo>
             <StyledBubbleMine>
@@ -164,7 +165,7 @@ const ChatMessageMine = ({message, createdAt}: ChatMessage) => {
 }
 
 
-const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profileImageUrl}: ChatMessage) => {
+const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profileImageUrl, totalParticipants}: ChatMessage) => {
     return (
         <StyledChatMessageOtherContainer>
             {/*TODO: alignSelf : 부모 요소가 display: flex or grid 일 때만 사용가능. 노션에 정리 */}
@@ -177,7 +178,7 @@ const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profile
                 <StyledMessageRow>
                     <StyledBubbleOther>{message}</StyledBubbleOther>
                     <StyledMessageInfo>
-                        {/*<StyledUnreadCountOther>2</StyledUnreadCountOther>*/}
+                        <StyledUnreadCountOther>{totalParticipants}</StyledUnreadCountOther>
                         <StyledTime>{formatTime(createdAt)}</StyledTime>
                     </StyledMessageInfo>
                 </StyledMessageRow>
@@ -193,12 +194,25 @@ interface ChatMessage {
     profileImageUrl: string;
     message: string;
     createdAt: string;
+    totalParticipants: number;
+}
+
+interface CurrentParticipants {
+    chatRoomId: number;
+    userId: number;
+    nickname: string;
+    status: string;
 }
 
 const ChatRoomBody = () => {
     const [loginUserId, setLoginUserId] = useState<number>(0);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const currentChatRoom = useSelector((state: RootState) => state.chatRooms.currentChatRoom);
+    const totalParticipants = currentChatRoom?.participants.length ?? 0;
+    const [otherUnreadCount, setOtherUnreadCount] = useState<number>(currentChatRoom?.participants.length ?? 0);
+    const loginUserNickname = useSelector((state:RootState) => state.user.nickname) ?? "알수없는 사용자";
+    const [currentParticipants, setCurrentParticipants] = useState<CurrentParticipants[]>([]);
+
     //TODO: 적절한 null 처리를 어떻게 할지 고민해보기.
 
     const chatRoomId = currentChatRoom?.chatRoomId ?? null;
@@ -207,6 +221,12 @@ const ChatRoomBody = () => {
     const formatDate = (dateString: string) => {
         return dayjs(dateString).format('YYYY년 M월 D일');
     };
+
+    useEffect(() => {
+        if (currentChatRoom) {
+            setOtherUnreadCount(currentChatRoom.participants.length);
+        }
+    }, [currentChatRoom]);
 
     useEffect(() => {
         if (!chatRoomId) {
@@ -222,21 +242,35 @@ const ChatRoomBody = () => {
         }
         fetchMessages();
         notifyEnterChatRoom(chatRoomId);
+        setOtherUnreadCount(prev => prev - 1);
 
         // 채팅방 구독로직.
         if(chatRoomId) {
+            setCurrentParticipants([]); // 혹은 api로 현재 접속중인 user 가져오기
+            // 입장 알림 전송
+            enterChatRoom(chatRoomId, loginUserNickname);
             chatSubscription = subscribeToChatRoom(chatRoomId, (receivedMessage) => {
                 console.log("전달된 메세지: ", receivedMessage);
+                // 1. 입장/퇴장 메시지인 경우
+                if (receivedMessage.status === 'ENTERED') {
+                    // 접속자 목록을 관리하는 상태가 있다면 여기서 추가/제거
+                    toast.success(receivedMessage.nickname + "님이 입장했습니다.");
+                    return;
+                }
+
+                if (receivedMessage.status === 'EXITED') {
+                    // 접속자 목록을 관리하는 상태가 있다면 여기서 추가/제거
+                    toast.success(receivedMessage.nickname + "님이 퇴장했습니다.");
+                    return;
+                }
                 setMessages((prevMessages) =>{
                     // messageId로만 중복 체크 (내용이 아닌 고유 ID로)
                     const isAlreadyExists = prevMessages.some(msg =>
                         msg.messageId === receivedMessage.messageId
                     );
-
                     if (isAlreadyExists) {
                         return prevMessages;
                     }
-
                    return [...prevMessages, receivedMessage]});
             })
         }
@@ -245,6 +279,7 @@ const ChatRoomBody = () => {
             if(chatSubscription) {
                 unsubscribeFromChatRoom(chatSubscription);
             }
+            exitChatRoom(chatRoomId, loginUserNickname);
             // 채팅방을 나갈때도, 접속 시간을 업데이트 해야 최신정보를 유지 가능.
             notifyEnterChatRoom(chatRoomId);
         };
@@ -268,9 +303,9 @@ const ChatRoomBody = () => {
                     <React.Fragment key={message.messageId}>
                         {isFirstMessageOfDay && <ChatDateDivider date={currentDate} />}
                         {loginUserId === message.senderId ? (
-                            <ChatMessageMine {...message} />
+                            <ChatMessageMine {...message} totalParticipants={totalParticipants}/>
                         ) : (
-                            <ChatMessageOther {...message} />
+                            <ChatMessageOther {...message} totalParticipants={otherUnreadCount}/>
                         )}
                     </React.Fragment>
                 );

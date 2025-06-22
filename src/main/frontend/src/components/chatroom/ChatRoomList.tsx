@@ -17,8 +17,6 @@ const ChatRoomList = () => {
     const {data: unreadCounts = [], isLoading, error} = useUnreadCountsQuery();
     const currentChatRoomId = useSelector((state: RootState) => state.detailContent.chatRoomId); // 추가
 
-
-
     const filteredChatRooms = chatRoomList.filter(chatRoom => {
         const roomName = chatRoom.chatRoomName || "";
         const participants = (chatRoom.participants || [])

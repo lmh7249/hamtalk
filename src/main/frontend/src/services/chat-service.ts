@@ -33,7 +33,7 @@ export const createDirectChatRoom = async (friendId: number) =>{
     return response.data;
 }
 
-//TODO: API 데이터 반환 타입 결정하기.
+//TODO: API 데이터 반환 타입 결정하기, 해당 함수는 입장 + 퇴장 모두 사용 중. 방법 생각하기.
 export const notifyEnterChatRoom = async (chatRoomId: number) => {
     const response = await notifyEnterChatRoomApi(chatRoomId);
 }

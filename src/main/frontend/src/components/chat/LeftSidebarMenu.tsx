@@ -11,6 +11,7 @@ import {userLogout} from "../../services/auth-service";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
 import {closeDetail} from "../../store/contentDetailSlice";
+import {useUnreadTotal} from "../../hooks/useUnreadTotal";
 
 const StyledLeftSidebarMenu = styled.div`
     flex-grow: 1;
@@ -52,10 +53,32 @@ const StyledMenuButton = styled.button`
     }
 `;
 
+const LabelWithBadge = styled.p`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* 텍스트와 뱃지 사이 여백 */
+  margin: 0;
+`;
+
+const UnreadBadge = styled.span`
+    background-color: #ff6b81; /* 귀여운 핑크빛 빨강 */
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+`;
+
 const LeftSidebarMenu = () => {
     const dispatch = useDispatch();
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const navigate = useNavigate();
+    const totalUnreadCount = useUnreadTotal();
 
     useEffect(() => {
     }, [selectedMenu]);
@@ -85,7 +108,12 @@ const LeftSidebarMenu = () => {
                             onClick={() => dispatch(setMenu({ key: item.key, label: item.label }))}
                         >
                             <img src={item.icon} alt={item.label} width={30} height={30}/>
-                            <p>{item.label}</p>
+                            <LabelWithBadge>
+                                {item.label}
+                                {item.key === 'chats' && totalUnreadCount > 0 && (
+                                    <UnreadBadge>{totalUnreadCount}</UnreadBadge>
+                                )}
+                            </LabelWithBadge>
                         </StyledMenuButton>
                     </li>
                 ))}

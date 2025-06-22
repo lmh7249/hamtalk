@@ -23,8 +23,9 @@ public class RedisService {
     private final RedisMessageListenerContainer container;
     private final MessageListenerAdapter listenerAdapter;
     private final Set<String> subscribedChannels = ConcurrentHashMap.newKeySet();
+
     // Hash 형식으로 값 저장
-    // 추후 30분 이내 호출 5회 미만 설정하기
+    //TODO: 추후 30분 이내 호출 5회 미만 설정하기
     public void saveAuthCode(String email, String authCode) {
         String key = "emailAuth: " + email;
         redisTemplate.opsForHash().put(key, "code", authCode);
@@ -60,7 +61,8 @@ public class RedisService {
     public void subscribeChatRoom(Long chatRoomId) {
         String topicName = "chatRoom:" + chatRoomId;
         // 중복 구독 방지
-        if(!subscribedChannels.contains(topicName)) {
+        if (!subscribedChannels.contains(topicName)) {
+            // listenerAdapter를 통해 메시지 수신 처리 -> RedisSubscriber가 콜백됨.
             container.addMessageListener(listenerAdapter, new ChannelTopic(topicName));
             subscribedChannels.add(topicName);
         }
@@ -69,12 +71,20 @@ public class RedisService {
     public void subscribeGlobalNotification(Long userId) {
         String topicName = "userNotify:" + userId;
         // 중복 구독 방지
-        if(!subscribedChannels.contains(topicName)) {
+        if (!subscribedChannels.contains(topicName)) {
             container.addMessageListener(listenerAdapter, new ChannelTopic(topicName));
             subscribedChannels.add(topicName);
         }
     }
 
+    public void saveUserToChatRoom(Long chatRoomId, Long userId, String nickname) {
+        String key = "chatroom:users:" + chatRoomId;
+        redisTemplate.opsForHash().put(key, String.valueOf(userId), nickname);
+    }
 
+    public void deleteUserToChatRoom(Long chatRoomId, Long userId) {
+        String key = "chatroom:users:" + chatRoomId;
+        redisTemplate.opsForHash().delete(key, String.valueOf(userId));
+    }
 
 }

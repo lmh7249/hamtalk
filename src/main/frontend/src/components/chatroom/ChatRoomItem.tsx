@@ -67,11 +67,12 @@ const UnreadCount = styled.span`
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: red;
+    background-color: #ff6b81;
     font-size: 12px;
     font-weight: bold;
     color: white;
-    width: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
 `;
 
@@ -130,9 +131,7 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
                     : item
             );
         });
-
     };
-
     //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
     const handleProfileImageClick = (e: React.MouseEvent) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)

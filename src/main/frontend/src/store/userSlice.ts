@@ -53,8 +53,6 @@ const userSlice = createSlice({
         updateStatusMessage: (state, action) => {
             state.statusMessage = action.payload.statusMessage;
         },
-
-
         updateProfile: (state, action: PayloadAction<ProfileUpdatePayload>) => {
             const { nickname, profileImageUrl, statusMessage } = action.payload;
             if (nickname !== undefined) state.nickname = nickname;

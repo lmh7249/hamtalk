@@ -97,3 +97,35 @@ export const disconnectWebSocket = () => {
         })
     }
 };
+
+export const enterChatRoom = (chatRoomId: number, nickname: string) => {
+    if(!stompClient || !stompClient.connected) {
+        console.error("웹소켓 연결 안되어있어요. enterChatRoom 호출 실패");
+        return;
+    }
+    const enterRequest = {
+        nickname: nickname
+    };
+
+    stompClient.send(
+        `/app/chat/${chatRoomId}/enter`,
+        {},
+        JSON.stringify(enterRequest)
+    );
+}
+
+export const exitChatRoom = (chatRoomId: number, nickname: string) => {
+    if(!stompClient || !stompClient.connected) {
+        console.error("웹소켓 연결 안되어있어요. exitChatRoom 호출 실패");
+        return;
+    }
+    const enterRequest = {
+        nickname: nickname
+    };
+
+    stompClient.send(
+        `/app/chat/${chatRoomId}/exit`,
+        {},
+        JSON.stringify(enterRequest)
+    );
+}

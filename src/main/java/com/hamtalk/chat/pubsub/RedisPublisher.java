@@ -12,7 +12,8 @@ public class RedisPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
 
     // topic -> chatRoomId
-    public void publish(String topicName, ChatMessageResponse message) {
+    public <T> void publish(String topicName, T message) {
+        // 레디스에서 convertAndSend -> 서버 간 메세지를 전달하는 용도
         redisTemplate.convertAndSend(topicName, message);
     }
 

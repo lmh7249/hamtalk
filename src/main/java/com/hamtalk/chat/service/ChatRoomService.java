@@ -112,15 +112,11 @@ public class ChatRoomService {
         uniqueChatRooms.sort((a, b) -> {
             LocalDateTime timeA = a.getLastMessageTime();
             LocalDateTime timeB = b.getLastMessageTime();
-
             if (timeA == null && timeB == null) return 0;
             if (timeA == null) return 1;
             if (timeB == null) return -1;
-
             return timeB.compareTo(timeA);
         });
-
-
         log.info("최종 반환 값: {}", uniqueChatRooms);
         return uniqueChatRooms;
     }

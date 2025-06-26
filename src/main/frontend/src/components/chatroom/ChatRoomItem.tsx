@@ -95,13 +95,17 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
     const chatRoom = useSelector((state: RootState) => state.chatRooms.chatRooms.find(room => room.chatRoomId === chatRoomId));
     const maxLength: number = 14;
     const queryClient = useQueryClient();
+    const loginUserId = useSelector((state:RootState) => state.user.id);
 
     if (!chatRoom) return null;
 
-    // 채팅방 이름이 설정되어 있으면 그대로 사용하고, 설정되어 있지 않으면 참여자들의 이름을 합침
+    // 채팅방 이름이 설정되어 있으면 그대로 사용하고, 설정되어 있지 않으면 로그인한 유저의 정보만 제외하고 참여자들의 이름을 합침
     const chatRoomName = chatRoom.chatRoomName
-        ? chatRoom.chatRoomName // 채팅방 이름이 설정되어 있으면 그대로 사용
-        : chatRoom.participants.map(participant => participant.nickname).join(", "); // 참여자들 이름 합치기
+        ? chatRoom.chatRoomName
+        : chatRoom.participants
+            .filter(participant => participant.userId !== loginUserId)
+            .map(participant => participant.nickname)
+            .join(", ");
 
     //TODO: 추후에 채팅방 이미지 추출 방식 변경하기.
     const chatRoomImageUrl = chatRoom.participants[0].profileImageUrl;

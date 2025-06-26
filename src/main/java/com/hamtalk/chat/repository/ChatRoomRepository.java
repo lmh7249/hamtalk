@@ -20,7 +20,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "JOIN ChatRoomParticipant crp2 ON crp1.chatRoomId = crp2.chatRoomId " +
             "JOIN UserProfile up ON crp2.userId = up.userId " +
             "JOIN ChatRoom cr ON crp1.chatRoomId = cr.id " +
-            "WHERE crp1.userId = :userId AND crp2.userId != :userId")
+            "WHERE crp1.userId = :userId ")
     List<ChatRoomListResponse> findChatRoomsByUserId(@Param("userId") Long userId);
 
     @Query("select new com.hamtalk.chat.model.response.DirectChatRoomResponse(cr, crp1, crp2) " +

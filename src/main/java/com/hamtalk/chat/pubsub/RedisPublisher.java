@@ -1,9 +1,7 @@
 package com.hamtalk.chat.pubsub;
 
-import com.hamtalk.chat.model.response.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 
 @Component

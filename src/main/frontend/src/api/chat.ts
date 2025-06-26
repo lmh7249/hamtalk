@@ -68,3 +68,27 @@ export const getUnreadMessageCountApi = async () => {
     }
     return await response.json();
 }
+
+
+export const getOnlineParticipantsApi = async (chatRoomId: number) => {
+    const response = await customFetch(`/api/chat-rooms/${chatRoomId}/participants`, {
+        method:"get",
+    })
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
+}
+
+
+export const getLastReadAtListApi = async (chatRoomId: number) => {
+    const response = await customFetch(`/api/chat-rooms/${chatRoomId}/last-read`, {
+        method:"get",
+    })
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
+}

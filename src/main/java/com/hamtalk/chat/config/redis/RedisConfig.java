@@ -20,10 +20,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-
     private final RedisSubscriber redisSubscriber;
-
-
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
@@ -42,20 +39,16 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisConfig);
     }
 
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(){
+    // 1. 객체 (JSON) 저장을 위한 RedisTemplate
+    @Bean(name = "objectRedisTemplate") // 빈 이름 추가
+    public RedisTemplate<String, Object> objectRedisTemplate(){
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
-
         // ObjectMapper 설정
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // Java 8 시간 타입 지원 모듈 등록
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // ISO-8601 형식 사용
-
-
-
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-
         // GenericJackson2JsonRedisSerializer에 커스텀 ObjectMapper 전달
         GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         redisTemplate.setValueSerializer(jsonSerializer);
@@ -77,8 +70,5 @@ public class RedisConfig {
     @Bean
     public MessageListenerAdapter messageListenerAdapter() {
         return new MessageListenerAdapter(redisSubscriber, "onMessage");
-
     }
-
-
 }

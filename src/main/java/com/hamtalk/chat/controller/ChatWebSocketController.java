@@ -18,6 +18,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -64,8 +66,9 @@ public class ChatWebSocketController {
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
         String nickname = request.getNickname();
         // 입장한 유저의 id와, nickname을 redis에 저장 -> 현재 채팅방 접속자 리스트를 뽑기 위해 필요.
-        redisService.saveUserToChatRoom(chatRoomId, userId, nickname);
-        ChatUserStatusResponse enterMessage = new ChatUserStatusResponse(chatRoomId, userId, nickname, ChatParticipantStatus.ENTERED);
+        LocalDateTime now = LocalDateTime.now();
+        redisService.saveUserToChatRoom(chatRoomId, userId, nickname, now);
+        ChatUserStatusResponse enterMessage = new ChatUserStatusResponse(chatRoomId, userId, nickname, ChatParticipantStatus.ENTERED, now);
         redisPublisher.publish("chatRoom:" + chatRoomId, enterMessage);
     }
 
@@ -78,8 +81,9 @@ public class ChatWebSocketController {
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
         String nickname = request.getNickname();
         // 삭제
+        LocalDateTime now = LocalDateTime.now();
         redisService.deleteUserToChatRoom(chatRoomId, userId);
-        ChatUserStatusResponse enterMessage = new ChatUserStatusResponse(chatRoomId, userId, nickname, ChatParticipantStatus.EXITED);
+        ChatUserStatusResponse enterMessage = new ChatUserStatusResponse(chatRoomId, userId, nickname, ChatParticipantStatus.EXITED, now);
         redisPublisher.publish("chatRoom:" + chatRoomId, enterMessage);
     }
 

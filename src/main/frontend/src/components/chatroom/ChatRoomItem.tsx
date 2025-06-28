@@ -96,8 +96,8 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
     const maxLength: number = 14;
     const queryClient = useQueryClient();
     const loginUserId = useSelector((state:RootState) => state.user.id);
-
     if (!chatRoom) return null;
+    const otherParticipants = chatRoom.participants.filter(participant => participant.userId !== loginUserId);
 
     // 채팅방 이름이 설정되어 있으면 그대로 사용하고, 설정되어 있지 않으면 로그인한 유저의 정보만 제외하고 참여자들의 이름을 합침
     const chatRoomName = chatRoom.chatRoomName
@@ -136,11 +136,11 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
             );
         });
     };
-    //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
+    //TODO: 나를 제외한 userId 중 첫 번째 유저의 프로필을 보여줌.
     const handleProfileImageClick = (e: React.MouseEvent) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
-        // alert(participantIds);
-        dispatch(openUserProfile(chatRoom.participants[0].userId));
+
+        dispatch(openUserProfile(otherParticipants[0].userId));
     }
 
     return (
@@ -148,7 +148,7 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
             onDoubleClick={() => handleChatRoomDoubleClick()}>
             <div style={{display: "flex", gap: "10px"}}>
                 <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e)}>
-                    <StyledImage src={chatRoom.participants[0].profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
+                    <StyledImage src={otherParticipants[0].profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
                 </ImageWrapper>
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>

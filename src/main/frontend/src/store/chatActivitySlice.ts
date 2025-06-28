@@ -1,10 +1,11 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {RootState} from "./index";
+import {getOnlineParticipants} from "../services/chat-service";
 
 interface ViewerProfile {
     userId: number;
     nickname: string;
-    profileImageUrl: string;
+    enteredAt: string;
 }
 
 interface ChatActivityState {
@@ -22,6 +23,24 @@ const initialState: ChatActivityState = {
     status: 'idle',
     error: null,
 };
+
+export const fetchInitialViewers = createAsyncThunk(
+    // 1. 이 비동기 액션의 고유한 이름 (타입 접두사)
+    'chatActivity/fetchInitialViewers',
+
+    // 2. 실제 비동기 작업을 처리하는 함수
+    async (chatRoomId: number, thunkAPI) => {
+        try {
+            const viewers = await getOnlineParticipants(chatRoomId);
+            return {chatRoomId: chatRoomId, viewers: viewers};
+        } catch (error:any) {
+            // 실패 시, 에러 메시지를 담아서 반환하면 'rejected' 액션의 payload가 됨
+            return thunkAPI.rejectWithValue(error.message);
+        }
+
+    }
+
+)
 
 const chatActivitySlice = createSlice({
     name: 'chatActivity',
@@ -49,6 +68,29 @@ const chatActivitySlice = createSlice({
             delete state.viewersByChatRoomId[action.payload.chatRoomId];
         },
     },
+
+    // 비동기 액션의 결과를 처리하는 부분
+    extraReducers: (builder) => {
+        builder
+            // 1. API 호출이 시작됐을 때 (pending 상태)
+            .addCase(fetchInitialViewers.pending, (state) => {
+                state.status = 'loading';
+                state.error = null; // 이전 에러 초기화
+            })
+            // 2. API 호출이 성공적으로 끝났을 때 (fulfilled 상태)
+            .addCase(fetchInitialViewers.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                // action.payload에는 Thunk에서 return한 값이 그대로 들어옴
+                const { chatRoomId, viewers } = action.payload;
+                state.viewersByChatRoomId[chatRoomId] = viewers;
+            })
+            // 3. API 호출이 실패했을 때 (rejected 상태)
+            .addCase(fetchInitialViewers.rejected, (state, action) => {
+                state.status = 'failed';
+                // action.payload에는 Thunk에서 rejectWithValue로 전달한 값이 들어옴
+                state.error = action.payload as string;
+            });
+    }
 })
 
 export const { userJoined, userLeft, clearRoomViewers } = chatActivitySlice.actions;

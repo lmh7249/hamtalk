@@ -10,7 +10,8 @@ import {RootState} from "../../store";
 import IconButton2 from "../common/IconButton2";
 import {useMemo, useRef, useState} from "react";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
-import { FaUsers } from "react-icons/fa";
+import {FaUsers} from "react-icons/fa";
+import {selectViewersByRoomId} from "../../store/chatActivitySlice";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -66,9 +67,9 @@ const StyledPopoverContainer = styled.div`
 const StyledProfileImage = styled.img`
     width: 40px;
     height: 40px;
-    border-radius: 50%; 
-    object-fit: cover; 
-    background-color: #f0f0f0; 
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #f0f0f0;
     margin-right: 5px;
 `;
 
@@ -77,6 +78,7 @@ const PopoverWrapper = styled.div`
     gap: 5px;
     align-items: center;
     padding: 5px;
+
     &:hover {
         background-color: #f0f0f0;
         user-select: none;
@@ -93,23 +95,23 @@ const MySelfIndicator = styled.div`
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background-color: #4A4A4A; 
-    color: white; 
+    background-color: #4A4A4A;
+    color: white;
     display: flex;
-    justify-content: center; 
-    align-items: center;     
+    justify-content: center;
+    align-items: center;
     font-size: 10px;
     font-weight: bold;
 `;
 
 const PopoverHeader = styled.p`
-    font-size: 14px; 
-    margin-bottom: 8px; 
+    font-size: 14px;
+    margin-bottom: 8px;
     text-align: center;
     color: #888;
     margin-top: 0;
     padding-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0; 
+    border-bottom: 1px solid #f0f0f0;
 `;
 
 const softPulse = keyframes`
@@ -130,37 +132,39 @@ const softPulse = keyframes`
 const NicknameContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 8px; 
+    gap: 8px;
 `;
 
 const FocusDot = styled.div`
     width: 8px;
     height: 8px;
-    background-color: #007bff; 
+    background-color: #007bff;
     border-radius: 50%;
     animation: ${softPulse} 2s infinite;
 
     position: relative;
+
     &:hover {
-        animation: none; 
+        animation: none;
     }
+
     &:hover::after {
-        content: attr(data-tooltip); 
+        content: attr(data-tooltip);
         position: absolute;
-        top: 200%; 
+        top: 200%;
         left: 50%;
-        transform: translateX(-50%); 
-        background-color: #333; 
-        color: white; 
-        padding: 6px 10px; 
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 6px 10px;
         border-radius: 5px;
         font-size: 13px;
-        white-space: nowrap; 
+        white-space: nowrap;
 
         &::after {
             content: '';
             opacity: 0;
-            pointer-events: none; 
+            pointer-events: none;
         }
 `;
 
@@ -178,16 +182,23 @@ const ChatRoomParticipantItem = () => {
     const chatRoomName = currentChatRoom?.chatRoomName
         ?? currentChatRoom?.participants?.map(p => p.nickname).join(", ")
         ?? "알 수 없음";
-    const loginUserId = useSelector((state:RootState) => state.user.id);
+    const loginUserId = useSelector((state: RootState) => state.user.id);
     const imageUrl = currentChatRoom?.chatRoomImageUrl || currentChatRoom?.participants[0].profileImageUrl || "알수 없음";
     console.log("Redux에서 가져온 chatRoomId:", currentChatRoomId);
-    // 1. 팝어보 열림/닫힘 상태 관리
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
-    // 2. 팝오버와 버튼 영역을 참조할 Ref 생성
+    // 팝오버와 버튼 영역을 참조할 Ref 생성
     const popoverRef = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<HTMLDivElement>(null);
 
-    // 2. '나'를 맨 위로 오도록 정렬된 새로운 배열 생성 (useMemo 사용)
+    const currentViewers = useSelector((state: RootState) => {
+        if (currentChatRoomId === null || typeof currentChatRoomId === 'undefined') {
+            // 셀렉터를 호출하지 않고, 바로 빈 배열을 반환한다.
+            return [];
+        }
+        return selectViewersByRoomId(state, currentChatRoomId)
+    });
+
+    // '나'를 맨 위로 오도록 정렬된 새로운 배열 생성 (useMemo 사용)
     const sortedParticipants = useMemo(() => {
         // participants가 없으면 빈 배열 반환
         if (!currentParticipants) return [];
@@ -213,7 +224,8 @@ const ChatRoomParticipantItem = () => {
             <ParticipantProfileImage src={imageUrl}/>
             <ParticipantProfileNickName>{chatRoomName}</ParticipantProfileNickName>
             <IconWrapper ref={triggerRef}>
-                <IconButton2 icon={<FaUsers/>} alt={"참여자 목록 보기"} bgColor="transparent" hoverBgColor="#F2F2F2"  onClick={() => setIsPopoverOpen(!isPopoverOpen)}/>
+                <IconButton2 icon={<FaUsers/>} alt={"참여자 목록 보기"} bgColor="transparent" hoverBgColor="#F2F2F2"
+                             onClick={() => setIsPopoverOpen(!isPopoverOpen)}/>
             </IconWrapper>
             {isPopoverOpen && (
                 <StyledPopoverContainer ref={popoverRef}>
@@ -223,8 +235,10 @@ const ChatRoomParticipantItem = () => {
                             <StyledProfileImage src={participant.profileImageUrl || "이미지 없음"}/>
                             {loginUserId === participant.userId && <MySelfIndicator>나</MySelfIndicator>}
                             <NicknameContainer>
-                            <StyledNickname>{participant.nickname}</StyledNickname>
-                            <FocusDot data-tooltip="현재 이 채팅방을 보고 있어요."/>
+                                <StyledNickname>{participant.nickname}</StyledNickname>
+                                {currentViewers.find(user => user.userId === participant.userId) &&
+                                    <FocusDot data-tooltip="현재 이 채팅방을 보고 있어요."/>
+                                }
                             </NicknameContainer>
                         </PopoverWrapper>
                     ))}

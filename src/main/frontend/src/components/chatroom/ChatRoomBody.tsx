@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import {ParticipantProfileImage} from "./ChatRoomHeader";
 import React, {useEffect, useRef, useState} from "react";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../store";
 import {
     getChatMessageList, getLastReadAtList,
     getOnlineParticipants,
@@ -12,6 +12,7 @@ import {formatTime} from "../../utils/formatTime";
 import {enterChatRoom, exitChatRoom, subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
 import dayjs from "../../utils/dayjs";
 import toast from "react-hot-toast";
+import {fetchInitialViewers, userJoined, userLeft} from "../../store/chatActivitySlice";
 
 const StyledChatRoomBodyWrapper = styled.div`
     flex-grow: 1;
@@ -176,7 +177,6 @@ const ChatMessageOther = ({senderId, senderNickName, message, createdAt, profile
             <div style={{alignSelf: "center"}}>
                 <ParticipantProfileImage src={profileImageUrl}/>
             </div>
-
             <StyledMessageContentWrapper>
                 <StyledUsername>{senderNickName}</StyledUsername>
                 <StyledMessageRow>
@@ -223,21 +223,13 @@ const ChatRoomBody = () => {
     const totalParticipants = Math.max((currentChatRoom?.participants.length ?? 0) - 1, 0);
 
     const loginUserNickname = useSelector((state:RootState) => state.user.nickname) ?? "알수없는 사용자";
-    // 2. 특정 채팅방에 실시간으로 접속해 있는 유저(chatRoomId, userId, nickname)
-    const [currentParticipants, setCurrentParticipants] = useState<CurrentParticipants[]>([]);
-    // 3. 각 유저의 마지막 접속 시간을 관리하는 상태
+     // 3. 각 유저의 마지막 접속 시간을 관리하는 상태
     const [lastReadAtList, setLastReadAtList] = useState<LastReadAtEntry[]>([]);
     //TODO: 적절한 null 처리를 어떻게 할지 고민해보기.
     const chatRoomId = currentChatRoom?.chatRoomId ?? null;
     // 채팅창 스크롤바 위치를 위한 ref
     const chatRoomBodyRef = useRef<HTMLDivElement>(null);
-    //TODO: 실시간성을 위한 추가
-    const currentParticipantsRef = useRef<CurrentParticipants[]>([]);
-
-    // state가 바뀔 때마다 ref도 업데이트
-    useEffect(() => {
-        currentParticipantsRef.current = currentParticipants;
-    }, [currentParticipants]);
+    const dispatch: AppDispatch = useDispatch();
 
     const formatDate = (dateString: string) => {
         return dayjs(dateString).format('YYYY년 M월 D일');
@@ -246,8 +238,6 @@ const ChatRoomBody = () => {
     useEffect(() => {
         if (!chatRoomId) {
             setMessages([]);
-            setCurrentParticipants([]);
-            currentParticipantsRef.current = [];
             return;
         }
         let chatSubscription: any = null;
@@ -262,11 +252,7 @@ const ChatRoomBody = () => {
 
         // 채팅방 구독로직.
         if(chatRoomId) {
-            const fetchParticipantsAndLastReadAtList = async () => {
-                const onlineParticipants = await getOnlineParticipants(chatRoomId);
-                console.log("유저 목록:", onlineParticipants);
-                setCurrentParticipants(onlineParticipants);
-                currentParticipantsRef.current = onlineParticipants; // ref 값도 갱신
+            const fetchLastReadAtList = async () => {
                 const lastReadAtList = await getLastReadAtList(chatRoomId);
                 setLastReadAtList(lastReadAtList);
                 console.log("유저별 마지막 입장 시간 {}", lastReadAtList);
@@ -274,7 +260,8 @@ const ChatRoomBody = () => {
 
             // 입장 알림 전송
             enterChatRoom(chatRoomId, loginUserNickname);
-            fetchParticipantsAndLastReadAtList();
+            fetchLastReadAtList();
+            dispatch(fetchInitialViewers(chatRoomId));
 
             chatSubscription = subscribeToChatRoom(chatRoomId, (receivedMessage) => {
                 console.log("전달된 메세지: ", receivedMessage);
@@ -283,38 +270,22 @@ const ChatRoomBody = () => {
                 if (receivedMessage.status === 'ENTERED') {
                     // 접속자 목록을 관리하는 상태가 있다면 여기서 추가/제거
                     toast.success(receivedMessage.nickname + "님이 입장했습니다.");
-                    setCurrentParticipants(prev => {
-                        // 이미 존재하는지 체크
-                        const exists = prev.find(p => p.userId === receivedMessage.userId);
-                        if (exists) return prev; // 중복 시 이전 상태 유지
-                        // 없으면 새 유저 추가
-                        const newParticipants = [...prev, {
-                            chatRoomId: receivedMessage.chatRoomId,
+                    dispatch(userJoined({
+                        chatRoomId: receivedMessage.chatRoomId,
+                        user: {
                             userId: receivedMessage.userId,
                             nickname: receivedMessage.nickname,
                             enteredAt: receivedMessage.enteredAt,
-                        }];
-                        currentParticipantsRef.current = newParticipants;
-                        // 메시지 unreadCount 재계산
-                        setMessages(prevMessages => {
-                            return prevMessages.map(msg => {
-                                const defaultUnreadCount = totalParticipants;
-                                const currentlyOnline = currentParticipantsRef.current.filter(p => p.userId !== msg.senderId);
-                                const finalUnread = Math.max(defaultUnreadCount - currentlyOnline.length, 0);
-                                return { ...msg, unreadCount: finalUnread };
-                            });
-                        });
-                        return newParticipants;
-                    });
+                        }
+                    }))
                     return;
                 }
                 if (receivedMessage.status === 'EXITED') {
                     toast.success(`${receivedMessage.nickname}님이 퇴장했습니다.`);
-                    setCurrentParticipants(prev => {
-                        const updated = prev.filter(p => p.userId !== receivedMessage.userId);
-                        currentParticipantsRef.current = updated; // 💡 ref 값도 같이 갱신
-                        return updated;
-                    });
+                    dispatch(userLeft({
+                        chatRoomId: receivedMessage.chatRoomId,
+                        userId: receivedMessage.userId
+                    }));
                     return;
                 }
                 setMessages((prevMessages) =>{
@@ -325,10 +296,8 @@ const ChatRoomBody = () => {
                     if (isAlreadyExists) {
                         return prevMessages;
                     }
-                    const defaultUnreadCount = totalParticipants;
-                    const currentlyOnline = currentParticipantsRef.current.filter(p => p.userId !== receivedMessage.senderId);
-                    const finalUnread = Math.max(defaultUnreadCount - currentlyOnline.length, 0);
-                    return [...prevMessages, {...receivedMessage, unreadCount: finalUnread}]});
+                    return [...prevMessages, receivedMessage]
+                });
             })
         }
         return () => {

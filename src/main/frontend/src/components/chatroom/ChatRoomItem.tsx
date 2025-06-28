@@ -51,6 +51,9 @@ const ChatRoomName = styled.span`
     font-size: 16px;
     font-weight: bold;
     color: #333;
+    white-space: nowrap;      /* 1. 텍스트가 길어져도 줄바꿈을 하지 않음 */
+    overflow: hidden;         /* 2. 부모 요소의 너비를 넘어가는 부분을 숨김 */
+    text-overflow: ellipsis;  /* 3. 숨겨진 텍스트가 있다는 것을 ... 으로 표시 */
 `;
 
 const LastMessage = styled.span`

@@ -59,6 +59,7 @@ public class ChatRoomService {
         // 1. 로그인한 유저의 채팅방 목록 조회
         List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
 
+
         // 2. 채팅방 ID 기준으로 데이터 그룹화
         Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
 
@@ -120,6 +121,7 @@ public class ChatRoomService {
         log.info("최종 반환 값: {}", uniqueChatRooms);
         return uniqueChatRooms;
     }
+
     @Transactional(readOnly = true)
     public DirectChatRoomResponse findDirectChatRoom(Long myId, Long friendId) {
         log.info("넘어 온 값 조회: {}, {}", myId, friendId);

@@ -220,7 +220,8 @@ const ChatRoomBody = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const currentChatRoom = useSelector((state: RootState) => state.chatRooms.currentChatRoom);
     // 1. 특정 채팅방에 참여한 유저 정보(로그인한 본인 제외) 예: 2명이 존재하는 채팅방 -> 나 빼고 1명의 데이터만 존재
-    const totalParticipants = currentChatRoom?.participants.length ?? 0; //todo: -1 해줘야함.
+    const totalParticipants = Math.max((currentChatRoom?.participants.length ?? 0) - 1, 0);
+
     const loginUserNickname = useSelector((state:RootState) => state.user.nickname) ?? "알수없는 사용자";
     // 2. 특정 채팅방에 실시간으로 접속해 있는 유저(chatRoomId, userId, nickname)
     const [currentParticipants, setCurrentParticipants] = useState<CurrentParticipants[]>([]);

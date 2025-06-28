@@ -107,8 +107,7 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
             .map(participant => participant.nickname)
             .join(", ");
 
-    //TODO: 추후에 채팅방 이미지 추출 방식 변경하기.
-    const chatRoomImageUrl = chatRoom.participants[0].profileImageUrl;
+    const chatRoomImageUrl = otherParticipants[0].profileImageUrl;
 
     const displayLastMessage = chatRoom.lastMessage && chatRoom.lastMessage.length > maxLength
         ? `${chatRoom.lastMessage.slice(0, maxLength)}...`

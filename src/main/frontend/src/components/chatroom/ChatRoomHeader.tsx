@@ -179,12 +179,13 @@ const ChatRoomParticipantItem = () => {
     const currentChatRoom = useSelector((state: RootState) => state.chatRooms.currentChatRoom);
     const currentParticipants = currentChatRoom?.participants;
     const totalCount = currentParticipants?.length;
-    const chatRoomName = currentChatRoom?.chatRoomName
-        ?? currentChatRoom?.participants?.map(p => p.nickname).join(", ")
-        ?? "알 수 없음";
+
     const loginUserId = useSelector((state: RootState) => state.user.id);
-    const imageUrl = currentChatRoom?.chatRoomImageUrl || currentChatRoom?.participants[0].profileImageUrl || "알수 없음";
-    console.log("Redux에서 가져온 chatRoomId:", currentChatRoomId);
+    const otherParticipants = currentChatRoom?.participants.filter(participant => participant.userId !== loginUserId);
+    const chatRoomName = currentChatRoom?.chatRoomName
+        ?? otherParticipants?.map(p => p.nickname).join(", ")
+        ?? "알 수 없음";
+    const imageUrl = currentChatRoom?.chatRoomImageUrl || otherParticipants?.[0].profileImageUrl || "알수 없음";
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
     // 팝오버와 버튼 영역을 참조할 Ref 생성
     const popoverRef = useRef<HTMLDivElement>(null);

@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {RootState} from "./index";
 import {getOnlineParticipants} from "../services/chat-service";
 
-interface ViewerProfile {
+export interface ViewerProfile {
     userId: number;
     nickname: string;
     enteredAt: string;

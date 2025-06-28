@@ -94,14 +94,6 @@ public class ChatMessageService {
             if (userProfile == null) {
                 throw new UserProfileNotFoundException();
             }
-
-            // 6-1. unreadCount 계산
-//            int unreadCount = (int) lastReadMap.entrySet().stream()
-//                    .filter(entry -> !entry.getKey().equals(message.getSenderId())) // 보낸 사람 제외
-//                    .filter(entry -> !entry.getKey().equals(loginUserId))            // 로그인 유저 제외
-//                    .filter(entry -> entry.getValue().isBefore(message.getCreatedAt()))
-//                    .count();
-
             int unreadCount = (int) participantIds.stream()
                     .filter(userId -> !userId.equals(message.getSenderId()))
                     .filter(userId -> !userId.equals(loginUserId))

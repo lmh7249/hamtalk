@@ -2,7 +2,7 @@ import styled from "styled-components";
 import {ParticipantProfileImage} from "./ChatRoomHeader";
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store";
+import {AppDispatch, RootState, store} from "../../store";
 import {
     getChatMessageList, getLastReadAtList,
     getOnlineParticipants,
@@ -398,16 +398,21 @@ const ChatRoomBody = () => {
 
         // --- 4. 클린업 함수 (컴포넌트 언마운트 또는 chatRoomId 변경 시) ---
         return () => {
+            const isLoggingOut = store.getState().user.isLoggingOut;
             if (chatSubscription) {
                 unsubscribeFromChatRoom(chatSubscription);
             }
-            exitChatRoom(chatRoomId, loginUserNickname);
-            notifyEnterChatRoom(chatRoomId)
-            if (chatRoomId) {
+            // "로그아웃 중이 아닐 때만" 퇴장 관련 로직을 실행
+            if (!isLoggingOut && chatRoomId && loginUserNickname) {
+                console.log(`[클린업] 로그아웃 중이 아니므로, ${chatRoomId}번 방의 퇴장 처리를 실행합니다.`);
+                exitChatRoom(chatRoomId, loginUserNickname);
+                notifyEnterChatRoom(chatRoomId);
                 dispatch(clearRoomViewers({ chatRoomId }));
+            } else if (isLoggingOut) {
+                console.log("[클린업] 로그아웃이 진행 중이므로, 퇴장 처리를 건너뜁니다.");
             }
         };
-    }, [chatRoomId, dispatch]);
+    }, [chatRoomId, dispatch, loginUserNickname]);
 
     // 내가 보낸 메시지일 경우에만 스크롤을 하단으로 이동
     useEffect(() => {

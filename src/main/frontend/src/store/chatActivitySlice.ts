@@ -37,9 +37,7 @@ export const fetchInitialViewers = createAsyncThunk(
             // 실패 시, 에러 메시지를 담아서 반환하면 'rejected' 액션의 payload가 됨
             return thunkAPI.rejectWithValue(error.message);
         }
-
     }
-
 )
 
 const chatActivitySlice = createSlice({
@@ -67,6 +65,11 @@ const chatActivitySlice = createSlice({
         clearRoomViewers: (state, action: PayloadAction<{ chatRoomId: number }>) => {
             delete state.viewersByChatRoomId[action.payload.chatRoomId];
         },
+        resetChatActivity: (state) => {
+            // 이 슬라이스의 모든 상태를 initialState로 되돌린다.
+            // viewersByChatRoomId 객체도 깨끗하게 비워진다.
+            return initialState;
+        },
     },
 
     // 비동기 액션의 결과를 처리하는 부분
@@ -93,7 +96,7 @@ const chatActivitySlice = createSlice({
     }
 })
 
-export const { userJoined, userLeft, clearRoomViewers } = chatActivitySlice.actions;
+export const { userJoined, userLeft, clearRoomViewers, resetChatActivity } = chatActivitySlice.actions;
 // --- Selector export (컴포넌트에서 편하게 쓰기 위함) ---
 export const selectViewersByRoomId = (state: RootState, chatRoomId: number) =>
     state.chatActivity.viewersByChatRoomId[chatRoomId] || [];

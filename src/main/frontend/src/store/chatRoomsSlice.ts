@@ -24,7 +24,6 @@ export interface CurrentChatRoom {
     chatRoomImageUrl: string | null;
 }
 
-
 interface ChatRoomsState {
     // 2열 채팅방 리스트에서 활용
     chatRooms: ChatRoom[];
@@ -81,9 +80,15 @@ const chatRoomsSlice = createSlice({
         },
         setCurrentChatRoom: (state, action: PayloadAction<CurrentChatRoom>) => {
             state.currentChatRoom = action.payload;
-        }
+        },
+        resetChatState: (state) => {
+            state.chatRooms = [];
+            state.currentChatRoom = null;
+            state.loading = false;
+            state.error = null;
+        },
     },
 });
 
-export const {setChatRooms, setLoading, setError, addChatRoom,updateLastMessage, setCurrentChatRoom} = chatRoomsSlice.actions;
+export const {setChatRooms, setLoading, setError, addChatRoom,updateLastMessage, setCurrentChatRoom, resetChatState} = chatRoomsSlice.actions;
 export default chatRoomsSlice.reducer;

@@ -12,8 +12,8 @@ import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
 import {closeDetail} from "../../store/contentDetailSlice";
 import {useUnreadTotal} from "../../hooks/useUnreadTotal";
-import {exitChatRoom} from "../../utils/websocketUtil";
-import {notifyEnterChatRoom} from "../../services/chat-service";
+import {publishExitMessage} from "../../utils/websocketUtil";
+import {updateLastReadAt} from "../../services/chat-service";
 import {resetChatState} from "../../store/chatRoomsSlice";
 import {clearRoomViewers, resetChatActivity} from "../../store/chatActivitySlice";
 import {logout, logoutStart} from "../../store/userSlice";
@@ -101,17 +101,11 @@ const LeftSidebarMenu = () => {
             dispatch(logoutStart());
             if (chatRoomId && loginUserNickname) {
                 console.log("로그아웃 전, 채팅방 퇴장 처리를 먼저 실행합니다.");
-                exitChatRoom(chatRoomId, loginUserNickname); // 웹소켓 메시지 전송 (fire-and-forget)
-                await notifyEnterChatRoom(chatRoomId); // 퇴장 시간 기록 API 호출
+                publishExitMessage(chatRoomId, loginUserNickname); // 웹소켓 메시지 전송
+                await updateLastReadAt(chatRoomId); // 퇴장 시간 기록 API 호출
             }
             const isSuccess = await userLogout();
             if (isSuccess) {
-                // [6. 로컬 정리] 서버 로그아웃까지 성공해야 비로소 로컬의 정보를 정리한다.
-                // dispatch(logout()); // Redux의 user 상태를 완전히 초기화 (isLoggingOut도 false로)
-                // dispatch(resetChatState()); // 채팅방 관련 상태도 초기화
-                // dispatch(resetChatActivity());
-                // dispatch(closeDetail());
-
                 toast.success("정상적으로 로그아웃 되었습니다.", {
                     id: loadingToast,
                     position: "bottom-left",

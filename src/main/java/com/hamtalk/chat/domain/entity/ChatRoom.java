@@ -21,5 +21,4 @@ public class ChatRoom extends BaseEntity{
     private int chatRoomTypeId;
     private String name;
     private LocalDateTime deletedAt;
-
 }

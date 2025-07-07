@@ -5,7 +5,7 @@ import ImageUploadIcon from "../../assets/icons/image-upload.svg";
 import IconButton from "../common/IconButton";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {sendChatMessageViaSocket, subscribeToChatRoom} from "../../utils/websocketUtil";
+import {sendChatMessageViaSocket} from "../../utils/websocketUtil";
 import {createDirectChatRoom} from "../../services/chat-service";
 import {openChatRoom} from "../../store/contentDetailSlice";
 import {addChatRoom, CurrentChatRoom, setCurrentChatRoom, updateLastMessage} from "../../store/chatRoomsSlice";

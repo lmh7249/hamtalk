@@ -6,10 +6,15 @@ import {AppDispatch, RootState, store} from "../../store";
 import {
     getChatMessageList, getLastReadAtList,
     getOnlineParticipants,
-    notifyEnterChatRoom
+    updateLastReadAt
 } from "../../services/chat-service";
 import {formatTime} from "../../utils/formatTime";
-import {enterChatRoom, exitChatRoom, subscribeToChatRoom, unsubscribeFromChatRoom} from "../../utils/websocketUtil";
+import {
+    publishEnterMessage,
+    publishExitMessage,
+    subscribeToChatRoom,
+    unsubscribeFromChatRoom
+} from "../../utils/websocketUtil";
 import dayjs from "../../utils/dayjs";
 import toast from "react-hot-toast";
 import {
@@ -262,10 +267,18 @@ const ChatRoomBody = () => {
     const loginUserIdRef = useRef<number | null>(null); // 로그인 아이디도 Ref로 관리
 
 // state가 변경될 때마다 ref의 current 값을 업데이트
-    useEffect(() => { messagesRef.current = messages; }, [messages]);
-    useEffect(() => { lastReadAtMapRef.current = lastReadAtMap; }, [lastReadAtMap]);
-    useEffect(() => { participantsRef.current = participants; }, [participants]);
-    useEffect(() => { viewersRef.current = currentViewers; }, [currentViewers]);
+    useEffect(() => {
+        messagesRef.current = messages;
+    }, [messages]);
+    useEffect(() => {
+        lastReadAtMapRef.current = lastReadAtMap;
+    }, [lastReadAtMap]);
+    useEffect(() => {
+        participantsRef.current = participants;
+    }, [participants]);
+    useEffect(() => {
+        viewersRef.current = currentViewers;
+    }, [currentViewers]);
 
     const formatDate = (dateString: string) => {
         return dayjs(dateString).format('YYYY년 M월 D일');
@@ -277,51 +290,8 @@ const ChatRoomBody = () => {
             setMessages([]);
             return;
         }
-        let chatSubscription: any = null;
 
-        // --- 1. 채팅방 초기화 함수 ---
-        const initializeChatRoom = async () => {
-            // 이전 채팅방 데이터 초기화
-            setMessages([]);
-            await notifyEnterChatRoom(chatRoomId);
-
-            const [response, lastReadAtList, initialViewersResult] = await Promise.all([
-                getChatMessageList(chatRoomId),
-                getLastReadAtList(chatRoomId),
-                dispatch(fetchInitialViewers(chatRoomId)).unwrap() // unwrap()으로 Promise의 payload를 기다립니다.
-            ]);
-
-            const initialViewers: ViewerProfile[] = initialViewersResult.viewers;
-
-            const loginUserId = response.loginUserId;
-            loginUserIdRef.current = loginUserId;
-
-            const map = lastReadAtList.reduce((acc: LastReadAtMap, item: LastReadAtEntry) => { // acc, item 타입 명시
-                acc[item.userId] = item.lastReadAt;
-                return acc;
-            }, {} as LastReadAtMap);
-            setLastReadAtMap(map);
-
-            // '실시간 접속자' 정보를 이용해 서버가 준 unreadCount를 최종 보정
-            const correctedMessages = response.messages.map((msg: ChatMessage) => { // 💡 [TS 에러 수정 2] msg 타입 명시
-                let correctedCount = msg.unreadCount;
-
-                for (const viewer of initialViewers) {
-                    if (viewer.userId === msg.senderId || viewer.userId === loginUserId) {
-                        continue;
-                    }
-
-                    const viewerLastReadAt = map[viewer.userId];
-
-                    if (viewerLastReadAt && new Date(viewerLastReadAt) < new Date(msg.createdAt) && correctedCount > 0) {
-                        correctedCount--;
-                    }
-                }
-                return { ...msg, unreadCount: correctedCount };
-            });
-            setMessages(correctedMessages);
-        };
-        // --- 2. 웹소켓 메시지 처리 핸들러 ---
+        // --- 1. 웹소켓 메시지 처리 핸들러 ---
         const handleReceivedMessage = (receivedMessage: any) => {
             // 메시지 타입에 따라 분기 처리
             // --- 로직 A: 다른 유저 입장 ---
@@ -335,7 +305,6 @@ const ChatRoomBody = () => {
                         enteredAt: receivedMessage.updatedLastReadAt,
                     }
                 }))
-
                 // '따라잡기' unreadCount 업데이트
                 const newViewerId = receivedMessage.userId;
                 const userLastReadAt = lastReadAtMapRef.current[newViewerId];
@@ -344,7 +313,7 @@ const ChatRoomBody = () => {
                     setMessages(prevMessages =>
                         prevMessages.map(msg =>
                             new Date(msg.createdAt) > new Date(userLastReadAt) && msg.unreadCount > 0
-                                ? { ...msg, unreadCount: Math.max(0, msg.unreadCount - 1)}
+                                ? {...msg, unreadCount: Math.max(0, msg.unreadCount - 1)}
                                 : msg
                         )
                     );
@@ -358,7 +327,6 @@ const ChatRoomBody = () => {
                     chatRoomId: receivedMessage.chatRoomId,
                     userId: receivedMessage.userId
                 }));
-
                 // **[수정] 퇴장한 유저의 lastReadAt을 클라이언트 state에서도 즉시 업데이트**
                 // 서버의 EXITED 메시지에 'updatedLastReadAt' 필드가 있다면 그것을 사용하고,
                 // 없다면 클라이언트의 현재 시간을 사용합니다. 서버 시간을 사용하는 것이 더 정확
@@ -380,7 +348,6 @@ const ChatRoomBody = () => {
                 // 새 메시지 unreadCount 계산 (우리 원칙!)
                 // 보낸 사람도 접속자에 포함되므로, (총인원 - 현재 접속자 수)로 간단히 계산
                 const calculatedUnreadCount = Math.max(0, totalParticipants - currentViewersCount);
-
                 const newMessage = {
                     ...receivedMessage,
                     unreadCount: calculatedUnreadCount,
@@ -389,25 +356,68 @@ const ChatRoomBody = () => {
             });
         };
 
+        // 구독 성공 후 실행될 메인 로직을 담을 함수.
+        const setupAndEnterChatRoom = async () => {
+            console.log(`[${chatRoomId}번 방] 구독 성공! 초기화 로직을 시작합니다.`);
+            setMessages([]); // 채팅 목록 초기화
+            // ✅ 1. '쓰기' 작업을 먼저 실행한다.
+            // 이 두 작업이 완료되어야 다음 '읽기' 작업들이 정확한 데이터를 가져올 수 있다.
+            console.log("1단계: 마지막 읽은 시간 업데이트 & 입장 메시지 전송");
+            await Promise.all([
+                updateLastReadAt(chatRoomId),
+                publishEnterMessage(chatRoomId, loginUserNickname)
+            ]);
+            console.log("2단계: 채팅 목록, 최종 읽은 시간 목록, 현재 접속자 목록 가져오기");
+            const [response, lastReadAtList, initialViewersResult] = await Promise.all([
+                getChatMessageList(chatRoomId),
+                getLastReadAtList(chatRoomId),
+                dispatch(fetchInitialViewers(chatRoomId)).unwrap()
+            ]);
+// 3단계: 가져온 데이터로 상태 업데이트 (unreadCount 로직 등 기존 로직 유지)
+            console.log("3단계: 가져온 데이터로 화면 상태 업데이트");
+            const initialViewers: ViewerProfile[] = initialViewersResult.viewers;
+            console.log("보고있는 사람 리스트: {}", initialViewers);
+
+            const loginUserId = response.loginUserId;
+            loginUserIdRef.current = loginUserId;
+
+            const map = lastReadAtList.reduce((acc: LastReadAtMap, item: LastReadAtEntry) => {
+                acc[item.userId] = item.lastReadAt;
+                return acc;
+            }, {} as LastReadAtMap);
+            setLastReadAtMap(map);
+
+            const correctedMessages = response.messages.map((msg: ChatMessage) => {
+                let correctedCount = msg.unreadCount;
+                for (const viewer of initialViewers) {
+                    if (viewer.userId === msg.senderId || viewer.userId === loginUserId) {
+                        continue;
+                    }
+                    const viewerLastReadAt = map[viewer.userId];
+                    if (viewerLastReadAt && new Date(viewerLastReadAt) < new Date(msg.createdAt) && correctedCount > 0) {
+                        correctedCount--;
+                    }
+                }
+                return {...msg, unreadCount: correctedCount};
+            });
+            setMessages(correctedMessages);
+
+        };
         // --- 3. 실행 로직 ---
-        initializeChatRoom().then(() => {
-            // 초기화가 끝난 후, 알림 전송 및 구독 시작
-            enterChatRoom(chatRoomId, loginUserNickname);
-            chatSubscription = subscribeToChatRoom(chatRoomId, handleReceivedMessage);
-        });
+        subscribeToChatRoom(chatRoomId, handleReceivedMessage, setupAndEnterChatRoom);
 
         // --- 4. 클린업 함수 (컴포넌트 언마운트 또는 chatRoomId 변경 시) ---
         return () => {
             const isLoggingOut = store.getState().user.isLoggingOut;
-            if (chatSubscription) {
-                unsubscribeFromChatRoom(chatSubscription);
+            if (chatRoomId) {
+                unsubscribeFromChatRoom(chatRoomId);
             }
             // "로그아웃 중이 아닐 때만" 퇴장 관련 로직을 실행
             if (!isLoggingOut && chatRoomId && loginUserNickname) {
                 console.log(`[클린업] 로그아웃 중이 아니므로, ${chatRoomId}번 방의 퇴장 처리를 실행합니다.`);
-                exitChatRoom(chatRoomId, loginUserNickname);
-                notifyEnterChatRoom(chatRoomId);
-                dispatch(clearRoomViewers({ chatRoomId }));
+                publishExitMessage(chatRoomId, loginUserNickname);
+                updateLastReadAt(chatRoomId);
+                dispatch(clearRoomViewers({chatRoomId}));
             } else if (isLoggingOut) {
                 console.log("[클린업] 로그아웃이 진행 중이므로, 퇴장 처리를 건너뜁니다.");
             }

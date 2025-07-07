@@ -46,8 +46,8 @@ public class ChatWebSocketController {
         log.info("User ID: {}", userId);
         ChatMessageResponse chatMessageResponse = chatMessageService.saveChatMessage(userId, chatRoomId, chatMessageRequest);
         // 채팅방 Redis 채널 구독 (최초 메시지 전송 시)
-        redisService.subscribeChatRoom(chatRoomId);
-        redisService.subscribeGlobalNotification(chatMessageRequest.getReceiverId());
+//        redisService.subscribeChatRoom(chatRoomId);
+//        redisService.subscribeGlobalNotification(chatMessageRequest.getReceiverId());
         // Redis 발행
         // 1. 채팅방 채널에 발행 → 채팅방 열려있으면 실시간 메시지 수신
         redisPublisher.publish("chatRoom:" +chatRoomId, chatMessageResponse);
@@ -67,6 +67,7 @@ public class ChatWebSocketController {
         String nickname = request.getNickname();
         // 입장한 유저의 id와, nickname을 redis에 저장 -> 현재 채팅방 접속자 리스트를 뽑기 위해 필요.
         LocalDateTime now = LocalDateTime.now();
+//        redisService.subscribeChatRoom(chatRoomId);
         redisService.saveUserToChatRoom(chatRoomId, userId, nickname, now);
         ChatUserStatusResponse enterMessage = new ChatUserStatusResponse(chatRoomId, userId, nickname, ChatParticipantStatus.ENTERED, now);
         redisPublisher.publish("chatRoom:" + chatRoomId, enterMessage);

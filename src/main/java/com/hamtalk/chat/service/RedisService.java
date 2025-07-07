@@ -1,6 +1,5 @@
 package com.hamtalk.chat.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hamtalk.chat.config.jwt.JwtProperties;
 import com.hamtalk.chat.model.request.ChatParticipantRedisRequest;
@@ -9,17 +8,10 @@ import com.hamtalk.common.constant.EmailConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -32,9 +24,9 @@ public class RedisService {
     // 순수 문자열 저장을 위한 템플릿, boot에서 기본으로 만들어줘서 RedisConfig에 설정 안해줘도 됨.
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final JwtProperties jwtProperties;
-    private final RedisMessageListenerContainer container;
-    private final MessageListenerAdapter listenerAdapter;
-    private final Set<String> subscribedChannels = ConcurrentHashMap.newKeySet();
+//    private final RedisMessageListenerContainer container;
+//    private final MessageListenerAdapter listenerAdapter;
+//    private final Set<String> subscribedChannels = ConcurrentHashMap.newKeySet();
     private final ObjectMapper objectMapper;
 
     // Hash 형식으로 값 저장
@@ -71,24 +63,6 @@ public class RedisService {
         stringRedisTemplate.delete(key);
     }
 
-    public void subscribeChatRoom(Long chatRoomId) {
-        String topicName = "chatRoom:" + chatRoomId;
-        // 중복 구독 방지
-        if (!subscribedChannels.contains(topicName)) {
-            // listenerAdapter를 통해 메시지 수신 처리 -> RedisSubscriber가 콜백됨.
-            container.addMessageListener(listenerAdapter, new ChannelTopic(topicName));
-            subscribedChannels.add(topicName);
-        }
-    }
-
-    public void subscribeGlobalNotification(Long userId) {
-        String topicName = "userNotify:" + userId;
-        // 중복 구독 방지
-        if (!subscribedChannels.contains(topicName)) {
-            container.addMessageListener(listenerAdapter, new ChannelTopic(topicName));
-            subscribedChannels.add(topicName);
-        }
-    }
 
     public void saveUserToChatRoom(Long chatRoomId, Long userId, String nickname, LocalDateTime now) {
         String key = "chatroom:users:" + chatRoomId;

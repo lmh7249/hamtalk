@@ -37,8 +37,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // STOMP 레벨의 하트비트를 10초 간격으로 사용하도록 명시적으로 설정(yml 파일)
         registry.enableSimpleBroker("/topic")
                 .setTaskScheduler(taskScheduler())
-                .setHeartbeatValue(new long[]{heartbeat, heartbeat});
-        ; // 메세지 받을 경로(구독), 서버 -> 클라이언트
+                .setHeartbeatValue(new long[]{heartbeat, heartbeat}); // 메세지 받을 경로(구독), 서버 -> 클라이언트
         // 예: convertAndSend("/topic/chat/1", message) -> 구독중인 모든 클라이언트에게 전송.
         registry.setApplicationDestinationPrefixes("/app"); // 클라이언트 -> 서버(발행)
     }
@@ -51,14 +50,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-
         // 하트비트 전용 스레드 풀 크기 설정
         scheduler.setPoolSize(1);
         // 스레드 이름 접두사 설정
         scheduler.setThreadNamePrefix("websocket-heartbeat-scheduler-");
         // Spring 컨텍스트가 종료될 때 스케줄러도 함께 종료되도록 설정
         scheduler.setDaemon(true);
-
         return scheduler;
     }
 

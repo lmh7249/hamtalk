@@ -3,7 +3,7 @@ import {
     findDirectChatRoomApi,
     getChatMessageListApi, getLastReadAtListApi,
     getMyChatRoomListApi, getOnlineParticipantsApi, getUnreadMessageCountApi,
-    notifyEnterChatRoomApi
+    updateLastReadAtApi
 } from "../api/chat";
 
 export const getMyChatRoomList = async () => {
@@ -33,9 +33,9 @@ export const createDirectChatRoom = async (friendId: number) =>{
     return response.data;
 }
 
-//TODO: API 데이터 반환 타입 결정하기, 해당 함수는 입장 + 퇴장 모두 사용 중. 방법 생각하기.
-export const notifyEnterChatRoom = async (chatRoomId: number) => {
-    const response = await notifyEnterChatRoomApi(chatRoomId);
+// TODO: 마지막 입퇴장 시간 기록(mongoDB)
+export const updateLastReadAt = async (chatRoomId: number) => {
+    const response = await updateLastReadAtApi(chatRoomId);
 }
 
 export const getUnreadMessageCount = async () => {

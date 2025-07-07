@@ -49,7 +49,7 @@ export const createDirectChatRoomApi = async (friendId: number) => {
 };
 
 // 채팅방 입장 시간을 저장하는 api
-export const notifyEnterChatRoomApi = async (chatRoomId: number) => {
+export const updateLastReadAtApi = async (chatRoomId: number) => {
     const response = await customFetch(`/api/chat-rooms/enter/${chatRoomId}`, {
         method: "post",
     });

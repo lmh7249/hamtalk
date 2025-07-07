@@ -4,12 +4,10 @@ import UserInfoText from "./UserInfoText";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {ChatRoomPayload, setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
-import {findDirectChatRoomApi} from "../../api/chat";
+import {openChatRoom, openUserProfile} from "../../store/contentDetailSlice";
 import {findDirectChatRoom} from "../../services/chat-service";
-import {subscribeToChatRoom} from "../../utils/websocketUtil";
-import testImg from "../../assets/images/img.png"
 import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
+import {CurrentChatRoom, setCurrentChatRoom} from "../../store/chatRoomsSlice";
 
 const StyledFriendProfile = styled.div`
     display: flex;
@@ -38,7 +36,7 @@ const ImageWrapper = styled.div`
     border-radius: 50%;
     width: 60px;
     height: 60px;
-    overflow: hidden; 
+    overflow: hidden;
     box-sizing: border-box;
 `;
 
@@ -54,31 +52,56 @@ const FriendItem = ({userId}: FriendProfileProps) => {
     const {data: friends = [], isLoading, error} = useMyFriendsQuery(isFriendsTab);
     //TODO: Map으로 미리 변환해두면 더 빠름 (예: id -> friend)
     const friend = friends.find(friend => friend.toUserId === userId);
+    const myProfile = useSelector((state: RootState) => state.user);
+
     if (!friend) return null;
 
     const handleProfileDoubleClick = async () => {
-        //TODO: profileImageUrl 함께 반환하기.
-        const response = await findDirectChatRoom(userId);
-
-        if (response === undefined || response === null) {
-            const nickname = friend.nickname;
-            dispatch(setChatRoom({userId, nickname}));
+        if (!myProfile.id) {
+            // 내 ID가 null이거나 유효하지 않으면 아무 작업도 하지 않고 함수를 종료
+            console.error("사용자 정보가 올바르지 않아 채팅방을 열 수 없습니다.");
             return;
-               }
-
-        dispatch(setChatRoom({
-            chatRoomId: response.chatRoomId,
-            creatorId: response.creatorId,
-            //TODO: null or undefined일 경우, 오른쪽 값 반환.
-            chatRoomName: response.chatRoomName ?? friend.nickname,
-            friendId: response.friendId,
-            chatRoomImageUrl: friend.profileImageUrl
-        }));
+        }
+        const participantsPayload = [
+            { // 내 정보
+                userId: myProfile.id,
+                nickname: myProfile.nickname ?? '이름없음',
+                profileImageUrl: myProfile.profileImageUrl,
+            },
+            { // 친구 정보
+                userId: friend.toUserId,
+                nickname: friend.nickname ?? '알 수 없는 친구',
+                profileImageUrl: friend.profileImageUrl,
+            }
+        ];
+        const response = await findDirectChatRoom(userId);
+        let chatRoomToSet: CurrentChatRoom;
+        if (response === undefined || response === null) {
+            dispatch(openChatRoom(null));
+            chatRoomToSet = {
+                chatRoomId: null,
+                chatRoomName: friend.nickname,
+                creatorId: null,
+                participants: participantsPayload,
+                chatRoomImageUrl: friend.profileImageUrl,
+            };
+        } else {
+            dispatch(openChatRoom(response.chatRoomId));
+            //TODO: 여기도 dispatch로 이동할 채팅방 데이터 세팅하기.
+            chatRoomToSet = {
+                chatRoomId: response.chatRoomId,
+                chatRoomName: response.chatRoomName,
+                creatorId: response.creatorId,
+                participants: participantsPayload,
+                chatRoomImageUrl: friend.profileImageUrl,
+            };
+        }
+        dispatch(setCurrentChatRoom(chatRoomToSet));
     }
 
     const handleImageClick = (e: React.MouseEvent, userId: number) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
-        dispatch(setUserProfile({userId: userId}));
+        dispatch(openUserProfile(userId));
     }
 
     return (
@@ -86,7 +109,8 @@ const FriendItem = ({userId}: FriendProfileProps) => {
             <ImageWrapper onClick={(e: React.MouseEvent) => handleImageClick(e, userId)}>
                 <StyledImage src={friend.profileImageUrl} alt="유저이미지"/>
             </ImageWrapper>
-            <UserInfoText nickName={friend.nickname} statusMessage={friend.statusMessage} email={friend.email} $isMe={false} statusLength={23}/>
+            <UserInfoText nickName={friend.nickname} statusMessage={friend.statusMessage} email={friend.email}
+                          $isMe={false} statusLength={23}/>
         </StyledFriendProfile>
     )
 }

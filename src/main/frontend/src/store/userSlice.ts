@@ -7,6 +7,7 @@ interface UserState {
     nickname: string | null;
     statusMessage: string | null;
     profileImageUrl: string | null;
+    isLoggingOut: boolean;
 }
 
 const initialState: UserState = {
@@ -16,6 +17,7 @@ const initialState: UserState = {
     nickname: null,
     statusMessage: null,
     profileImageUrl: null,
+    isLoggingOut: false,
 };
 
 interface LoginPayload {
@@ -39,6 +41,9 @@ const userSlice = createSlice({
             state.email = action.payload.email;
             state.roleId = action.payload.roleId;
         },
+        logoutStart: (state) => {
+            state.isLoggingOut = true;
+        },
         logout: (state) => {
             return initialState; // 모두 null 처리해주기.
         },
@@ -53,8 +58,6 @@ const userSlice = createSlice({
         updateStatusMessage: (state, action) => {
             state.statusMessage = action.payload.statusMessage;
         },
-
-
         updateProfile: (state, action: PayloadAction<ProfileUpdatePayload>) => {
             const { nickname, profileImageUrl, statusMessage } = action.payload;
             if (nickname !== undefined) state.nickname = nickname;
@@ -65,5 +68,5 @@ const userSlice = createSlice({
     },
 });
 
-export const {login, logout, updateNickname , updateStatusMessage, updateProfileImageUrl, updateProfile} = userSlice.actions;
+export const {login, logoutStart, logout, updateNickname , updateStatusMessage, updateProfileImageUrl, updateProfile} = userSlice.actions;
 export default userSlice.reducer;

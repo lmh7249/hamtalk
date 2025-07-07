@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React from "react";
-import {setUserProfile} from "../../store/contentDetailSlice";
+import {openUserProfile} from "../../store/contentDetailSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import toast from "react-hot-toast";
@@ -36,7 +36,7 @@ const SettingList = ({openModal} : SettingListProps) => {
             toast.error("내 프로필 불러올 수 없어요. 로그아웃 후, 다시 이용 해주세요.");
             return;
         }
-        dispatch(setUserProfile({userId: userId}));
+        dispatch(openUserProfile(userId));
     }
 
     return (

@@ -277,7 +277,8 @@ interface searchUserProfileData {
 const UserProfileDetail = () => {
     const [searchUserProfile, setSearchUserProfile] = useState<searchUserProfileData>();
     const [isFriend, setIsFriend] = useState<boolean>(false);
-    const searchUserProfileId = useSelector((state: RootState) => state.detailContent.payload?.userId);
+    const detailContent = useSelector((state: RootState) => state.detailContent);
+    const searchUserProfileId = detailContent.type === 'userProfile' ? detailContent.userId : undefined;
     const loginUserId = useSelector((state: RootState) => state.user.id);
     const isMyUserId: boolean = searchUserProfileId === loginUserId;
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -293,6 +294,8 @@ const UserProfileDetail = () => {
     }
 
     useEffect(() => {
+        if(searchUserProfileId === undefined) return;
+
         if (searchUserProfileId > 0) {
             console.log(`searchUserProfileId: ${searchUserProfileId}`);
             // api 호출 함수 설정하기.

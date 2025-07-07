@@ -1,11 +1,13 @@
 package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.domain.entity.ChatReadStatus;
+import com.hamtalk.chat.model.response.ChatRoomLastReadAtResponse;
 import com.hamtalk.chat.repository.ChatReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +23,10 @@ public class ChatReadStatusService {
                         .build());
         chatReadStatus.updateLastReadAt(LocalDateTime.now());
         chatReadStatusRepository.save(chatReadStatus);
+    }
 
+    public List<ChatRoomLastReadAtResponse> getLastReadAtList(Long chatRoomId) {
+        return chatReadStatusRepository.findByChatRoomId(chatRoomId);
     }
 
 }

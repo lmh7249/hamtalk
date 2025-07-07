@@ -59,6 +59,7 @@ public class ChatRoomService {
         // 1. 로그인한 유저의 채팅방 목록 조회
         List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
 
+
         // 2. 채팅방 ID 기준으로 데이터 그룹화
         Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
 
@@ -112,18 +113,15 @@ public class ChatRoomService {
         uniqueChatRooms.sort((a, b) -> {
             LocalDateTime timeA = a.getLastMessageTime();
             LocalDateTime timeB = b.getLastMessageTime();
-
             if (timeA == null && timeB == null) return 0;
             if (timeA == null) return 1;
             if (timeB == null) return -1;
-
             return timeB.compareTo(timeA);
         });
-
-
         log.info("최종 반환 값: {}", uniqueChatRooms);
         return uniqueChatRooms;
     }
+
     @Transactional(readOnly = true)
     public DirectChatRoomResponse findDirectChatRoom(Long myId, Long friendId) {
         log.info("넘어 온 값 조회: {}, {}", myId, friendId);

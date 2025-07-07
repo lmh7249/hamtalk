@@ -7,7 +7,7 @@ import { isValidEmail } from "../../utils/signupValidation";
 import toast from "react-hot-toast";
 import {addFriend} from "../../services/friend-service";
 import {useDispatch, useSelector} from "react-redux";
-import {setUserProfile} from "../../store/contentDetailSlice";
+import {openUserProfile} from "../../store/contentDetailSlice";
 import {useAddFriendMutation} from "../../hooks/useAddFriendMutation";
 
 const Title = styled.h3`
@@ -180,7 +180,7 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
         console.log("유저 프로필 보기 핸들 실행!", userId);
         console.log(userProfileData);
         if(!userProfileData) return;
-        dispatch(setUserProfile({userId: userId}));
+        dispatch(openUserProfile(userId));
         modalClose();
     }
 

@@ -6,6 +6,7 @@ import signupReducer from "../store/signupSlice";
 import friendsReducer from "./friends/friendsSlice";
 import chatRoomsReducer from "./chatRoomsSlice";
 import SearchReducer from "../store/searchSlice";
+import chatActivityReducer from "../store/chatActivitySlice";
 
 
 export const store = configureStore({
@@ -14,10 +15,10 @@ export const store = configureStore({
         user: userReducer,
         detailContent: contentDetailReducer,
         signup: signupReducer,
-        friends: friendsReducer,
+        // friends: friendsReducer,
         chatRooms: chatRoomsReducer,
         search: SearchReducer,
-
+        chatActivity: chatActivityReducer,
     },
 });
 

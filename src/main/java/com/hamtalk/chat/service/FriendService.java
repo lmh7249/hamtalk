@@ -51,5 +51,4 @@ public class FriendService {
         return friendRepository.existsByFromUserIdAndToUserId(fromUserId, toUserId);
     }
 
-
 }

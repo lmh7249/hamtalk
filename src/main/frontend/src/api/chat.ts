@@ -49,7 +49,7 @@ export const createDirectChatRoomApi = async (friendId: number) => {
 };
 
 // 채팅방 입장 시간을 저장하는 api
-export const notifyEnterChatRoomApi = async (chatRoomId: number) => {
+export const updateLastReadAtApi = async (chatRoomId: number) => {
     const response = await customFetch(`/api/chat-rooms/enter/${chatRoomId}`, {
         method: "post",
     });
@@ -58,14 +58,37 @@ export const notifyEnterChatRoomApi = async (chatRoomId: number) => {
     }
 }
 
-export const getUnreadMessageCountApi   = async (chatRoomId: number) => {
-    const response = await customFetch(`/api/chat/rooms/${chatRoomId}/messages/unread-count`, {
+export const getUnreadMessageCountApi = async () => {
+    const response = await customFetch(`/api/chat/rooms/unread-counts`, {
         method:"get",
     })
     if (!response.ok) {
-        throw new Error(`읽지 않은 메시지 수 조회 실패: ${response.status}`);
+        const errorData = await response.json(); // body에 errorMessage 들어있음
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
     }
-
     return await response.json();
+}
 
+
+export const getOnlineParticipantsApi = async (chatRoomId: number) => {
+    const response = await customFetch(`/api/chat-rooms/${chatRoomId}/participants`, {
+        method:"get",
+    })
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
+}
+
+
+export const getLastReadAtListApi = async (chatRoomId: number) => {
+    const response = await customFetch(`/api/chat-rooms/${chatRoomId}/last-read`, {
+        method:"get",
+    })
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
 }

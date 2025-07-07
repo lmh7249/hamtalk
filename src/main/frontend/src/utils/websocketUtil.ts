@@ -13,7 +13,6 @@ let activeChatRoomSubscriptions = new Map<number, { callback: (message: any) => 
 
 // 1. 웹소켓 연결
 export const connectWebSocket = (url: string, token: string | null, userId: number, dispatchChatListUpdate: (notificationData: ChatNotificationPayload) => void) => {
-
     // 만약 이미 stompClient가 존재하고 활성화 상태(connected)라면,
     // 중복으로 연결을 시도하는 것을 막기 위해 함수를 바로 종료한다.
     if (stompClient && stompClient.connected) {

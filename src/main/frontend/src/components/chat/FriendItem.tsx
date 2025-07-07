@@ -4,6 +4,7 @@ import UserInfoText from "./UserInfoText";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
+
 import {openChatRoom, openUserProfile} from "../../store/contentDetailSlice";
 import {findDirectChatRoom} from "../../services/chat-service";
 import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
@@ -53,7 +54,6 @@ const FriendItem = ({userId}: FriendProfileProps) => {
     //TODO: Map으로 미리 변환해두면 더 빠름 (예: id -> friend)
     const friend = friends.find(friend => friend.toUserId === userId);
     const myProfile = useSelector((state: RootState) => state.user);
-
     if (!friend) return null;
 
     const handleProfileDoubleClick = async () => {

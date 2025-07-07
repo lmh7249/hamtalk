@@ -206,7 +206,6 @@ const ChatRoomParticipantItem = () => {
 
         // 원본 배열을 건드리지 않기 위해 복사본 생성!
         const copiedParticipants = [...currentParticipants];
-
         copiedParticipants.sort((a, b) => {
             if (a.userId === loginUserId) return -1; // a가 '나'라면 맨 앞으로
             if (b.userId === loginUserId) return 1;  // b가 '나'라면 맨 앞으로

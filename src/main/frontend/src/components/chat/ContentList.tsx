@@ -13,6 +13,8 @@ import {getMyChatRoomList} from "../../services/chat-service";
 import SettingList from "./SettingList";
 import {setChatRooms} from "../../store/chatRoomsSlice";
 import {setKeyword} from "../../store/searchSlice";
+import {useQuery} from "@tanstack/react-query";
+import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
 
 const StyledContentList = styled.div`
     min-width: 350px;

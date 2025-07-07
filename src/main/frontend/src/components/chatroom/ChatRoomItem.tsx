@@ -1,10 +1,13 @@
 import styled from "styled-components";
 import React from "react";
 import {findDirectChatRoom} from "../../services/chat-service";
-import {setChatRoom, setUserProfile} from "../../store/contentDetailSlice";
+import {openChatRoom, openUserProfile} from "../../store/contentDetailSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {formatLastMessageTime} from "../../utils/formatTime";
 import {RootState} from "../../store";
+import {CurrentChatRoom, setCurrentChatRoom} from "../../store/chatRoomsSlice";
+import {useQueryClient} from "@tanstack/react-query";
+import {UnreadCountType} from "../../hooks/useUnreadCountsQuery";
 
 const StyledChattingRoomItem = styled.div`
     display: flex;
@@ -48,6 +51,9 @@ const ChatRoomName = styled.span`
     font-size: 16px;
     font-weight: bold;
     color: #333;
+    white-space: nowrap;      /* 1. 텍스트가 길어져도 줄바꿈을 하지 않음 */
+    overflow: hidden;         /* 2. 부모 요소의 너비를 넘어가는 부분을 숨김 */
+    text-overflow: ellipsis;  /* 3. 숨겨진 텍스트가 있다는 것을 ... 으로 표시 */
 `;
 
 const LastMessage = styled.span`
@@ -64,11 +70,12 @@ const UnreadCount = styled.span`
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: red;
+    background-color: #ff6b81;
     font-size: 12px;
     font-weight: bold;
     color: white;
-    width: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
 `;
 
@@ -83,63 +90,77 @@ const ImageWrapper = styled.div`
 
 interface ChattingRoomItemProps {
     chatRoomId: number;
+    unreadCount: number;
 }
 
-const ChatRoomItem = ({chatRoomId}: ChattingRoomItemProps) => {
+const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
     const dispatch = useDispatch();
     const chatRoom = useSelector((state: RootState) => state.chatRooms.chatRooms.find(room => room.chatRoomId === chatRoomId));
     const maxLength: number = 14;
-
+    const queryClient = useQueryClient();
+    const loginUserId = useSelector((state:RootState) => state.user.id);
     if (!chatRoom) return null;
+    const otherParticipants = chatRoom.participants.filter(participant => participant.userId !== loginUserId);
 
-    // 채팅방 이름이 설정되어 있으면 그대로 사용하고, 설정되어 있지 않으면 참여자들의 이름을 합침
+    // 채팅방 이름이 설정되어 있으면 그대로 사용하고, 설정되어 있지 않으면 로그인한 유저의 정보만 제외하고 참여자들의 이름을 합침
     const chatRoomName = chatRoom.chatRoomName
-        ? chatRoom.chatRoomName // 채팅방 이름이 설정되어 있으면 그대로 사용
-        : chatRoom.participants.map(participant => participant.nickname).join(", "); // 참여자들 이름 합치기
+        ? chatRoom.chatRoomName
+        : chatRoom.participants
+            .filter(participant => participant.userId !== loginUserId)
+            .map(participant => participant.nickname)
+            .join(", ");
 
-
+    const chatRoomImageUrl = otherParticipants[0].profileImageUrl;
 
     const displayLastMessage = chatRoom.lastMessage && chatRoom.lastMessage.length > maxLength
         ? `${chatRoom.lastMessage.slice(0, maxLength)}...`
         : chatRoom.lastMessage ?? "";
 
     const handleChatRoomDoubleClick = async () => {
-        dispatch(setChatRoom({
-            chatRoomId: chatRoomId,
+        dispatch(openChatRoom(chatRoomId));
+        console.log("채팅방 오픈" + chatRoomId);
+        const currentChatRoom: CurrentChatRoom = {
+            chatRoomId: chatRoom.chatRoomId,
+            chatRoomName: chatRoomName,
             creatorId: chatRoom.creatorId,
-            //TODO: null or undefined일 경우, 오른쪽 값 반환.
-            chatRoomName: chatRoom.chatRoomName,
-            friendId: chatRoom.participants[0].userId,
-            chatRoomImageUrl: chatRoom.participants[0].profileImageUrl,
-        }));
-    }
-    //TODO: userId가 배열로 들어올 때를 대비한 코드가 필요함.
+            participants: chatRoom.participants,
+            chatRoomImageUrl: chatRoomImageUrl,
+        }
+        dispatch(setCurrentChatRoom(currentChatRoom));
+
+        // React Query 캐시에서 해당 채팅방의 unreadCount를 0으로 설정
+        queryClient.setQueryData<UnreadCountType[]>(['unreadCounts'], (old) => {
+            if (!old) return [];
+            return old.map((item) =>
+                item.chatRoomId === chatRoomId
+                    ? { ...item, unreadCount: 0 }
+                    : item
+            );
+        });
+    };
+    //TODO: 나를 제외한 userId 중 첫 번째 유저의 프로필을 보여줌.
     const handleProfileImageClick = (e: React.MouseEvent) => {
         e.stopPropagation(); //TODO: 상위 이벤트 전파 방지(= 이벤트 버블링 방지)
-        // alert(participantIds);
-        dispatch(setUserProfile({userId: chatRoom.participants[0].userId}));
+
+        dispatch(openUserProfile(otherParticipants[0].userId));
     }
 
     return (
-
         <StyledChattingRoomItem
             onDoubleClick={() => handleChatRoomDoubleClick()}>
             <div style={{display: "flex", gap: "10px"}}>
                 <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e)}>
-                    <StyledImage src={chatRoom.participants[0].profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
+                    <StyledImage src={otherParticipants[0].profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
                 </ImageWrapper>
-
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>
                     <LastMessage>{displayLastMessage}</LastMessage>
                 </ChatMainInfo>
             </div>
-
             <MessageMetaInfo>
                 <LastMessageTime> {chatRoom.lastMessageTime ? formatLastMessageTime(chatRoom.lastMessageTime) : ""}</LastMessageTime>
-                {/*{unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}*/}
+                {unreadCount > 0 && <UnreadCount>{unreadCount}</UnreadCount>}
             </MessageMetaInfo>
-
         </StyledChattingRoomItem>
     )
 }

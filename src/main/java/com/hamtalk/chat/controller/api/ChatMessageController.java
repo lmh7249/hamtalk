@@ -3,6 +3,7 @@ package com.hamtalk.chat.controller.api;
 import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
 import com.hamtalk.chat.model.response.ChatRoomMessagesResponse;
+import com.hamtalk.chat.model.response.UnreadMessageCountResponse;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.ChatMessageService;
 import com.hamtalk.common.model.response.ApiResponse;
@@ -14,6 +15,8 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/chat")
@@ -30,14 +33,12 @@ public class ChatMessageController {
         return ResponseEntity.ok(ApiResponse.ok(chatMessageList));
     }
 
-    @GetMapping("/rooms/{chatRoomId}/messages/unread-count")
+    // TODO: 로그인 한 유저가 속한 모든 채팅방의 읽지않은 메세지 수를 반환.
+    @GetMapping("/rooms/unread-counts")
     @Operation(summary = "읽지 않은 메세지 수 조회", description = "로그인 한 유저의 읽지 않은 메세지 수를 반환합니다.")
-    public ResponseEntity<ApiResponse<Long>> getUnreadMessageCount(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @PathVariable Long chatRoomId
-    ) {
-        long unreadCount = chatMessageService.countUnreadMessages(customUserDetails.getId(), chatRoomId);
-        return ResponseEntity.ok(ApiResponse.ok(unreadCount));
+    public ResponseEntity<ApiResponse<List<UnreadMessageCountResponse>>> getUnreadMessageCount(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        List<UnreadMessageCountResponse> unreadCountList = chatMessageService.countUnreadMessages(customUserDetails.getId());
+        return ResponseEntity.ok(ApiResponse.ok(unreadCountList));
     }
 
 

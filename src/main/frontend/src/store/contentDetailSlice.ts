@@ -1,24 +1,12 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
+// 현재 보고있는 3열의 뷰 정보, 뷰를 위한 최소한의 값만 지니고 있어야 함(type, id)
 type ContentDetailType = "empty" | "userProfile" | "chatRoom";
 
 interface ContentDetailState {
     type: ContentDetailType;
-    payload?: any;
-
-}
-
-export interface ChatRoomPayload {
-    chatRoomId: number;
-    creatorId: number;
-    chatRoomName?: string | null;
-    friendId: number;
-    chatRoomImageUrl: string | null;
-}
-
-interface UserProfilePayload {
-    userId: number;
-    nickname: string;
+    userId?: number;  // userProfile 사용
+    chatRoomId?: number | null; // chatRoom 사용
 }
 
 const initialState : ContentDetailState = {
@@ -29,20 +17,21 @@ const contentDetailSlice = createSlice({
     name: "contentDetail",
     initialState,
     reducers: {
-        setEmpty: (state) => {
-            state.type = "empty";
-            state.payload = undefined;
-        },
-        setUserProfile: (state, action: PayloadAction<{userId: number}>) => {
+        openUserProfile: (state, action: PayloadAction<number>) => {
             state.type = "userProfile";
-            state.payload = action.payload;
+            state.userId = action.payload;
         },
-        setChatRoom: (state, action: PayloadAction<ChatRoomPayload | UserProfilePayload>) => {
+        openChatRoom: (state, action: PayloadAction<number|null>) => {
             state.type = "chatRoom";
-            state.payload = action.payload;
+            state.chatRoomId = action.payload;
+        },
+        closeDetail: (state) => {
+            state.type = "empty";
+            state.userId = undefined;
+            state.chatRoomId = undefined;
         },
     },
 });
 
-export const {setEmpty, setUserProfile, setChatRoom} = contentDetailSlice.actions;
+export const {closeDetail, openUserProfile, openChatRoom} = contentDetailSlice.actions;
 export default contentDetailSlice.reducer;

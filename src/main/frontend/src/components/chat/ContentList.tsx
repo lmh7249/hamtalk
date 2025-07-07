@@ -6,13 +6,11 @@ import SearchIcon from "../../assets/icons/search.svg"
 import ChattingRoomList from "../chatroom/ChatRoomList";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {MenuState, MenuType} from "../../store/menuSlice";
-import {useEffect, useState} from "react";
-import {getMyFriendList} from "../../services/friend-service";
+import {MenuType} from "../../store/menuSlice";
+import {useEffect} from "react";
 import {ModalType} from "../../containers/ChatMainContainer";
 import {getMyChatRoomList} from "../../services/chat-service";
 import SettingList from "./SettingList";
-import toast from "react-hot-toast";
 import {setChatRooms} from "../../store/chatRoomsSlice";
 import {setKeyword} from "../../store/searchSlice";
 import {useQuery} from "@tanstack/react-query";
@@ -104,8 +102,6 @@ const ContentList = ({openModal}: ContentListProps) => {
     const isFriendsTab = selectedMenu.key === "friends";
     const isChatsTab = selectedMenu.key === "chats";
     const isSettingsTab = selectedMenu.key === "settings";
-
-
 
     useEffect(() => {
         // 메뉴가 변경 될 때마다 적절한 API 호출

@@ -4,7 +4,7 @@ import {Friend} from "../components/chat/ContentList";
 
 export const getMyFriendList = async (): Promise<Friend[]> => {
     const response = await getMyFriendListApi();
-    
+    console.log("친구리스트 호출!!!");
     if(response.status === "success" && response.data) {
         return response.data;
     }

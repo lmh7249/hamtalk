@@ -71,7 +71,6 @@ public class ChatRoomService {
             });
         }
 
-
         // 4. 채팅방의 타입(1:1/그룹)을 결정하고, ChatRoom 엔티티를 생성하여 DB에 먼저 저장
         int chatRoomTypeId = (userIds.size() == 1) ? ChatRoomType.DIRECT.getCode() : ChatRoomType.GROUP.getCode();
         ChatRoomCreateRequest chatRoomCreateRequest = new ChatRoomCreateRequest(creatorId, chatRoomTypeId);
@@ -85,11 +84,17 @@ public class ChatRoomService {
         // 클라이언트에게 반환할 최종 DTO를 생성
         List<ChatRoomParticipantResponse> participantResponses =
                 userProfileRepository.findParticipantInfoByUserIds(allParticipantIds);
+
+        String initialChatRoomName = determineChatRoomName(creatorId, participantResponses);
+
+        String chatRoomImageUrl = determineChatRoomImageUrl(creatorId, participantResponses);
+
         // 반환타입 객체 세팅, chatRoomName은 기본값 null -> ct쪽에서 처리.
         return ChatRoomCreateResponse.builder()
                 .chatRoomId(newChatRoom.getId())
-                .chatRoomName(newChatRoom.getName())
+                .chatRoomName(initialChatRoomName)
                 .creatorId(creatorId)
+                .chatRoomImageUrl(chatRoomImageUrl)
                 .participants(participantResponses)
                 .build();
     }
@@ -99,7 +104,6 @@ public class ChatRoomService {
     public List<ChatRoomListResponse> getChatRoomsWithLastMessage(Long userId) {
         // 1. 로그인한 유저의 채팅방 목록 조회
         List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
-
 
         // 2. 채팅방 ID 기준으로 데이터 그룹화
         Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
@@ -173,4 +177,30 @@ public class ChatRoomService {
         return directChatRoomResponse;
     }
 
+    private String determineChatRoomName(Long creatorId, List<ChatRoomParticipantResponse> participants) {
+        // 참여자가 2명 이하일 경우 (1:1 채팅 또는 자기 자신과의 채팅)
+        if (participants.size() <= 2) {
+            // 내가 아닌 다른 사람의 닉네임을 찾아서 채팅방 이름으로 설정
+            return participants.stream()
+                    .filter(p -> !p.getUserId().equals(creatorId))
+                    .findFirst()
+                    .map(ChatRoomParticipantResponse::getNickname)
+                    .orElse("나 자신과의 대화"); // 다른 참여자가 없으면(참여자가 1명)
+        } else { // 그룹 채팅일 경우
+            // 나를 제외한 참여자의 닉네임을 콤마(,)로 이어서 채팅방 이름으로 설정
+            return participants.stream()
+                    .filter(p -> !p.getUserId().equals(creatorId))
+                    .map(ChatRoomParticipantResponse::getNickname)
+                    .collect(Collectors.joining(", "));
+        }
+    }
+
+    private String determineChatRoomImageUrl(Long creatorId, List<ChatRoomParticipantResponse> participants) {
+        // 나를 제외한 다른 참여자 목록을 찾아서
+        return participants.stream()
+                .filter(p -> !p.getUserId().equals(creatorId))
+                .findFirst() // 그 중 첫 번째 사람을 찾고
+                .map(ChatRoomParticipantResponse::getProfileImageUrl) // 그 사람의 프로필 이미지 URL을 반환한다.
+                .orElse(null); // 다른 참여자가 없으면 null 반환
+    }
 }

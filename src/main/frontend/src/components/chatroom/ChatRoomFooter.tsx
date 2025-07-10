@@ -77,25 +77,17 @@ const ChatRoomFooter = () => {
 
             // 2. 신규 채팅방 생성(백엔드에서 해당 채팅방 존재하는지 먼저 확인).
             const response = await createDirectChatRoom(otherParticipantIdList);
-            const newChatRoomId = response.id;
-            const chatRoomName = friend?.nickname ?? null;
 
             const currentChatRoom: CurrentChatRoom = {
-                chatRoomId: newChatRoomId,  // 응답에서 받은 chatRoomId
-                chatRoomName: chatRoomName,
+                chatRoomId: response.id,  // 응답에서 받은 chatRoomId
+                chatRoomName: response.chatRoomName,
                 creatorId: response.creatorId,  // 응답에서 받은 creatorId
-                participants: [
-                    {
-                        userId: friendId,
-                        nickname: friend?.nickname,
-                        profileImageUrl: friend?.profileImageUrl ?? null,
-                    }
-                ],                  // chatRoomName이 있을 수도 없을 수도 있음 response.chatRoomName || null
-                chatRoomImageUrl: friendProfileImageUrl,
+                participants: response.participants,
+                chatRoomImageUrl: response.chatRoomImageUrl,
             };
             console.log("새로 생성된 chatRoomId: ", response);
             // 2. 리덕스에 chatroomid 업데이트하기. -> 이러면 구독이 되고, 렌더링도 되려나?
-            dispatch(openChatRoom(newChatRoomId));
+            dispatch(openChatRoom(response.chatRoomId));
             dispatch(setCurrentChatRoom(currentChatRoom));
             // 3. sendChatMessageViaSocket stomp 함수 호출
             sendChatMessageViaSocket(response.id, message, friendId);
@@ -103,13 +95,9 @@ const ChatRoomFooter = () => {
             //TODO: 채팅방 리스트 실시간 렌더링이 아니라 채팅방 리스트 자체에 넣어줘야 실시간 렌더링이 됨.
             dispatch(addChatRoom({
                 chatRoomId: response.id,
-                chatRoomName: null,
+                chatRoomName: response.chatRoomName,
                 creatorId: response.creatorId,
-                participants: [{
-                    userId: friendId,
-                    nickname: friend?.nickname || "",
-                    profileImageUrl: friend?.profileImageUrl ?? null,
-                }],
+                participants:response.participants,
                 lastMessage: message,
                 lastMessageTime: now,
             }));

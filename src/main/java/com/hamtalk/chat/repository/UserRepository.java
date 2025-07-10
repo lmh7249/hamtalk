@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -23,5 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "from User u join UserProfile up on u.id = up.userId where u.id = :id")
     Optional<UserProfileByIdResponse> findUserProfileById(@Param("id") Long id);
 
+    // 모든 유저가 존재하는지 확인하는 쿼리
+    long countByIdIn(List<Long> ids);
 
 }

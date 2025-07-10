@@ -1,11 +1,7 @@
 package com.hamtalk.chat.controller.api;
 
-import com.hamtalk.chat.domain.entity.ChatRoom;
 import com.hamtalk.chat.model.request.ParticipantUserIdsRequest;
-import com.hamtalk.chat.model.response.ChatRoomLastReadAtResponse;
-import com.hamtalk.chat.model.response.ChatRoomListResponse;
-import com.hamtalk.chat.model.response.DirectChatRoomResponse;
-import com.hamtalk.chat.model.response.OnlineChatParticipantResponse;
+import com.hamtalk.chat.model.response.*;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.ChatReadStatusService;
 import com.hamtalk.chat.service.ChatRoomService;
@@ -29,7 +25,7 @@ public class ChatRoomController {
 
     @PostMapping
     @Operation(summary = "채팅방 생성", description = "첫 메세지를 보낸 유저의 id 값으로 채팅방 생성")
-    public ResponseEntity<ApiResponse<ChatRoom>> createChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ParticipantUserIdsRequest request) {
+    public ResponseEntity<ApiResponse<ChatRoomCreateResponse>> createChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ParticipantUserIdsRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.createChatRoom(customUserDetails.getId(), request.getUserIds())));
     }
 

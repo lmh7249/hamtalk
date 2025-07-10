@@ -28,7 +28,7 @@ export const getChatMessageList = async (chatRoomId: number) => {
 }
 
 
-export const createDirectChatRoom = async (friendId: number) =>{
+export const createDirectChatRoom = async (friendId: number[]) =>{
     const response = await createDirectChatRoomApi(friendId);
     return response.data;
 }

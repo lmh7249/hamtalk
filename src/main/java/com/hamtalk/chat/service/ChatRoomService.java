@@ -2,27 +2,26 @@ package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.domain.entity.ChatRoom;
 import com.hamtalk.chat.domain.entity.ChatRoomParticipant;
+import com.hamtalk.chat.domain.enums.ChatRoomType;
 import com.hamtalk.chat.model.projection.ChatMessageProjection;
 import com.hamtalk.chat.model.request.ChatRoomCreateRequest;
 import com.hamtalk.chat.model.request.ChatRoomParticipantCreateRequest;
+import com.hamtalk.chat.model.response.ChatRoomCreateResponse;
 import com.hamtalk.chat.model.response.ChatRoomListResponse;
+import com.hamtalk.chat.model.response.ChatRoomParticipantResponse;
 import com.hamtalk.chat.model.response.DirectChatRoomResponse;
-import com.hamtalk.chat.repository.ChatMessageRepository;
-import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
-import com.hamtalk.chat.repository.ChatRoomRepository;
-import com.hamtalk.chat.repository.UserRepository;
-import com.hamtalk.common.exeption.custom.UserNotFoundException;
+import com.hamtalk.chat.repository.*;
+import com.hamtalk.common.exeption.custom.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,25 +31,67 @@ public class ChatRoomService {
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
+    @Value("${app.chat.max-participants}")
+    private int maxParticipants;
 
     @Transactional
-    public ChatRoom createChatRoom(Long creatorId, List<Long> userIds) {
-        // TODO: 1. 해당 채팅방이 존재하는지 확인해야 함. -> 반환타입 Entity 말고 dto로 추후 변경하기.
-
-        List<ChatRoomParticipant> participants = new ArrayList<>();
-        // 1. 채팅방 생성
-        ChatRoomCreateRequest chatRoomCreateRequest = new ChatRoomCreateRequest(creatorId, 1);
-        ChatRoom chatRoom = chatRoomRepository.save(chatRoomCreateRequest.toChatRoomEntity());
-        // 2. 채팅방 생성자도 참여자로 추가
-        participants.add(new ChatRoomParticipantCreateRequest(chatRoom.getId(), creatorId).toChatRoomParticipantEntity());
-        // 3. 채팅방 생성한 id 값으로 채팅방 참여자 테이블 값 saveAll
-        //TODO: 추후, BulkInsert 도입 고민해보기.
-        for (Long userId : userIds) {
-            ChatRoomParticipantCreateRequest participant = new ChatRoomParticipantCreateRequest(chatRoom.getId(), userId);
-            participants.add(participant.toChatRoomParticipantEntity());
+    public ChatRoomCreateResponse createChatRoom(Long creatorId, List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            throw new EmptyParticipantsException();
         }
+
+        if (userIds.size() == 1 && creatorId.equals(userIds.get(0))) {
+            throw new SelfChatNotAllowedException();
+        }
+
+        // 채팅방 참여 인원을 초과하면 바로 예외 발생.
+        if ((1 + userIds.size()) > maxParticipants) {
+            throw new ParticipantLimitExceededException();
+        }
+
+        // 1. 요청자(creatorId)와 초대된 사용자(userIds)를 합쳐, 중복을 제거한 전체 참여자 ID 리스트를 생성
+        List<Long> allParticipantIds = Stream.concat(
+                        Stream.of(creatorId), // 방장 ID
+                        userIds.stream()      // 나머지 참여자 ID
+                ).distinct() // 중복 제거 (혹시 userIds에 방장 ID가 포함될 경우 대비)
+                .collect(Collectors.toList());
+
+        // 2. 모든 참여자 ID가 실제 DB에 존재하는 사용자인지 한 번의 쿼리로 검증
+        long existingUserCount = userRepository.countByIdIn(allParticipantIds);
+        if (existingUserCount != allParticipantIds.size()) {
+            throw new InvalidParticipantException();
+        }
+
+        // 3. 1:1 채팅의 경우, 두 사용자 간의 채팅방이 이미 존재하는지 확인하여 중복 생성을 방지
+        if (userIds.size() == 1) {
+            Long otherUserId = userIds.get(0);
+            chatRoomRepository.findDirectChatRoom(creatorId, otherUserId).ifPresent(chatRoom -> {
+                throw new ChatRoomAlreadyExistsException();
+            });
+        }
+
+
+        // 4. 채팅방의 타입(1:1/그룹)을 결정하고, ChatRoom 엔티티를 생성하여 DB에 먼저 저장
+        int chatRoomTypeId = (userIds.size() == 1) ? ChatRoomType.DIRECT.getCode() : ChatRoomType.GROUP.getCode();
+        ChatRoomCreateRequest chatRoomCreateRequest = new ChatRoomCreateRequest(creatorId, chatRoomTypeId);
+        ChatRoom newChatRoom = chatRoomRepository.save(chatRoomCreateRequest.toChatRoomEntity());
+
+        List<ChatRoomParticipant> participants = allParticipantIds.stream()
+                .map(participantId -> new ChatRoomParticipantCreateRequest(newChatRoom.getId(), participantId).toChatRoomParticipantEntity())
+                .collect(Collectors.toList());
         chatRoomParticipantRepository.saveAll(participants);
-        return chatRoom;
+
+        // 클라이언트에게 반환할 최종 DTO를 생성
+        List<ChatRoomParticipantResponse> participantResponses =
+                userProfileRepository.findParticipantInfoByUserIds(allParticipantIds);
+        // 반환타입 객체 세팅, chatRoomName은 기본값 null -> ct쪽에서 처리.
+        return ChatRoomCreateResponse.builder()
+                .chatRoomId(newChatRoom.getId())
+                .chatRoomName(newChatRoom.getName())
+                .creatorId(creatorId)
+                .participants(participantResponses)
+                .build();
     }
 
     // 수정 안해도 됨.

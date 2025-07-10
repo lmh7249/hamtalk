@@ -2,6 +2,7 @@ package com.hamtalk.chat.repository;
 
 import com.hamtalk.chat.domain.entity.UserProfile;
 import com.hamtalk.chat.model.projection.UserProfileProjection;
+import com.hamtalk.chat.model.response.ChatRoomParticipantResponse;
 import com.hamtalk.chat.model.response.MyProfileResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,5 +24,9 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     Optional<UserProfileProjection> findByUserId(Long userId);
 
     Optional<UserProfile> findEntityByUserId(Long userId);
+
+    @Query("SELECT new com.hamtalk.chat.model.response.ChatRoomParticipantResponse(up.userId, up.nickname, up.profileImageUrl) " +
+            "FROM UserProfile up WHERE up.userId IN :userIds")
+    List<ChatRoomParticipantResponse> findParticipantInfoByUserIds(@Param("userIds") List<Long> userIds);
 
 }

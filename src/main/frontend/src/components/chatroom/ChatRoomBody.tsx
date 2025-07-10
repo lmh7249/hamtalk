@@ -431,9 +431,7 @@ const ChatRoomBody = () => {
         }
     }, [messages]);  // 메시지가 추가될 때마다 확인
 
-    if (!chatRoomId) {
-        return <p>채팅방을 선택해주세요.</p>;
-    }
+
     return (
         <StyledChatRoomBodyWrapper ref={chatRoomBodyRef}>
             {messages.map((message, index) => {

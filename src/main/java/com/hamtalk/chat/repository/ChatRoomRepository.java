@@ -34,4 +34,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<DirectChatRoomResponse> findDirectChatRoom(@Param("myId") Long myId, @Param("friendId") Long friendId);
 
 
+
 }

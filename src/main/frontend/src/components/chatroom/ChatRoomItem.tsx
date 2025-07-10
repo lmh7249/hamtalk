@@ -110,7 +110,7 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
             .map(participant => participant.nickname)
             .join(", ");
 
-    const chatRoomImageUrl = otherParticipants[0].profileImageUrl;
+    const chatRoomImageUrl = otherParticipants[0]?.profileImageUrl;
 
     const displayLastMessage = chatRoom.lastMessage && chatRoom.lastMessage.length > maxLength
         ? `${chatRoom.lastMessage.slice(0, maxLength)}...`
@@ -150,7 +150,7 @@ const ChatRoomItem = ({chatRoomId, unreadCount}: ChattingRoomItemProps) => {
             onDoubleClick={() => handleChatRoomDoubleClick()}>
             <div style={{display: "flex", gap: "10px"}}>
                 <ImageWrapper onClick={(e: React.MouseEvent) => handleProfileImageClick(e)}>
-                    <StyledImage src={otherParticipants[0].profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
+                    <StyledImage src={otherParticipants[0]?.profileImageUrl ?? undefined} alt={"채팅방 이미지"}></StyledImage>
                 </ImageWrapper>
                 <ChatMainInfo>
                     <ChatRoomName>{chatRoomName}</ChatRoomName>

@@ -90,7 +90,7 @@ const ChatRoomFooter = () => {
             dispatch(openChatRoom(response.chatRoomId));
             dispatch(setCurrentChatRoom(currentChatRoom));
             // 3. sendChatMessageViaSocket stomp 함수 호출
-            sendChatMessageViaSocket(response.id, message, friendId);
+            sendChatMessageViaSocket(response.id, message);
 
             //TODO: 채팅방 리스트 실시간 렌더링이 아니라 채팅방 리스트 자체에 넣어줘야 실시간 렌더링이 됨.
             dispatch(addChatRoom({
@@ -103,7 +103,7 @@ const ChatRoomFooter = () => {
             }));
         } else {
             // 기존 채팅방 있는 경우 바로 실시간 통신
-            sendChatMessageViaSocket(chatRoomId ?? 0, message, friendId);
+            sendChatMessageViaSocket(chatRoomId, message);
             dispatch(updateLastMessage({
                 chatRoomId,
                 lastMessage: message,
@@ -112,6 +112,7 @@ const ChatRoomFooter = () => {
         }
         setMessage("");
     }
+
     const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setMessage(e.target.value);
     }
@@ -125,6 +126,7 @@ const ChatRoomFooter = () => {
 
         }
     };
+
     return (
         <StyledChatRoomFooterWrapper>
             <StyledTextAreaWrapper>

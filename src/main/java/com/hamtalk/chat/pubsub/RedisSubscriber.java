@@ -49,7 +49,8 @@ public class RedisSubscriber implements MessageListener {
             } else if (channel.startsWith("userNotify:")) {
                 ChatMessageResponse chatMessage = objectMapper.readValue(body, ChatMessageResponse.class);
                 // 유저 전역 알림 (채팅방 리스트 갱신 등)
-                String destination = "/topic/user/" + chatMessage.getReceiverId() + "/chat-notifications";
+                String receiverId = channel.substring(channel.indexOf(":") + 1);
+                String destination = "/topic/user/" + receiverId + "/chat-notifications";
                 log.info("📡 유저 전역 알림 전송: {}", destination);
                 messagingTemplate.convertAndSend(destination, chatMessage);
             }

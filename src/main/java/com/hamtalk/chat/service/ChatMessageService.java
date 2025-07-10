@@ -46,7 +46,6 @@ public class ChatMessageService {
                 .messageId(chatMessage.getId())
                 .chatRoomId(chatMessage.getChatRoomId())
                 .senderId(chatMessage.getSenderId())
-                .receiverId(chatMessageRequest.getReceiverId())
                 .senderNickName(userProfileProjection.getNickname())
                 .profileImageUrl(userProfileProjection.getProfileImageUrl())
                 .message(chatMessage.getMessage())

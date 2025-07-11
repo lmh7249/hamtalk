@@ -82,12 +82,12 @@ const ContentListTopState = ({selectedMenu, openModal}: { selectedMenu: { key: M
         <StyledContentListTopState>
             <h3>{selectedMenu.label}</h3>
             {selectedMenu.key === "friends" &&
-                <IconButton onClick={() => openModal("friend")}>
+                <IconButton onClick={() => openModal("friend")} title="친구 추가">
                     <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
                 </IconButton>
             }
             {selectedMenu.key === "chats" &&
-                <IconButton onClick={() => openModal("chat")}>
+                <IconButton onClick={() => openModal("chat")} title="채팅방 생성">
                     <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>
                 </IconButton>
             }

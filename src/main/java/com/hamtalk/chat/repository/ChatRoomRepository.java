@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +32,18 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "and cr.deletedAt is null ")
     Optional<DirectChatRoomResponse> findDirectChatRoom(@Param("myId") Long myId, @Param("friendId") Long friendId);
 
-
+    @Query(value = """
+              select cr.*
+              from chat_room cr
+              join (
+                select chat_room_id
+                from chat_room_participant
+                group by chat_room_id
+                having count(*) = :size
+                   and sum(user_id in (:userIds)) = :size
+              ) matched on cr.id = matched.chat_room_id
+            """, nativeQuery = true)
+    List<ChatRoom> findChatRoomByExactParticipants(@Param("userIds") List<Long> userIds,
+                                                   @Param("size") int size);
 
 }

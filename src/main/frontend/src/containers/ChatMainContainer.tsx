@@ -4,8 +4,6 @@ import styled from "styled-components";
 import FriendAddModal from "../components/friends/FriendAddModal";
 import {useEffect, useState} from "react";
 import ChatRoomAddModal from "../components/chatroom/ChatRoomAddModal";
-// import {getFilteredFriendList} from "../services/friend-service";
-import BaseModal from "../components/common/BaseModal";
 import EditMyProfileModal from "../components/settings/EditMyProfileModal";
 
 const MainContentWrapper = styled.div`
@@ -26,8 +24,6 @@ export type ModalType = null | "friend" | "chat" | "editMyProfile";
 
 const ChatMainContainer = () => {
     const[modalType, setModalType] = useState<ModalType>(null);
-    const [friendList, setFriendList] = useState<getFilteredFriendListProps[]>([]);
-
 
     const openModal = (type: ModalType) => {
         setModalType(type);
@@ -37,17 +33,6 @@ const ChatMainContainer = () => {
         setModalType(null);
     };
 
-    useEffect(() => {
-        if(modalType === "chat") {
-            // const fetchFilteredFriendList = async () => {
-            //     const response = await getFilteredFriendList();
-            //     setFriendList(response);
-            // };
-            // fetchFilteredFriendList();
-        }
-    }, [modalType]);
-
-
     return (
         <>
             <LeftSideBar>
@@ -56,7 +41,7 @@ const ChatMainContainer = () => {
                 <MainContent openModal = {openModal}/>
             </MainContentWrapper>
             {modalType === "friend" && <FriendAddModal modalClose ={closeModal}/>}
-            {modalType === "chat" && <ChatRoomAddModal modalClose ={closeModal} friendList={friendList}/>}
+            {modalType === "chat" && <ChatRoomAddModal modalClose ={closeModal}/>}
             {modalType === "editMyProfile" && <EditMyProfileModal modalClose ={closeModal}/>}
         </>
     )

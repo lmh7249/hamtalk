@@ -60,6 +60,14 @@ public class ChatRoomController {
         return ResponseEntity.ok(ApiResponse.ok(chatReadStatusService.getLastReadAtList(chatRoomId)));
     }
 
+    @PostMapping("/verify")
+    @Operation(summary = "채팅방 존재 여부 확인", description = "참여자들로 구성된 채팅방의 존재 여부를 확인하고, 없으면 생성 준비 정보를 반환합니다.")
+    public ResponseEntity<ApiResponse<ChatRoomVerifyResponse>> verifyChatRoom(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ParticipantUserIdsRequest request){
+
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.verifyChatRoom(customUserDetails.getId(), request.getUserIds())));
+    }
 
 
 

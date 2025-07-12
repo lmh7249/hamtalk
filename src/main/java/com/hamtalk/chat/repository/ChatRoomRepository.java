@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-
+public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, CustomChatRoomRepository {
 
     @Query("SELECT new com.hamtalk.chat.model.response.ChatRoomListResponse(cr, crp2, up) " +
             "FROM ChatRoomParticipant crp1 " +
@@ -31,19 +30,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "and cr.chatRoomTypeId = 1 " +
             "and cr.deletedAt is null ")
     Optional<DirectChatRoomResponse> findDirectChatRoom(@Param("myId") Long myId, @Param("friendId") Long friendId);
-
-    @Query(value = """
-              select cr.*
-              from chat_room cr
-              join (
-                select chat_room_id
-                from chat_room_participant
-                group by chat_room_id
-                having count(*) = :size
-                   and sum(user_id in (:userIds)) = :size
-              ) matched on cr.id = matched.chat_room_id
-            """, nativeQuery = true)
-    List<ChatRoom> findChatRoomByExactParticipants(@Param("userIds") List<Long> userIds,
-                                                   @Param("size") int size);
 
 }

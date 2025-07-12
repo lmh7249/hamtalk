@@ -65,10 +65,8 @@ public class ChatRoomController {
     public ResponseEntity<ApiResponse<ChatRoomVerifyResponse>> verifyChatRoom(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody ParticipantUserIdsRequest request){
-
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.verifyChatRoom(customUserDetails.getId(), request.getUserIds())));
     }
-
 
 
         //    @GetMapping("/{chatRoomId}")
@@ -82,6 +80,5 @@ public class ChatRoomController {
 //    public ResponseEntity<ApiResponse<>> getChatRoomList() {
 //        return null;
 //    }
-
 
 }

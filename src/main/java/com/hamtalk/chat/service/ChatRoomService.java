@@ -111,6 +111,7 @@ public class ChatRoomService {
         if ((1 + userIds.size()) > maxParticipants) {
             throw new ParticipantLimitExceededException();
         }
+
         List<Long> allParticipantIds = Stream.concat(
                 Stream.of(loginUserId),
                 userIds.stream()
@@ -144,33 +145,42 @@ public class ChatRoomService {
                         .build();
             };
         } else if (userIds.size() > 1) {
-            List<ChatRoom> groupChatRoom = chatRoomRepository.findChatRoomByExactParticipants(allParticipantIds, allParticipantIds.size());
-            if(!groupChatRoom.isEmpty()) {
+            Optional<ChatRoomByParticipantsResponse> groupChatRoom = chatRoomRepository.findChatRoomByExactParticipants(allParticipantIds);
+            if(groupChatRoom.isPresent()) {
                 List<ChatRoomParticipantResponse> participantResponses =
                         userProfileRepository.findParticipantInfoByUserIds(allParticipantIds);
                 String chatRoomImageUrl = determineChatRoomImageUrl(loginUserId, participantResponses);
-//                return ChatRoomVerifyResponse.builder()
-//                        .resultType("EXISTING_GROUP")
-//                        .currentChatRoom(
-//                                CurrentChatRoomResponse.builder()
-//                                        .chatRoomId(groupChatRoom.get()getChatRoomId())
-//                                        .chatRoomName(directChatRoom.get().getChatRoomName())
-//                                        .creatorId(directChatRoom.get().getCreatorId())
-//                                        .chatRoomImageUrl(chatRoomImageUrl)
-//                                        .participants(participantResponses)
-//                                        .build()
-//                        )
-//                        .build();
+                return ChatRoomVerifyResponse.builder()
+                        .resultType("EXISTING_GROUP")
+                        .currentChatRoom(
+                                CurrentChatRoomResponse.builder()
+                                        .chatRoomId(groupChatRoom.get().getId())
+                                        .chatRoomName(groupChatRoom.get().getName())
+                                        .creatorId(groupChatRoom.get().getCreatorId())
+                                        .chatRoomImageUrl(chatRoomImageUrl)
+                                        .participants(participantResponses)
+                                        .build()
+                        )
+                        .build();
             }
-
         }
-
-
-
-
-
-
-        return null;
+        // 위 분기에 모두 해당하지 않으면 (= 채팅방이 존재하지 않는다면) 채팅방 생성을 위한 정보 세팅
+        List<ChatRoomParticipantResponse> participantResponses =
+                userProfileRepository.findParticipantInfoByUserIds(allParticipantIds);
+        String newChatRoomImageUrl = determineChatRoomImageUrl(loginUserId, participantResponses);
+        String newChatRoomName = determineChatRoomName(loginUserId, participantResponses);
+        return ChatRoomVerifyResponse.builder()
+                .resultType("NEW")
+                .currentChatRoom(
+                        CurrentChatRoomResponse.builder()
+                                .chatRoomId(null)
+                                .chatRoomName(newChatRoomName)
+                                .creatorId(null)
+                                .chatRoomImageUrl(newChatRoomImageUrl)
+                                .participants(participantResponses)
+                                .build()
+                )
+                .build();
 }
 
 // 수정 안해도 됨.

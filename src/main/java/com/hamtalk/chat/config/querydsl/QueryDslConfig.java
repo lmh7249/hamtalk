@@ -14,7 +14,6 @@ public class QueryDslConfig {
        QueryDSL은 우리가 직접 자바 코드로 쿼리를 조립해야 함
             -> 조립의 주체가 되는 JPAQueryFactory가 명시적으로 필요함.
      */
-
     /*
         EntityManager
         - JPA의 가장 핵심적인 부품(DB 총괄 매니저)

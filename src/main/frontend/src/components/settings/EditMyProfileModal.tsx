@@ -1,15 +1,15 @@
 import BaseModal from "../common/BaseModal";
 import styled from "styled-components";
 
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useRef, useState} from "react";
 
 import {FaCamera} from "react-icons/fa";
-import FloatingLabelInput from "../common/FloatingLabelInput";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import toast from "react-hot-toast";
 import {updateUserProfile, updateUserProfileImage} from "../../services/user-service";
-import userSlice, {updateProfile} from "../../store/userSlice";
+import {updateProfile} from "../../store/userSlice";
+import {closeModal} from "../../store/modalSlice";
 
 
 const Title = styled.h3`
@@ -148,13 +148,7 @@ const CharCount = styled.span`
     pointer-events: none;
 `;
 
-interface EditMyProfileModalProps {
-    modalClose: () => void;
-
-}
-
-
-const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
+const EditMyProfileModal = () => {
     const myProfile = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const [nicknameInputValue, setNicknameInputValue] = useState<string>(myProfile.nickname || "");
@@ -162,9 +156,12 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
     const [previewImageUrl, setPreviewImageUrl] = useState<string>(myProfile.profileImageUrl || "");
-
     const nicknameMaxLength = 20;
     const statusMaxLength = 25;
+
+    const handleCloseModal = useCallback(() => {
+        dispatch(closeModal());
+    }, [dispatch]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -228,7 +225,7 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
             // 4. dispatch로 전역변수에서 관리되는 로그인 유저의 데이터 변경해주기.
             dispatch(updateProfile(profileUpdatePayload));
             toast.success("프로필이 성공적으로 수정되었어요.");
-            modalClose();
+            handleCloseModal();
         } catch (error) {
             if (error instanceof Error) {
                 toast.error(error.message);
@@ -239,7 +236,7 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
     }
 
     return (
-        <BaseModal width="350px" height="350px" modalClose={modalClose}>
+        <BaseModal width="350px" height="350px" modalClose={handleCloseModal}>
             <Title>내 프로필 편집</Title>
             <ProfileImageContainer>
 
@@ -283,7 +280,7 @@ const EditMyProfileModal = ({modalClose}: EditMyProfileModalProps) => {
 
             <StatusFooter>
                 <SaveButton onClick={handleSaveClick}>저장</SaveButton>
-                <CancelButton onClick={modalClose}>취소</CancelButton>
+                <CancelButton onClick={handleCloseModal}>취소</CancelButton>
             </StatusFooter>
         </BaseModal>
     );

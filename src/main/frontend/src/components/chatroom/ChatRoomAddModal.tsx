@@ -2,8 +2,11 @@ import styled from "styled-components";
 import BaseModal from "../common/BaseModal";
 import ModalButton from "../common/ModalButton";
 import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {RiCheckboxCircleFill, RiCheckboxBlankCircleLine} from "react-icons/ri";
+import {useVerifyChatRoomMutation} from "../../hooks/useVerifyChatRoomMutation";
+import {useDispatch} from "react-redux";
+import {closeModal} from "../../store/modalSlice";
 
 const Title = styled.h3`
     margin-top: 0;
@@ -176,11 +179,6 @@ const RemoveButton = styled.span`
     }
 `;
 
-
-type ChattingRoomAddModalProps = {
-    modalClose: () => void;
-};
-
 interface SelectedFriends {
     id: number;
     nickname: string;
@@ -192,12 +190,15 @@ const ModalLayoutWrapper = styled.div`
   height: calc(100% - 80px); /* 전체 높이에서 하단 버튼 영역만큼의 높이를 뺌 */
 `;
 
-
-
-
-const ChatRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
+const ChatRoomAddModal = () => {
     const {data: friends = [], isLoading, error} = useMyFriendsQuery(true);
     const [selectedFriends, setSelectedFriends] = useState<SelectedFriends[]>([]);
+    const {mutate: verifyChatRoom, isPending} = useVerifyChatRoomMutation();
+    const dispatch = useDispatch();
+
+    const handleCloseModal = useCallback(() => {
+        dispatch(closeModal());
+    }, [dispatch]);
 
     if (isLoading) {
         return <div>친구 목록을 불러오는 중...</div>;
@@ -218,64 +219,66 @@ const ChatRoomAddModal = ({modalClose}: ChattingRoomAddModalProps) => {
     };
 
     const handleStartChat = () => {
-        // TODO: 3단계에서 이 함수 내부 로직을 구현
+        if(isPending) return;
         console.log("채팅 시작! 선택된 친구들:", selectedFriends);
-
+        const selectedFriendIds = selectedFriends.map(friend => friend.id);
+        verifyChatRoom(selectedFriendIds);
+        // TODO: 3단계에서 이 함수 내부 로직을 구현
         // 여기서 1:1 채팅방 존재 여부 확인 또는 그룹 채팅방 생성 준비 API 호출
 
-        modalClose(); // 로직 처리 후 모달 닫기
+        // modalClose(); // 로직 처리 후 모달 닫기
     };
 
     return (
-        <BaseModal width={"400px"} height={"600px"} modalClose={modalClose}>
+        <BaseModal width={"400px"} height={"600px"} modalClose={handleCloseModal}>
             <ModalLayoutWrapper>
-            <TitleWrapper>
-                <Title>대화상대 선택</Title>
-                {selectedFriends.length > 0 &&
-                    <SelectedCount>{selectedFriends.length}</SelectedCount>
-                }
-            </TitleWrapper>
-            <SelectedFriendsContainer hasSelection={selectedFriends.length > 0}>
-                {selectedFriends.map(selectedFriend => (
-                    <SelectedFriendPill key={selectedFriend.id} onClick={() => handleFriendSelect(selectedFriend)}>
-                        <span>{selectedFriend.nickname}</span>
-                        <RemoveButton>
-                            &times; {/* HTML 특수문자로 X 모양을 만듦 */}
-                        </RemoveButton>
-                    </SelectedFriendPill>
-                ))}
-            </SelectedFriendsContainer>
-            <SearchInput type={"text"} placeholder={"이름 또는 이메일을 입력하세요."}/>
-            <FriendListContainer>
-                <FriendCount>
-                    친구
-                    <span> {friends.length}</span>
-                </FriendCount>
-                <FriendWrapper>
-                    {friends.map((friend) => (
-                        <FriendItem key={friend.toUserId}>
-                            <HiddenCheckbox
-                                type="checkbox"
-                                id={`friend-${friend.toUserId}`}
-                                checked={selectedFriends.some(selected => selected.id === friend.toUserId)}
-                                onChange={() => handleFriendSelect({id: friend.toUserId, nickname: friend.nickname})}
-                            />
-                            <StyledFriendItemLabel htmlFor={`friend-${friend.toUserId}`}>
-                                <ProfileImage src={friend.profileImageUrl} alt="유저 프로필 이미지"/>
-                                <StyledNickNameAndEmail>
-                                    <FriendNikName>{friend.nickname}</FriendNikName>
-                                    <FriendEmail>{friend.email}</FriendEmail>
-                                </StyledNickNameAndEmail>
-                                {selectedFriends.some(selected => selected.id === friend.toUserId) ? (
-                                    <CheckedIcon/>
-                                ) : (
-                                    <UncheckedIcon/>
-                                )}
-                            </StyledFriendItemLabel>
-                        </FriendItem>
+                <TitleWrapper>
+                    <Title>대화상대 선택</Title>
+                    {selectedFriends.length > 0 &&
+                        <SelectedCount>{selectedFriends.length}</SelectedCount>
+                    }
+                </TitleWrapper>
+                <SelectedFriendsContainer hasSelection={selectedFriends.length > 0}>
+                    {selectedFriends.map(selectedFriend => (
+                        <SelectedFriendPill key={selectedFriend.id} onClick={() => handleFriendSelect(selectedFriend)}>
+                            <span>{selectedFriend.nickname}</span>
+                            <RemoveButton>
+                                &times; {/* HTML 특수문자로 X 모양을 만듦 */}
+                            </RemoveButton>
+                        </SelectedFriendPill>
                     ))}
-                </FriendWrapper>
-            </FriendListContainer>
+                </SelectedFriendsContainer>
+                <SearchInput type={"text"} placeholder={"이름 또는 이메일을 입력하세요."}/>
+                <FriendListContainer>
+                    <FriendCount>
+                        친구
+                        <span> {friends.length}</span>
+                    </FriendCount>
+                    <FriendWrapper>
+                        {friends.map((friend) => (
+                            <FriendItem key={friend.toUserId}>
+                                <HiddenCheckbox
+                                    type="checkbox"
+                                    id={`friend-${friend.toUserId}`}
+                                    checked={selectedFriends.some(selected => selected.id === friend.toUserId)}
+                                    onChange={() => handleFriendSelect({id: friend.toUserId, nickname: friend.nickname})}
+                                />
+                                <StyledFriendItemLabel htmlFor={`friend-${friend.toUserId}`}>
+                                    <ProfileImage src={friend.profileImageUrl} alt="유저 프로필 이미지"/>
+                                    <StyledNickNameAndEmail>
+                                        <FriendNikName>{friend.nickname}</FriendNikName>
+                                        <FriendEmail>{friend.email}</FriendEmail>
+                                    </StyledNickNameAndEmail>
+                                    {selectedFriends.some(selected => selected.id === friend.toUserId) ? (
+                                        <CheckedIcon/>
+                                    ) : (
+                                        <UncheckedIcon/>
+                                    )}
+                                </StyledFriendItemLabel>
+                            </FriendItem>
+                        ))}
+                    </FriendWrapper>
+                </FriendListContainer>
             </ModalLayoutWrapper>
             <ModalButtonWrapper>
                 <ModalButton backgroundColor={"#2C2D31"} color={"white"} hoverColor={"#3A3B40"}  disabled={selectedFriends.length === 0} onClick={handleStartChat}>채팅 시작</ModalButton>

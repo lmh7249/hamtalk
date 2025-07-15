@@ -3,7 +3,7 @@ import {
     findDirectChatRoomApi,
     getChatMessageListApi, getLastReadAtListApi,
     getMyChatRoomListApi, getOnlineParticipantsApi, getUnreadMessageCountApi,
-    updateLastReadAtApi
+    updateLastReadAtApi, verifyChatRoomApi
 } from "../api/chat";
 
 export const getMyChatRoomList = async () => {
@@ -56,6 +56,14 @@ export const getOnlineParticipants = async (chatRoomId: number) => {
 
 export const getLastReadAtList = async (chatRoomId: number) => {
     const response = await getLastReadAtListApi(chatRoomId);
+    if(response.status === "success" && response.data) {
+        return response.data;
+    }
+    throw new Error(response.errorMessage || "");
+}
+
+export const verifyChatRoom = async (userIds: number[]) => {
+    const response = await verifyChatRoomApi(userIds);
     if(response.status === "success" && response.data) {
         return response.data;
     }

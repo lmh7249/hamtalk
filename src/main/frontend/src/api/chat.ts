@@ -92,3 +92,17 @@ export const getLastReadAtListApi = async (chatRoomId: number) => {
     }
     return await response.json();
 }
+
+export const verifyChatRoomApi = async (userIds: number[]) => {
+    const response = await customFetch(`/api/chat-rooms/verify`, {
+        method: "post",
+        body: JSON.stringify({
+            userIds: userIds // friendId를 배열로 감싸서 전송
+        })
+    })
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
+}

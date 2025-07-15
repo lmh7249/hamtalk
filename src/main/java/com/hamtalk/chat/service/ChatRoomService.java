@@ -131,12 +131,16 @@ public class ChatRoomService {
                 List<ChatRoomParticipantResponse> participantResponses =
                         userProfileRepository.findParticipantInfoByUserIds(allParticipantIds);
                 String chatRoomImageUrl = determineChatRoomImageUrl(loginUserId, participantResponses);
+                String chatRoomName = directChatRoom.get().getChatRoomName() != null
+                        ? directChatRoom.get().getChatRoomName()
+                        : determineChatRoomName(loginUserId, participantResponses);
+
                 return ChatRoomVerifyResponse.builder()
                         .resultType("EXISTING_DIRECT")
                         .currentChatRoom(
                                 CurrentChatRoomResponse.builder()
                                         .chatRoomId(directChatRoom.get().getChatRoomId())
-                                        .chatRoomName(directChatRoom.get().getChatRoomName())
+                                        .chatRoomName(chatRoomName)
                                         .creatorId(directChatRoom.get().getCreatorId())
                                         .chatRoomImageUrl(chatRoomImageUrl)
                                         .participants(participantResponses)
@@ -150,12 +154,16 @@ public class ChatRoomService {
                 List<ChatRoomParticipantResponse> participantResponses =
                         userProfileRepository.findParticipantInfoByUserIds(allParticipantIds);
                 String chatRoomImageUrl = determineChatRoomImageUrl(loginUserId, participantResponses);
+                String chatRoomName = groupChatRoom.get().getName() != null
+                        ? groupChatRoom.get().getName()
+                        : determineChatRoomName(loginUserId, participantResponses);
+
                 return ChatRoomVerifyResponse.builder()
                         .resultType("EXISTING_GROUP")
                         .currentChatRoom(
                                 CurrentChatRoomResponse.builder()
                                         .chatRoomId(groupChatRoom.get().getId())
-                                        .chatRoomName(groupChatRoom.get().getName())
+                                        .chatRoomName(chatRoomName)
                                         .creatorId(groupChatRoom.get().getCreatorId())
                                         .chatRoomImageUrl(chatRoomImageUrl)
                                         .participants(participantResponses)

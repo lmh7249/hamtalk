@@ -4,12 +4,13 @@ import {ModalItem} from "../../store/modalSlice";
 import FriendAddModal from "../friends/FriendAddModal";
 import ChatRoomAddModal from "./ChatRoomAddModal";
 import EditMyProfileModal from "../settings/EditMyProfileModal";
+import ConfirmEnterChatModal from "./ConfirmEnterChatModal";
 
 const MODAL_COMPONENTS: { [key: string]: React.FC<any> } = {
     friend: FriendAddModal,
     chat: ChatRoomAddModal,
     editMyProfile: EditMyProfileModal,
-    // confirmEnterChat: ConfirmEnterChatModal, // 나중에 추가
+    confirmEnterChat: ConfirmEnterChatModal, // 나중에 추가
 };
 
 const GlobalModals = () => {

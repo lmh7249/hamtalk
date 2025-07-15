@@ -34,12 +34,11 @@ export const getChatMessageListApi = async (chatRoomId: number) => {
     return response.json();
 }
 
-// 신규 1:1 채팅방 생성  api
-export const createDirectChatRoomApi = async (friendId: number[]) => {
+export const createChatRoomApi = async (friendId: number[]) => {
     const response = await customFetch("/api/chat-rooms", {
         method: "post",
         body: JSON.stringify({
-            userIds: [friendId] // friendId를 배열로 감싸서 전송
+            userIds: friendId // friendId를 배열로 감싸서 전송
         })
     });
     if (!response.ok) {

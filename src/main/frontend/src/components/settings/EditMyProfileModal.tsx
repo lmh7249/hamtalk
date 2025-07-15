@@ -93,7 +93,6 @@ const CancelButton = styled.button`
 
 
 const SaveButton = styled.button`
-    background-color: #FFCE00;
     border: none;
     border-radius: 8px;
     padding: 8px 14px;

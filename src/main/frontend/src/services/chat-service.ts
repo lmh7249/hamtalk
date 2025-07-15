@@ -1,5 +1,5 @@
 import {
-    createDirectChatRoomApi,
+    createChatRoomApi,
     findDirectChatRoomApi,
     getChatMessageListApi, getLastReadAtListApi,
     getMyChatRoomListApi, getOnlineParticipantsApi, getUnreadMessageCountApi,
@@ -9,7 +9,6 @@ import {
 export const getMyChatRoomList = async () => {
     const response = getMyChatRoomListApi();
     return await response;
-
 }
 
 export const findDirectChatRoom = async (friendId: number) => {
@@ -28,8 +27,8 @@ export const getChatMessageList = async (chatRoomId: number) => {
 }
 
 
-export const createDirectChatRoom = async (friendId: number[]) =>{
-    const response = await createDirectChatRoomApi(friendId);
+export const createChatRoom = async (friendId: number[]) =>{
+    const response = await createChatRoomApi(friendId);
     return response.data;
 }
 

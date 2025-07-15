@@ -6,11 +6,9 @@ import IconButton from "../common/IconButton";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {sendChatMessageViaSocket} from "../../utils/websocketUtil";
-import {createDirectChatRoom} from "../../services/chat-service";
+import {createChatRoom} from "../../services/chat-service";
 import {openChatRoom} from "../../store/contentDetailSlice";
 import {addChatRoom, CurrentChatRoom, setCurrentChatRoom, updateLastMessage} from "../../store/chatRoomsSlice";
-import {useQueryClient} from "@tanstack/react-query";
-import {Friend} from "../chat/ContentList";
 
 const StyledChatRoomFooterWrapper = styled.div`
     display: flex;
@@ -76,10 +74,10 @@ const ChatRoomFooter = () => {
         if(chatRoomId == null) {
 
             // 2. 신규 채팅방 생성(백엔드에서 해당 채팅방 존재하는지 먼저 확인).
-            const response = await createDirectChatRoom(otherParticipantIdList);
-
+            const response = await createChatRoom(otherParticipantIdList);
+            const newChatRoomId = response.chatRoomId;
             const currentChatRoom: CurrentChatRoom = {
-                chatRoomId: response.id,  // 응답에서 받은 chatRoomId
+                chatRoomId: newChatRoomId,  // 응답에서 받은 chatRoomId
                 chatRoomName: response.chatRoomName,
                 creatorId: response.creatorId,  // 응답에서 받은 creatorId
                 participants: response.participants,
@@ -87,14 +85,14 @@ const ChatRoomFooter = () => {
             };
             console.log("새로 생성된 chatRoomId: ", response);
             // 2. 리덕스에 chatroomid 업데이트하기. -> 이러면 구독이 되고, 렌더링도 되려나?
-            dispatch(openChatRoom(response.chatRoomId));
+            dispatch(openChatRoom(newChatRoomId));
             dispatch(setCurrentChatRoom(currentChatRoom));
             // 3. sendChatMessageViaSocket stomp 함수 호출
-            sendChatMessageViaSocket(response.id, message);
+            sendChatMessageViaSocket(newChatRoomId, message);
 
             //TODO: 채팅방 리스트 실시간 렌더링이 아니라 채팅방 리스트 자체에 넣어줘야 실시간 렌더링이 됨.
             dispatch(addChatRoom({
-                chatRoomId: response.id,
+                chatRoomId: newChatRoomId,
                 chatRoomName: response.chatRoomName,
                 creatorId: response.creatorId,
                 participants:response.participants,

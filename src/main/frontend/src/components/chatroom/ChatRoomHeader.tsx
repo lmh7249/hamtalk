@@ -49,7 +49,6 @@ const IconWrapper = styled.div`
 
 `;
 
-// 팝오버 '빈 창' 스타일
 const StyledPopoverContainer = styled.div`
     position: absolute;
     top: calc(100% + 8px); // 버튼 바로 아래에서 8px 떨어진 위치
@@ -62,6 +61,8 @@ const StyledPopoverContainer = styled.div`
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     z-index: 100;
     padding: 8px;
+    max-height: 250px;
+    overflow-y: auto;
 `;
 
 const StyledProfileImage = styled.img`

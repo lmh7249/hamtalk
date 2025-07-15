@@ -2,7 +2,7 @@ import styled from "styled-components";
 import BaseModal from "../common/BaseModal";
 import ModalButton from "../common/ModalButton";
 import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
-import {useCallback, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import {RiCheckboxCircleFill, RiCheckboxBlankCircleLine} from "react-icons/ri";
 import {useVerifyChatRoomMutation} from "../../hooks/useVerifyChatRoomMutation";
 import {useDispatch} from "react-redux";
@@ -195,6 +195,18 @@ const ChatRoomAddModal = () => {
     const [selectedFriends, setSelectedFriends] = useState<SelectedFriends[]>([]);
     const {mutate: verifyChatRoom, isPending} = useVerifyChatRoomMutation();
     const dispatch = useDispatch();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredFriends = useMemo(() => {
+        const term = searchTerm.toLowerCase();
+        if (!term) {
+            return friends; // 검색어가 없으면 전체 목록 반환
+        }
+        return friends.filter(friend =>
+            friend.nickname.toLowerCase().includes(term) ||
+            friend.email.toLowerCase().includes(term)
+        );
+    }, [friends, searchTerm]); // friends 배열이나 searchTerm이 바뀔 때만 이 함수를 재실행
 
     const handleCloseModal = useCallback(() => {
         dispatch(closeModal());
@@ -223,10 +235,6 @@ const ChatRoomAddModal = () => {
         console.log("채팅 시작! 선택된 친구들:", selectedFriends);
         const selectedFriendIds = selectedFriends.map(friend => friend.id);
         verifyChatRoom(selectedFriendIds);
-        // TODO: 3단계에서 이 함수 내부 로직을 구현
-        // 여기서 1:1 채팅방 존재 여부 확인 또는 그룹 채팅방 생성 준비 API 호출
-
-        // modalClose(); // 로직 처리 후 모달 닫기
     };
 
     return (
@@ -248,14 +256,14 @@ const ChatRoomAddModal = () => {
                         </SelectedFriendPill>
                     ))}
                 </SelectedFriendsContainer>
-                <SearchInput type={"text"} placeholder={"이름 또는 이메일을 입력하세요."}/>
+                <SearchInput type={"text"} placeholder={"이름 또는 이메일을 입력하세요."} onChange={(e) => setSearchTerm(e.target.value)}/>
                 <FriendListContainer>
                     <FriendCount>
                         친구
-                        <span> {friends.length}</span>
+                        <span> {filteredFriends.length}</span>
                     </FriendCount>
                     <FriendWrapper>
-                        {friends.map((friend) => (
+                        {filteredFriends.map((friend) => (
                             <FriendItem key={friend.toUserId}>
                                 <HiddenCheckbox
                                     type="checkbox"

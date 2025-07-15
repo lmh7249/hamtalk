@@ -75,19 +75,24 @@ const TextInfo = styled.div`
     display: flex;
     gap: 8px;
     align-items: baseline;
+    width: 100%;
 `;
 
 const RoomName = styled.p`
     margin: 0;
     font-size: 16px;
-    font-weight: 600; /* 주된 정보이므로 조금 더 강조 */
+    font-weight: 600; 
     color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const ParticipantCount = styled.p`
     margin: 0;
     font-size: 14px;
-    color: #888; /* 보조 정보이므로 연한 색상으로 */
+    color: #888; 
+    white-space: nowrap;
 `;
 const Description = styled.div`
     font-size: 14px;

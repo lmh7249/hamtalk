@@ -147,10 +147,11 @@ public class ChatRoomService {
                                         .build()
                         )
                         .build();
-            };
+            }
+            ;
         } else if (userIds.size() > 1) {
             Optional<ChatRoomByParticipantsResponse> groupChatRoom = chatRoomRepository.findChatRoomByExactParticipants(allParticipantIds);
-            if(groupChatRoom.isPresent()) {
+            if (groupChatRoom.isPresent()) {
                 List<ChatRoomParticipantResponse> participantResponses =
                         userProfileRepository.findParticipantInfoByUserIds(allParticipantIds);
                 String chatRoomImageUrl = determineChatRoomImageUrl(loginUserId, participantResponses);
@@ -189,110 +190,119 @@ public class ChatRoomService {
                                 .build()
                 )
                 .build();
-}
+    }
 
-// 수정 안해도 됨.
-@Transactional(readOnly = true)
-public List<ChatRoomListResponse> getChatRoomsWithLastMessage(Long userId) {
-    // 1. 로그인한 유저의 채팅방 목록 조회
-    List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
+    // 수정 안해도 됨.
+    @Transactional(readOnly = true)
+    public List<ChatRoomListResponse> getChatRoomsWithLastMessage(Long userId) {
+        // 1. 로그인한 유저의 채팅방 목록 조회
+        List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
 
-    // 2. 채팅방 ID 기준으로 데이터 그룹화
-    Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
+        // 2. 채팅방 ID 기준으로 데이터 그룹화
+        Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
 
-    for (ChatRoomListResponse chatRoom : chatRoomsList) {
-        Long chatRoomId = chatRoom.getChatRoomId();
+        for (ChatRoomListResponse chatRoom : chatRoomsList) {
+            Long chatRoomId = chatRoom.getChatRoomId();
 
-        if (chatRoomMap.containsKey(chatRoomId)) {
-            // 이미 존재하는 채팅방이면 참여자만 추가
-            ChatRoomListResponse existingChatRoom = chatRoomMap.get(chatRoomId);
-            existingChatRoom.getParticipants().addAll(chatRoom.getParticipants());
-        } else {
-            // 새로운 채팅방이면 맵에 추가
-            chatRoomMap.put(chatRoomId, chatRoom);
+            if (chatRoomMap.containsKey(chatRoomId)) {
+                // 이미 존재하는 채팅방이면 참여자만 추가
+                ChatRoomListResponse existingChatRoom = chatRoomMap.get(chatRoomId);
+                existingChatRoom.getParticipants().addAll(chatRoom.getParticipants());
+            } else {
+                // 새로운 채팅방이면 맵에 추가
+                chatRoomMap.put(chatRoomId, chatRoom);
+            }
+        }
+
+        // 3. 중복 제거된 채팅방 목록 생성
+        List<ChatRoomListResponse> uniqueChatRooms = new ArrayList<>(chatRoomMap.values());
+
+        // 4. 채팅방 ID 목록 추출
+        List<Long> chatRoomIds = uniqueChatRooms.stream()
+                .map(ChatRoomListResponse::getChatRoomId)
+                .collect(Collectors.toList());
+
+        if (chatRoomIds.isEmpty()) {
+            return uniqueChatRooms; // 채팅방이 없으면 바로 반환
+        }
+
+        // 5. MongoDB에서 마지막 메시지 조회
+        List<ChatMessageProjection> lastMessages = chatMessageRepository.findLastMessagesByChatRoomIds(chatRoomIds);
+
+        // 6. 채팅방 ID 기준으로 마지막 메시지 맵핑
+        Map<Long, String> lastMessageMap = lastMessages.stream()
+                .collect(Collectors.toMap(ChatMessageProjection::getChatRoomId,
+                        ChatMessageProjection::getLastMessage,
+                        (existing, replacement) -> existing)); // 중복 키가 있을 경우 기존 값 유지
+
+        Map<Long, LocalDateTime> lastMessageTimeMap = lastMessages.stream()
+                .collect(Collectors.toMap(ChatMessageProjection::getChatRoomId,
+                        ChatMessageProjection::getLastMessageTime,
+                        (existing, replacement) -> existing));
+
+        // 7. 채팅방에 마지막 메시지와 시간 추가
+        uniqueChatRooms.forEach(chatRoom -> {
+            Long roomId = chatRoom.getChatRoomId();
+            chatRoom.setLastMessage(lastMessageMap.getOrDefault(roomId, ""));
+            chatRoom.setLastMessageTime(lastMessageTimeMap.getOrDefault(roomId, null));
+        });
+
+        // 8. 최신 메시지 순 정렬
+        uniqueChatRooms.sort((a, b) -> {
+            LocalDateTime timeA = a.getLastMessageTime();
+            LocalDateTime timeB = b.getLastMessageTime();
+            if (timeA == null && timeB == null) return 0;
+            if (timeA == null) return 1;
+            if (timeB == null) return -1;
+            return timeB.compareTo(timeA);
+        });
+        log.info("최종 반환 값: {}", uniqueChatRooms);
+        return uniqueChatRooms;
+    }
+
+    @Transactional(readOnly = true)
+    public DirectChatRoomResponse findDirectChatRoom(Long myId, Long friendId) {
+        log.info("넘어 온 값 조회: {}, {}", myId, friendId);
+        userRepository.findById(friendId).orElseThrow(UserNotFoundException::new);
+        DirectChatRoomResponse directChatRoomResponse = chatRoomRepository.findDirectChatRoom(myId, friendId).orElse(null);
+        log.info("객체에 저장된 값: {}", directChatRoomResponse);
+        // 채팅방이 없으면 null 반환, orElse -> 없을 경우 무엇을 반환할지.
+        return directChatRoomResponse;
+    }
+
+    @Transactional
+    public String leaveChatRoom(Long myId, Long chatRoomId) {
+        ChatRoomParticipant chatRoomParticipant = chatRoomParticipantRepository.findByUserIdAndChatRoomIdAndDeletedAtIsNull(myId, chatRoomId)
+                .orElseThrow(ParticipantNotFoundException::new);
+        chatRoomParticipant.leaveChatRoom();
+        return "성공적으로 채팅방을 나갔습니다.";
+    }
+
+
+    private String determineChatRoomName(Long creatorId, List<ChatRoomParticipantResponse> participants) {
+        // 참여자가 2명 이하일 경우 (1:1 채팅 또는 자기 자신과의 채팅)
+        if (participants.size() <= 2) {
+            // 내가 아닌 다른 사람의 닉네임을 찾아서 채팅방 이름으로 설정
+            return participants.stream()
+                    .filter(p -> !p.getUserId().equals(creatorId))
+                    .findFirst()
+                    .map(ChatRoomParticipantResponse::getNickname)
+                    .orElse("나 자신과의 대화"); // 다른 참여자가 없으면(참여자가 1명)
+        } else { // 그룹 채팅일 경우
+            // 나를 제외한 참여자의 닉네임을 콤마(,)로 이어서 채팅방 이름으로 설정
+            return participants.stream()
+                    .filter(p -> !p.getUserId().equals(creatorId))
+                    .map(ChatRoomParticipantResponse::getNickname)
+                    .collect(Collectors.joining(", "));
         }
     }
 
-    // 3. 중복 제거된 채팅방 목록 생성
-    List<ChatRoomListResponse> uniqueChatRooms = new ArrayList<>(chatRoomMap.values());
-
-    // 4. 채팅방 ID 목록 추출
-    List<Long> chatRoomIds = uniqueChatRooms.stream()
-            .map(ChatRoomListResponse::getChatRoomId)
-            .collect(Collectors.toList());
-
-    if (chatRoomIds.isEmpty()) {
-        return uniqueChatRooms; // 채팅방이 없으면 바로 반환
-    }
-
-    // 5. MongoDB에서 마지막 메시지 조회
-    List<ChatMessageProjection> lastMessages = chatMessageRepository.findLastMessagesByChatRoomIds(chatRoomIds);
-
-    // 6. 채팅방 ID 기준으로 마지막 메시지 맵핑
-    Map<Long, String> lastMessageMap = lastMessages.stream()
-            .collect(Collectors.toMap(ChatMessageProjection::getChatRoomId,
-                    ChatMessageProjection::getLastMessage,
-                    (existing, replacement) -> existing)); // 중복 키가 있을 경우 기존 값 유지
-
-    Map<Long, LocalDateTime> lastMessageTimeMap = lastMessages.stream()
-            .collect(Collectors.toMap(ChatMessageProjection::getChatRoomId,
-                    ChatMessageProjection::getLastMessageTime,
-                    (existing, replacement) -> existing));
-
-    // 7. 채팅방에 마지막 메시지와 시간 추가
-    uniqueChatRooms.forEach(chatRoom -> {
-        Long roomId = chatRoom.getChatRoomId();
-        chatRoom.setLastMessage(lastMessageMap.getOrDefault(roomId, ""));
-        chatRoom.setLastMessageTime(lastMessageTimeMap.getOrDefault(roomId, null));
-    });
-
-    // 8. 최신 메시지 순 정렬
-    uniqueChatRooms.sort((a, b) -> {
-        LocalDateTime timeA = a.getLastMessageTime();
-        LocalDateTime timeB = b.getLastMessageTime();
-        if (timeA == null && timeB == null) return 0;
-        if (timeA == null) return 1;
-        if (timeB == null) return -1;
-        return timeB.compareTo(timeA);
-    });
-    log.info("최종 반환 값: {}", uniqueChatRooms);
-    return uniqueChatRooms;
-}
-
-@Transactional(readOnly = true)
-public DirectChatRoomResponse findDirectChatRoom(Long myId, Long friendId) {
-    log.info("넘어 온 값 조회: {}, {}", myId, friendId);
-    userRepository.findById(friendId).orElseThrow(UserNotFoundException::new);
-    DirectChatRoomResponse directChatRoomResponse = chatRoomRepository.findDirectChatRoom(myId, friendId).orElse(null);
-    log.info("객체에 저장된 값: {}", directChatRoomResponse);
-    // 채팅방이 없으면 null 반환, orElse -> 없을 경우 무엇을 반환할지.
-    return directChatRoomResponse;
-}
-
-private String determineChatRoomName(Long creatorId, List<ChatRoomParticipantResponse> participants) {
-    // 참여자가 2명 이하일 경우 (1:1 채팅 또는 자기 자신과의 채팅)
-    if (participants.size() <= 2) {
-        // 내가 아닌 다른 사람의 닉네임을 찾아서 채팅방 이름으로 설정
+    private String determineChatRoomImageUrl(Long creatorId, List<ChatRoomParticipantResponse> participants) {
+        // 나를 제외한 다른 참여자 목록을 찾아서
         return participants.stream()
                 .filter(p -> !p.getUserId().equals(creatorId))
-                .findFirst()
-                .map(ChatRoomParticipantResponse::getNickname)
-                .orElse("나 자신과의 대화"); // 다른 참여자가 없으면(참여자가 1명)
-    } else { // 그룹 채팅일 경우
-        // 나를 제외한 참여자의 닉네임을 콤마(,)로 이어서 채팅방 이름으로 설정
-        return participants.stream()
-                .filter(p -> !p.getUserId().equals(creatorId))
-                .map(ChatRoomParticipantResponse::getNickname)
-                .collect(Collectors.joining(", "));
+                .findFirst() // 그 중 첫 번째 사람을 찾고
+                .map(ChatRoomParticipantResponse::getProfileImageUrl) // 그 사람의 프로필 이미지 URL을 반환한다.
+                .orElse(null); // 다른 참여자가 없으면 null 반환
     }
-}
-
-private String determineChatRoomImageUrl(Long creatorId, List<ChatRoomParticipantResponse> participants) {
-    // 나를 제외한 다른 참여자 목록을 찾아서
-    return participants.stream()
-            .filter(p -> !p.getUserId().equals(creatorId))
-            .findFirst() // 그 중 첫 번째 사람을 찾고
-            .map(ChatRoomParticipantResponse::getProfileImageUrl) // 그 사람의 프로필 이미지 URL을 반환한다.
-            .orElse(null); // 다른 참여자가 없으면 null 반환
-}
 }

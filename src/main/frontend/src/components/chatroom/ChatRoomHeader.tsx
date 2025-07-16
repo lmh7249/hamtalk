@@ -12,6 +12,7 @@ import {useMemo, useRef, useState} from "react";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import {FaUsers} from "react-icons/fa";
 import {selectViewersByRoomId} from "../../store/chatActivitySlice";
+import {openModal} from "../../store/modalSlice";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -256,11 +257,32 @@ const ChatRoomActions = () => {
         dispatch(closeDetail());
     }
 
+    const handleLeaveClick = () => {
+        dispatch(openModal({
+            type: 'commonConfirm',
+            props: {
+                title: "채팅방 나가기",
+                confirmText: "나가기",
+                onConfirm: () => {
+                    console.log("test")
+                },
+                cancelText: "취소",
+                // children으로 간단한 텍스트를 전달
+                children: <p>
+                    채팅방을 나가시겠습니까?
+                    <br/>
+                    나가신 후에는 대화 내용이 모두 삭제됩니다.
+                </p>
+            }
+        }));
+    };
+
     return (
         <ChatRoomButtonWrapper>
             {/*TODO: IconButton2 해당 컴포넌트로 모두 리팩토링 진행하고 컴포넌트명도 변경하기, 기존 IconButton 컴포넌트 삭제 필수*/}
-            <IconButton iconName={ChatRoomSearchIcon} alt={"검색"} bgColor="transparent" hoverBgColor="#F2F2F2"/>
-            <IconButton iconName={ChatRoomExitIcon} alt={"채팅방 나가기"} bgColor="transparent" hoverBgColor="#F2F2F2"/>
+            {/*<IconButton iconName={ChatRoomSearchIcon} alt={"검색"} bgColor="transparent" hoverBgColor="#F2F2F2"/>*/}
+            <IconButton iconName={ChatRoomExitIcon} alt={"채팅방 나가기"} bgColor="transparent" hoverBgColor="#F2F2F2"
+            onClick={handleLeaveClick}/>
             <IconButton iconName={ChatRoomCloseIcon} alt={"채팅방 닫기"} bgColor="transparent" hoverBgColor="#F2F2F2"
                         onClick={handleClose}/>
         </ChatRoomButtonWrapper>

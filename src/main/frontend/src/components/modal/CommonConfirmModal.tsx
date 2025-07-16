@@ -14,10 +14,10 @@ interface CommonConfirmModalProps {
 }
 
 const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
 `;
 
 const Title = styled.h3`
@@ -42,23 +42,25 @@ const BaseButton = styled.button`
     transition: background-color 0.2s ease; /* 부드러운 색상 변경 효과 */
 `;
 
-const PrimaryButton  = styled(BaseButton)`
+const PrimaryButton = styled(BaseButton)`
     background-color: #FFCE00; // 햄톡의 메인 컬러(예시)
+
     &:hover {
         background-color: #e6ba00;
     }
-    
+
 `;
-const SecondaryButton  = styled(BaseButton)`
+const SecondaryButton = styled(BaseButton)`
     background-color: #e9e9eb;
     color: #333;
+
     &:hover {
         background-color: #dcdce0;
     }
 `;
 
 const ContentWrapper = styled.div`
-  padding: 20px 5px;
+    padding: 20px 5px;
 `;
 
 const CommonConfirmModal = ({
@@ -71,17 +73,22 @@ const CommonConfirmModal = ({
                             }: CommonConfirmModalProps) => {
     const dispatch = useDispatch();
 
-    // onCancel 함수가 props로 전달되지 않으면, 기본적으로 모달만 닫는 함수를 사용
+
+    // BaseModal x 클릭 시, 해당 모달만 닫기.
+    const handleClose = useCallback(() => {
+        dispatch(closeModal());
+    }, [dispatch]);
+
     const handleCancel = useCallback(() => {
         if (onCancel) {
             onCancel();
         } else {
-            dispatch(closeModal());
+            handleClose();
         }
-    }, [onCancel, dispatch]);
+    }, [onCancel, handleClose]);
 
     return (
-        <BaseModal width="320px" height="auto" modalClose={handleCancel}>
+        <BaseModal width="320px" height="auto" modalClose={handleClose}>
             <TitleWrapper>
                 <Title>{title}</Title>
             </TitleWrapper>

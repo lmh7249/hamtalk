@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
-export type ModalType =  "friend" | "chat" | "editMyProfile" | "confirmEnterChat";
+export type ModalType =  "friend" | "chat" | "editMyProfile" | "confirmEnterChat" | "commonConfirm";
 
 interface ModalProps {
     [key: string]: any;

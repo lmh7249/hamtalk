@@ -68,6 +68,14 @@ public class ChatRoomController {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.verifyChatRoom(customUserDetails.getId(), request.getUserIds())));
     }
 
+    @DeleteMapping("/{chatRoomId}/participants/me")
+    @Operation(summary = "특정 채팅방 나가기", description = "현재 로그인 한 유저가 특정 채팅방을 나갑니다")
+    ResponseEntity<ApiResponse<String>> leaveChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long chatRoomId) {
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.leaveChatRoom(customUserDetails.getId(), chatRoomId)));
+    }
+
+
+
 
         //    @GetMapping("/{chatRoomId}")
 //    @Operation(summary = "특정 채팅방 조회", description = "특정 채팅방을 조회합니다.")

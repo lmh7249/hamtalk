@@ -19,4 +19,8 @@ public class ChatRoomParticipant extends BaseEntity{
     private Long chatRoomId;
     private Long userId;
     private LocalDateTime deletedAt;
+
+    public void leaveChatRoom() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

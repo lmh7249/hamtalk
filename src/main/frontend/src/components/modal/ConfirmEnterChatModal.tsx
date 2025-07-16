@@ -86,7 +86,7 @@ const ConfirmEnterChatModal = ({exitsGroupChatRoom, onCreateAnyway, onGoToRoom}:
             cancelText="신규 채팅방 만들기"
             onCancel={onCreateAnyway}
         >
-            {content} {/* <-- children으로 내용물을 전달! */}
+            {content}
         </CommonConfirmModal>
     )
 }

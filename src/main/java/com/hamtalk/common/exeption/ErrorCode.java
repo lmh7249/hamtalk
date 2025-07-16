@@ -28,7 +28,8 @@ public enum ErrorCode {
     CHAT_ROOM_ALREADY_EXISTS(HttpStatus.CONFLICT, "CHAT_ROOM_ALREADY_EXISTS", "이미 존재하는 채팅방입니다."),
     EMPTY_PARTICIPANTS_LIST(HttpStatus.BAD_REQUEST, "EMPTY_PARTICIPANTS_LIST", "초대할 사용자가 한 명 이상이어야 합니다."),
     SELF_CHAT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "SELF_CHAT_NOT_ALLOWED", "자기 자신과는 채팅방을 만들 수 없습니다."),
-    PARTICIPANT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "PARTICIPANT_LIMIT_EXCEEDED", "채팅방 최대 인원을 초과했습니다.");
+    PARTICIPANT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "PARTICIPANT_LIMIT_EXCEEDED", "채팅방 최대 인원을 초과했습니다."),
+    PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, "PARTICIPANT_NOT_FOUND", "채팅방 참여자를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;      // 프론트가 사용할 에러 코드

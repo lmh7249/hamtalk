@@ -61,7 +61,6 @@ public class ChatMessageService {
 
         List<Long> participantIds = chatRoomParticipantRepository.findUserIdsByChatRoomId(chatRoomId);
 
-
         // 채팅방 존재 유무 검증
         if (chatMessages == null) {
             throw new ChatRoomNotFoundException();

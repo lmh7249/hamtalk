@@ -59,7 +59,7 @@ export const updateLastReadAtApi = async (chatRoomId: number) => {
 
 export const getUnreadMessageCountApi = async () => {
     const response = await customFetch(`/api/chat/rooms/unread-counts`, {
-        method:"get",
+        method: "get",
     })
     if (!response.ok) {
         const errorData = await response.json(); // body에 errorMessage 들어있음
@@ -71,9 +71,9 @@ export const getUnreadMessageCountApi = async () => {
 
 export const getOnlineParticipantsApi = async (chatRoomId: number) => {
     const response = await customFetch(`/api/chat-rooms/${chatRoomId}/participants`, {
-        method:"get",
+        method: "get",
     })
-    if(!response.ok) {
+    if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
     }
@@ -83,9 +83,9 @@ export const getOnlineParticipantsApi = async (chatRoomId: number) => {
 
 export const getLastReadAtListApi = async (chatRoomId: number) => {
     const response = await customFetch(`/api/chat-rooms/${chatRoomId}/last-read`, {
-        method:"get",
+        method: "get",
     })
-    if(!response.ok) {
+    if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
     }
@@ -99,9 +99,20 @@ export const verifyChatRoomApi = async (userIds: number[]) => {
             userIds: userIds // friendId를 배열로 감싸서 전송
         })
     })
-    if(!response.ok) {
+    if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
+}
+
+export const leaveChatRoomApi = async (chatRoomId: number) => {
+    const response = await customFetch(`/api/chat-rooms/${chatRoomId}/participants/me`, {
+        method: "delete",
+    })
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.")
     }
     return await response.json();
 }

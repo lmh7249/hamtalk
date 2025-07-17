@@ -8,11 +8,13 @@ import {closeDetail} from "../../store/contentDetailSlice";
 import {RootState} from "../../store";
 // import {FaUsers} from "react-icons/fa6";
 import IconButton2 from "../common/IconButton2";
-import {useMemo, useRef, useState} from "react";
+import {useCallback, useMemo, useRef, useState} from "react";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import {FaUsers} from "react-icons/fa";
 import {selectViewersByRoomId} from "../../store/chatActivitySlice";
-import {openModal} from "../../store/modalSlice";
+import {closeModal, openModal} from "../../store/modalSlice";
+import {useLeaveChatRoomMutation} from "../../hooks/useLeaveChatRoomMutation";
+import {removeChatRoom} from "../../store/chatRoomsSlice";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -252,19 +254,30 @@ const ChatRoomParticipantItem = () => {
 
 const ChatRoomActions = () => {
     const dispatch = useDispatch();
+    const currentChatRoom = useSelector((state: RootState) => state.chatRooms.currentChatRoom);
+    const {mutate: leaveChatRoomMutate} = useLeaveChatRoomMutation();
 
     const handleClose = () => {
         dispatch(closeDetail());
     }
 
-    const handleLeaveClick = () => {
+    const handleLeaveClick = useCallback(() => {
+        if (!currentChatRoom || !currentChatRoom.chatRoomId) return;
+        const chatRoomIdToLeave = currentChatRoom.chatRoomId;
+
         dispatch(openModal({
             type: 'commonConfirm',
             props: {
                 title: "채팅방 나가기",
                 confirmText: "나가기",
                 onConfirm: () => {
-                    console.log("test")
+                    leaveChatRoomMutate(chatRoomIdToLeave, {
+                        onSuccess: () => {
+                            dispatch(removeChatRoom(chatRoomIdToLeave));
+                            dispatch(closeDetail());
+                            dispatch(closeModal());
+                        }
+                    })
                 },
                 cancelText: "취소",
                 // children으로 간단한 텍스트를 전달
@@ -275,7 +288,7 @@ const ChatRoomActions = () => {
                 </p>
             }
         }));
-    };
+    },[dispatch, currentChatRoom, leaveChatRoomMutate]);
 
     return (
         <ChatRoomButtonWrapper>

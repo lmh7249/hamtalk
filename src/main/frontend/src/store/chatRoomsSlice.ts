@@ -78,6 +78,13 @@ const chatRoomsSlice = createSlice({
                 state.chatRooms.unshift(updatedRoom); // 맨 앞으로 이동
             }
         },
+
+        removeChatRoom: (state, action: PayloadAction<number>) => {
+            state.chatRooms = state.chatRooms.filter(
+                room => room.chatRoomId != action.payload
+            )
+        },
+
         setCurrentChatRoom: (state, action: PayloadAction<CurrentChatRoom>) => {
             state.currentChatRoom = action.payload;
         },
@@ -90,5 +97,5 @@ const chatRoomsSlice = createSlice({
     },
 });
 
-export const {setChatRooms, setLoading, setError, addChatRoom,updateLastMessage, setCurrentChatRoom, resetChatState} = chatRoomsSlice.actions;
+export const {setChatRooms, setLoading, setError, addChatRoom,updateLastMessage, removeChatRoom, setCurrentChatRoom, resetChatState} = chatRoomsSlice.actions;
 export default chatRoomsSlice.reducer;

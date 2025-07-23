@@ -23,6 +23,8 @@ repositories {
     mavenCentral()
 }
 
+// implementation : 코드가 실행될 때 필요한 라이브러리
+// annotationProcessor : 코드를 컴파일(빌드)할 때만 잠깐 실행되는 프로그램 -> ex) Lombok
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
@@ -50,50 +52,36 @@ dependencies {
     // redis 직렬화를 위한 라이브러리 추가(createdAt 직렬화를 위한)
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    // ---- 여기부터 QueryDSL 의존성 ---
+    // QueryDSL 5.0 버전 의존성 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    // QueryDSL Q-Type 자동 생성기 : @Entity 스캔해서 -> QEntity 클래스를 자동 생성 -> 앱이 실행될 때, 필요 X, 컴파일 때만 필요.
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    // QueryDSL 자동 생성기가 참고할 메뉴얼
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    // ---- 여기까지 QueryDSL 의존성 ---
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-// 이 코드는 사용하지 않고 나중에 배포할때만 한번에 합치자.
+// 1. Q-Type이 저장될 폴더 경로를 변수로 지정
+def querydslDir = "$buildDir/generated/querydsl"
 
-//def frontendDir = "$projectDir/src/main/frontend"
-//
-//sourceSets {
-//    main {
-//        resources { srcDirs = ["$projectDir/src/main/resources"] }
-//    }
-//}
-//
-//processResources { dependsOn "copyReactBuildFiles" }
-//
-//task installReact(type: Exec) {
-//    workingDir "$frontendDir"
-//    inputs.dir "$frontendDir"
-//    group = BasePlugin.BUILD_GROUP
-//    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-//        commandLine "yarn.cmd", "install"  // npm 대신 yarn 사용
-//    } else {
-//        commandLine "yarn", "install"  // npm 대신 yarn 사용
-//    }
-//}
-//
-//task buildReact(type: Exec) {
-//    dependsOn "installReact"
-//    workingDir "$frontendDir"
-//    inputs.dir "$frontendDir"
-//    group = BasePlugin.BUILD_GROUP
-//    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-//        commandLine "yarn.cmd", "build"  // npm 대신 yarn 사용
-//    } else {
-//        commandLine "yarn", "build"  // npm 대신 yarn 사용
-//    }
-//}
-//
-//task copyReactBuildFiles(type: Copy) {
-//    dependsOn "buildReact"
-//    from "$frontendDir/build"
-//    into "$projectDir/src/main/resources/static"
-//}
+// 2. IntelliJ가 생성된 Q-Type을 우리 소스 코드의 일부로 인식하게 설정
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+}
+
+// 3. 자바 컴파일 시, Q-Type을 생성하고 'querydslDir'에 저장하도록 명령
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// 4. 프로젝트 clean 시, 생성된 Q-Type 폴더도 같이 삭제하도록 설정
+clean.doLast {
+    file(querydslDir).deleteDir()
+}
 

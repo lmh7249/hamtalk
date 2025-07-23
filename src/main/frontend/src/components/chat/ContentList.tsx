@@ -8,13 +8,13 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {MenuType} from "../../store/menuSlice";
 import {useEffect} from "react";
-import {ModalType} from "../../containers/ChatMainContainer";
 import {getMyChatRoomList} from "../../services/chat-service";
 import SettingList from "./SettingList";
 import {setChatRooms} from "../../store/chatRoomsSlice";
 import {setKeyword} from "../../store/searchSlice";
 import {useQuery} from "@tanstack/react-query";
 import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
+import {openModal} from "../../store/modalSlice";
 
 const StyledContentList = styled.div`
     min-width: 350px;
@@ -57,37 +57,25 @@ export interface Friend {
     statusMessage: string
 }
 
-interface ContentListProps {
-    openModal: (type: ModalType) => void;
-}
-
 export interface Participant {
     userId: number;
     nickname: string;
     profileImageUrl: string | null;  // profileImageUrl이 null일 수 있기 때문에
 }
 
-export interface ChatRoom {
-    chatRoomId: number;
-    chatRoomName: string;
-    creatorId: number;
-    participants: Participant[];  // participants 배열 추가
-    lastMessage: string;
-    lastMessageTime: string;
-}
+const ContentListTopState = ({selectedMenu}: { selectedMenu: { key: MenuType; label: string; }}) => {
+    const dispatch = useDispatch();
 
-const ContentListTopState = ({selectedMenu, openModal}: { selectedMenu: { key: MenuType; label: string; }; openModal: (type: ModalType) => void; }) =>
-{
     return (
         <StyledContentListTopState>
             <h3>{selectedMenu.label}</h3>
             {selectedMenu.key === "friends" &&
-                <IconButton onClick={() => openModal("friend")}>
+                <IconButton onClick={() => dispatch(openModal({type: "friend"}))} title="친구 추가">
                     <img src={FriendPlusIcon} alt="친구 추가" width={30} height={30}/>
                 </IconButton>
             }
             {selectedMenu.key === "chats" &&
-                <IconButton onClick={() => openModal("chat")}>
+                <IconButton onClick={() => dispatch(openModal({type: "chat"}))} title="채팅방 생성">
                     <img src={ChattingRoomPlusIcon} alt="채팅방 생성" width={30} height={30}/>
                 </IconButton>
             }
@@ -95,7 +83,7 @@ const ContentListTopState = ({selectedMenu, openModal}: { selectedMenu: { key: M
     )
 }
 
-const ContentList = ({openModal}: ContentListProps) => {
+const ContentList = () => {
     const selectedMenu = useSelector((state: RootState) => state.menu.selectedMenu);
     const keyword = useSelector((state: RootState) => state.search.keyword);
     const dispatch = useDispatch();
@@ -108,7 +96,7 @@ const ContentList = ({openModal}: ContentListProps) => {
         const fetchData = async () => {
             if (isChatsTab) {
                 const response = await getMyChatRoomList();
-                if(response.status === 'success') {
+                if (response.status === 'success') {
                     dispatch(setChatRooms(response.data));
                 }
             }
@@ -120,13 +108,13 @@ const ContentList = ({openModal}: ContentListProps) => {
 
     return (
         <StyledContentList>
-            <ContentListTopState selectedMenu={selectedMenu} openModal={openModal} />
+            <ContentListTopState selectedMenu={selectedMenu}/>
             {isFriendsTab && (
                 <>
                     <SearchInput
                         type="text"
                         placeholder="이름 또는 이메일을 입력하세요."
-                        value ={keyword}
+                        value={keyword}
                         onChange={(e) => dispatch(setKeyword(e.target.value))}
                     />
                     <FriendList/>
@@ -137,13 +125,13 @@ const ContentList = ({openModal}: ContentListProps) => {
                     <SearchInput
                         type="text"
                         placeholder="참여자 또는 채팅방명을 검색하세요."
-                        value = {keyword}
+                        value={keyword}
                         onChange={(e) => dispatch(setKeyword(e.target.value))}
                     />
                     <ChattingRoomList/>
                 </>
             )}
-            {isSettingsTab && <SettingList openModal={openModal} />}
+            {isSettingsTab && <SettingList/>}
         </StyledContentList>
     );
 }

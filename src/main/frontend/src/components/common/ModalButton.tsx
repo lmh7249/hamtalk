@@ -26,6 +26,12 @@ const ModalButton = styled.button<ModalButtonProps>`
         background-color: ${({ backgroundColor }) => backgroundColor};
         transform: translateY(0);
     }
+
+    &:disabled {
+        background-color: #E9ECEF; 
+        color: #ADB5BD; 
+        cursor: not-allowed;
+    }
 `;
 
 export default ModalButton;

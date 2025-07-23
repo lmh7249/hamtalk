@@ -1,12 +1,15 @@
 package com.hamtalk.chat.controller;
 
+import com.hamtalk.chat.domain.entity.ChatRoomParticipant;
 import com.hamtalk.chat.domain.enums.ChatParticipantStatus;
 import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.request.ChatUserEnterRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
 import com.hamtalk.chat.model.response.ChatUserStatusResponse;
 import com.hamtalk.chat.pubsub.RedisPublisher;
+import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.service.ChatMessageService;
+import com.hamtalk.chat.service.ChatRoomParticipantService;
 import com.hamtalk.chat.service.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +22,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,37 +32,47 @@ public class ChatWebSocketController {
     private final ChatMessageService chatMessageService;
     private final RedisPublisher redisPublisher;
     private final RedisService redisService;
+    private final ChatRoomParticipantRepository chatRoomParticipantRepository;
+    private final ChatRoomParticipantService chatRoomParticipantService;
 
     /*  TODO: 웹소켓 + Redis 전송 흐름
-    * 1. 유저가 메세지 보냄 -> ChatWebSocketController 도착
-    * 2. RedisPublisher -> Redis 채널에 "발행"
-    * 3. redisTemplate.convertAndSend() -> Redis에 "새 메세지 있다."고 알림.
-    * 4. RedisSubscriber onMessage 메서드가 콜백함수로 동작 -> Redis 메세지를 수신
-    * 5. messagingTemplate.convertAndSend -> 코드 동작 시, 웹소켓 구독 중인 브라우저로 전달.
-    * */
+     * 1. 유저가 메세지 보냄 -> ChatWebSocketController 도착
+     * 2. RedisPublisher -> Redis 채널에 "발행"
+     * 3. redisTemplate.convertAndSend() -> Redis에 "새 메세지 있다."고 알림.
+     * 4. RedisSubscriber onMessage 메서드가 콜백함수로 동작 -> Redis 메세지를 수신
+     * 5. messagingTemplate.convertAndSend -> 코드 동작 시, 웹소켓 구독 중인 브라우저로 전달.
+     * */
     @MessageMapping("/chat/{chatRoomId}/sendMessage")
-    @Operation(summary = "실시간 메세지 전송", description = "실시간 메세지 전송 + MongoDB 메세지 저장, 두 로직을 실행합니다." )
+    @Operation(summary = "실시간 메세지 전송", description = "실시간 메세지 전송 + MongoDB 메세지 저장, 두 로직을 실행합니다.")
     public void chatSendMessage(@DestinationVariable Long chatRoomId,
                                 ChatMessageRequest chatMessageRequest,
                                 SimpMessageHeaderAccessor headerAccessor) {
         log.info("WebSocket/Stomp Message Send");
-        Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
-        log.info("User ID: {}", userId);
-        ChatMessageResponse chatMessageResponse = chatMessageService.saveChatMessage(userId, chatRoomId, chatMessageRequest);
-        // 채팅방 Redis 채널 구독 (최초 메시지 전송 시)
-//        redisService.subscribeChatRoom(chatRoomId);
-//        redisService.subscribeGlobalNotification(chatMessageRequest.getReceiverId());
-        // Redis 발행
-        // 1. 채팅방 채널에 발행 → 채팅방 열려있으면 실시간 메시지 수신
-        redisPublisher.publish("chatRoom:" +chatRoomId, chatMessageResponse);
-        // 2. 상대방의 알림 채널에 발행 → 리스트에서 실시간 반영 가능
-        log.info("받는사람: {}", chatMessageRequest.getReceiverId());
-        redisPublisher.publish("userNotify:" + chatMessageRequest.getReceiverId(), chatMessageResponse);
+        Long senderId = (Long) headerAccessor.getSessionAttributes().get("userId");
+        log.info("User ID: {}", senderId);
+
+        // 메세지 저장 전, 메세저 보내는 사람이 나간 상태라면 해당 채팅방에 재참여하는 로직.
+        chatRoomParticipantService.validateAndRejoinParticipant(chatRoomId, senderId);
+
+        chatRoomParticipantService.rejoinOpponentIfOneOnOne(chatRoomId, senderId);
+
+        ChatMessageResponse chatMessageResponse = chatMessageService.saveChatMessage(senderId, chatRoomId, chatMessageRequest);
+        // 1. redis 채팅방 채널에 발행 → 채팅방 열려있으면 실시간 메시지 수신
+        redisPublisher.publish("chatRoom:" + chatRoomId, chatMessageResponse);
+
+        List<Long> participantsUserIds = chatRoomParticipantRepository.findUserIdsByChatRoomId(chatRoomId);
+        // 2. redis 상대방의 알림 채널에 발행 → 리스트에서 실시간 반영 가능
+        participantsUserIds.stream()
+                .filter(receiverId -> !receiverId.equals(senderId))
+                .forEach(receiverId -> {
+                    log.info("받는사람: {}", receiverId);
+                    redisPublisher.publish("userNotify:" + receiverId, chatMessageResponse);
+                });
     }
 
     // 2. 채팅방 입장
     @MessageMapping("/chat/{chatRoomId}/enter")
-    @Operation(summary = "실시간 채팅방 입장", description = "실시간으로 채팅방에 입장한 유저의 id, nickname을 전송합니다." )
+    @Operation(summary = "실시간 채팅방 입장", description = "실시간으로 채팅방에 입장한 유저의 id, nickname을 전송합니다.")
     public void enterChatRoom(@DestinationVariable Long chatRoomId,
                               @Payload ChatUserEnterRequest request,
                               SimpMessageHeaderAccessor headerAccessor) {

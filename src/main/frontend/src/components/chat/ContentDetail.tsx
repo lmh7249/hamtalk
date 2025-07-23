@@ -5,7 +5,6 @@ import ChatRoomItem from "../chatroom/ChatRoomItem";
 import ChatRoomDetail from "../chatroom/ChatRoomDetail";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {OpenModalProps} from "./MainContent";
 
 const StyledContentDetail = styled.div`
     flex-grow: 1;

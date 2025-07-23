@@ -2,6 +2,7 @@ package com.hamtalk.chat.service;
 
 import com.hamtalk.chat.domain.entity.ChatMessage;
 import com.hamtalk.chat.domain.entity.ChatReadStatus;
+import com.hamtalk.chat.domain.entity.ChatRoomParticipant;
 import com.hamtalk.chat.model.projection.UserProfileProjection;
 import com.hamtalk.chat.model.request.ChatMessageRequest;
 import com.hamtalk.chat.model.response.ChatMessageResponse;
@@ -13,6 +14,7 @@ import com.hamtalk.chat.repository.ChatReadStatusRepository;
 import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.repository.UserProfileRepository;
 import com.hamtalk.common.exeption.custom.ChatRoomNotFoundException;
+import com.hamtalk.common.exeption.custom.ParticipantNotFoundException;
 import com.hamtalk.common.exeption.custom.UserProfileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +46,6 @@ public class ChatMessageService {
                 .messageId(chatMessage.getId())
                 .chatRoomId(chatMessage.getChatRoomId())
                 .senderId(chatMessage.getSenderId())
-                .receiverId(chatMessageRequest.getReceiverId())
                 .senderNickName(userProfileProjection.getNickname())
                 .profileImageUrl(userProfileProjection.getProfileImageUrl())
                 .message(chatMessage.getMessage())
@@ -57,11 +56,30 @@ public class ChatMessageService {
     //TODO: 위 엔티티 리스트를 dto로 한번 바꿔주는 작업이 필요할지?
     @Transactional(readOnly = true)
     public ChatRoomMessagesResponse getChatMessageList(Long loginUserId, Long chatRoomId) {
-        // 1. 채팅방에 있는 모든 채팅메세지 조회
-        List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId);
+        // 로그인한 유저의 채팅방 최초 입장시간을 가져오기, deletedAt이 Null이 아닌경우 -> 채팅방을 나간 경우는 빈 리스트 반환.
+
+        Optional<ChatRoomParticipant> participantOptional = chatRoomParticipantRepository
+                .findByChatRoomIdAndUserId(chatRoomId, loginUserId);
+
+        if (participantOptional.isEmpty()) {
+            // 클라이언트와의 약속을 위해 빈 리스트를 담은 응답 객체를 반환
+            return ChatRoomMessagesResponse.builder()
+                    .loginUserId(loginUserId)
+                    .chatRoomId(chatRoomId)
+                    .messages(Collections.emptyList()) //  null 대신 빈 리스트 반환
+                    .build();
+        }
+
+        ChatRoomParticipant participant = participantOptional.get();
+        // 메시지를 필터링할 기준 시간을 정함.
+        LocalDateTime filterTime = (participant.getLastExitAt() == null)
+                ? participant.getCreatedAt()
+                : participant.getLastExitAt();
+
+        // 1. 채팅방에 있는 모든 채팅메세지 조회(채팅방 최초 입장 시간 필터링)
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomIdAndCreatedAtAfter(chatRoomId, filterTime);
 
         List<Long> participantIds = chatRoomParticipantRepository.findUserIdsByChatRoomId(chatRoomId);
-
 
         // 채팅방 존재 유무 검증
         if (chatMessages == null) {

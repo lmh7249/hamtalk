@@ -7,6 +7,7 @@ import friendsReducer from "./friends/friendsSlice";
 import chatRoomsReducer from "./chatRoomsSlice";
 import SearchReducer from "../store/searchSlice";
 import chatActivityReducer from "../store/chatActivitySlice";
+import modalReducer from "../store/modalSlice";
 
 
 export const store = configureStore({
@@ -19,7 +20,8 @@ export const store = configureStore({
         chatRooms: chatRoomsReducer,
         search: SearchReducer,
         chatActivity: chatActivityReducer,
-    },
+        modal: modalReducer,
+    }, 
 });
 
 export type RootState = ReturnType<typeof store.getState>;

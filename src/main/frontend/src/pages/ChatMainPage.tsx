@@ -4,10 +4,12 @@ import {useEffect, useRef} from "react";
 import {connectWebSocket, disconnectWebSocket} from "../utils/websocketUtil";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../store";
-import {updateLastMessage} from "../store/chatRoomsSlice";
+import {addChatRoom, updateLastMessage} from "../store/chatRoomsSlice";
 import {QueryClient, useQueryClient} from "@tanstack/react-query";
 import {UnreadCountType} from "../hooks/useUnreadCountsQuery";
 import {store} from "../store";
+import {getChatRoomDetail} from "../services/chat-service";
+import toast from "react-hot-toast";
 
 export type ChatNotificationPayload = {
     chatRoomId: number;
@@ -26,6 +28,7 @@ const ChatMainPage = () => {
     const loginUserId = useSelector((state:RootState) => state.user.id);
     const selectedMenu = useSelector((state:RootState) => state.menu.selectedMenu);
     const isChatsTab = selectedMenu.key === "chats";
+    const chatRooms = useSelector((state: RootState) => state.chatRooms.chatRooms);
     const currentChatRoomId = useSelector((state:RootState) => state.detailContent.chatRoomId);
     const dispatch = useDispatch();
     const queryClient = useQueryClient();
@@ -34,7 +37,8 @@ const ChatMainPage = () => {
     const latestStateRef = useRef({
         selectedMenu,
         currentChatRoomId,
-        isChatsTab
+        isChatsTab,
+        chatRooms
     });
 
     // 상태가 변경될 때마다 ref 업데이트
@@ -42,20 +46,38 @@ const ChatMainPage = () => {
         latestStateRef.current = {
             selectedMenu,
             currentChatRoomId,
-            isChatsTab
+            isChatsTab,
+            chatRooms
         };
-    }, [selectedMenu, currentChatRoomId, isChatsTab]);
+    }, [selectedMenu, currentChatRoomId, isChatsTab, chatRooms ]);
 
-    const dispatchChatListUpdate = (notificationData: ChatNotificationPayload) => {
-        const { selectedMenu, currentChatRoomId, isChatsTab } = latestStateRef.current;
-        dispatch(updateLastMessage({
-            chatRoomId: notificationData.chatRoomId,
-            lastMessage: notificationData.message,
-            lastMessageTime: notificationData.createdAt,
-        }));
+    const dispatchChatListUpdate = async (notificationData: ChatNotificationPayload) => {
+        const { selectedMenu, currentChatRoomId, isChatsTab , chatRooms} = latestStateRef.current;
+        const roomExists = chatRooms.some(room => room.chatRoomId === notificationData.chatRoomId);
         console.log("지금 열려있는 2열 페이지는?:");
         console.log(selectedMenu);
         console.log("현채 열려있는 chatRoomId: " + currentChatRoomId);
+
+        if(roomExists) {
+            dispatch(updateLastMessage({
+                chatRoomId: notificationData.chatRoomId,
+                lastMessage: notificationData.message,
+                lastMessageTime: notificationData.createdAt,
+            }));
+        } else {
+            try {
+                // 실시간으로 받은 메세지의 채팅방이 리덕스에 없다면 api로 해당 채팅방 상세정보를 받아와서 세팅
+                const newRoomData = await getChatRoomDetail(notificationData.chatRoomId);
+                dispatch(addChatRoom(newRoomData));
+                dispatch(updateLastMessage({
+                    chatRoomId: notificationData.chatRoomId,
+                    lastMessage: notificationData.message,
+                    lastMessageTime: notificationData.createdAt,
+                }));
+            } catch (error) {
+                toast.error( "새로운 채팅방 정보를 가져오는 데 실패했습니다.");
+            }
+        }
 
         // 읽지 않은 메세지 실시간 업데이트
         // 조건: 내가 보낸 메세지가 아니면서 + 채팅 리스트 탭이 열려 있고 + 현재 채팅방 id가 아닌 경우만 실시간 업데이트

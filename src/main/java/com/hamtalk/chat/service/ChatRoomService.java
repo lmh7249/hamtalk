@@ -197,6 +197,7 @@ public class ChatRoomService {
         // 1. 로그인한 유저의 채팅방 목록 조회
         List<ChatRoomListResponse> chatRoomsList = chatRoomRepository.findChatRoomsByUserId(userId);
 
+
         // 2. 채팅방 ID 기준으로 데이터 그룹화
         Map<Long, ChatRoomListResponse> chatRoomMap = new HashMap<>();
 

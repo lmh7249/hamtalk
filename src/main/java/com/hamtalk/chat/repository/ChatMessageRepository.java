@@ -7,10 +7,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
-    List<ChatMessage> findAllByChatRoomId(Long chatRoomId);
+    List<ChatMessage> findByChatRoomIdAndCreatedAtAfter(Long chatRoomId, LocalDateTime joinedAt);
 
     @Aggregation(pipeline = {
             "{ $match: { 'chatRoomId': { $in: ?0 } } }", // 특정 채팅방 ID 목록에 해당하는 메시지만 필터링

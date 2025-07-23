@@ -4,8 +4,7 @@ import {openUserProfile} from "../../store/contentDetailSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import toast from "react-hot-toast";
-import BaseModal from "../common/BaseModal";
-import {ModalType} from "../../containers/ChatMainContainer";
+import {openModal} from "../../store/modalSlice";
 
 const SettingButton = styled.button`
     background-color: #f5f5f5;
@@ -23,11 +22,7 @@ const SettingButton = styled.button`
     }
 `;
 
-interface SettingListProps {
-    openModal: (type: ModalType) => void;
-}
-
-const SettingList = ({openModal} : SettingListProps) => {
+const SettingList = () => {
     const dispatch = useDispatch();
     const myUserId = useSelector((state: RootState) => state.user.id);
 
@@ -42,7 +37,7 @@ const SettingList = ({openModal} : SettingListProps) => {
     return (
         <>
             <SettingButton onClick={() => handleClick(myUserId)}>내 프로필 보기</SettingButton>
-            <SettingButton onClick={() => openModal("editMyProfile")}>내 프로필 편집</SettingButton>
+            <SettingButton onClick={() => dispatch(openModal({type: "editMyProfile"}))}>내 프로필 편집</SettingButton>
         </>
     )
 }

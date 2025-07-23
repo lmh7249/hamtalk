@@ -1,5 +1,4 @@
 import {addFriendApi, checkFriendshipApi, getMyFriendListApi} from "../api/friend";
-import {getFilteredFriendListProps} from "../containers/ChatMainContainer";
 import {Friend} from "../components/chat/ContentList";
 
 export const getMyFriendList = async (): Promise<Friend[]> => {

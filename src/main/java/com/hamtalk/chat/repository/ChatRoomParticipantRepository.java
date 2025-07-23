@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -17,4 +18,11 @@ public interface ChatRoomParticipantRepository extends JpaRepository<ChatRoomPar
 
     @Query("SELECT crp.userId FROM ChatRoomParticipant crp WHERE crp.chatRoomId = :chatRoomId")
     List<Long> findUserIdsByChatRoomId(@Param("chatRoomId") Long chatRoomId);
+
+    Optional<ChatRoomParticipant> findByUserIdAndChatRoomIdAndDeletedAtIsNull(Long userId, Long chatRoomId);
+
+    Optional<ChatRoomParticipant> findByChatRoomIdAndUserId(Long chatRoomId, Long userId);
+
+    List<ChatRoomParticipant> findByChatRoomId(Long chatRoomId);
 }
+

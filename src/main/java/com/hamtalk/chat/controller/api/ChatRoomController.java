@@ -1,11 +1,7 @@
 package com.hamtalk.chat.controller.api;
 
-import com.hamtalk.chat.domain.entity.ChatRoom;
 import com.hamtalk.chat.model.request.ParticipantUserIdsRequest;
-import com.hamtalk.chat.model.response.ChatRoomLastReadAtResponse;
-import com.hamtalk.chat.model.response.ChatRoomListResponse;
-import com.hamtalk.chat.model.response.DirectChatRoomResponse;
-import com.hamtalk.chat.model.response.OnlineChatParticipantResponse;
+import com.hamtalk.chat.model.response.*;
 import com.hamtalk.chat.security.CustomUserDetails;
 import com.hamtalk.chat.service.ChatReadStatusService;
 import com.hamtalk.chat.service.ChatRoomService;
@@ -29,7 +25,7 @@ public class ChatRoomController {
 
     @PostMapping
     @Operation(summary = "채팅방 생성", description = "첫 메세지를 보낸 유저의 id 값으로 채팅방 생성")
-    public ResponseEntity<ApiResponse<ChatRoom>> createChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ParticipantUserIdsRequest request) {
+    public ResponseEntity<ApiResponse<ChatRoomCreateResponse>> createChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ParticipantUserIdsRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.createChatRoom(customUserDetails.getId(), request.getUserIds())));
     }
 
@@ -64,20 +60,23 @@ public class ChatRoomController {
         return ResponseEntity.ok(ApiResponse.ok(chatReadStatusService.getLastReadAtList(chatRoomId)));
     }
 
+    @PostMapping("/verify")
+    @Operation(summary = "채팅방 존재 여부 확인", description = "참여자들로 구성된 채팅방의 존재 여부를 확인하고, 없으면 생성 준비 정보를 반환합니다.")
+    public ResponseEntity<ApiResponse<ChatRoomVerifyResponse>> verifyChatRoom(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ParticipantUserIdsRequest request){
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.verifyChatRoom(customUserDetails.getId(), request.getUserIds())));
+    }
 
+    @DeleteMapping("/{chatRoomId}/participants/me")
+    @Operation(summary = "특정 채팅방 나가기", description = "현재 로그인 한 유저가 특정 채팅방을 나갑니다")
+    ResponseEntity<ApiResponse<String>> leaveChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long chatRoomId) {
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.leaveChatRoom(customUserDetails.getId(), chatRoomId)));
+    }
 
-
-        //    @GetMapping("/{chatRoomId}")
-//    @Operation(summary = "특정 채팅방 조회", description = "특정 채팅방을 조회합니다.")
-//    public ResponseEntity<ApiResponse<>> getChatRoomById() {
-//        return null;
-//    }
-
-//    @DeleteMapping("/{id}")
-//    @Operation(summary = "채팅방 삭제", description = "특정 채팅방을 삭제합니다.")
-//    public ResponseEntity<ApiResponse<>> getChatRoomList() {
-//        return null;
-//    }
-
-
+    @GetMapping("/{chatRoomId}")
+    @Operation(summary = "특정 채팅방 조회", description = "존재하면 채팅방 정보 응답 객체를 전송하고, 없다면 예외를 발생합니다.")
+    public ResponseEntity<ApiResponse<ChatRoomDetailsResponse>> getChatRoomById(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long chatRoomId) {
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.getChatRoomById(customUserDetails.getId(), chatRoomId)));
+    }
 }

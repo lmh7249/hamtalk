@@ -9,6 +9,7 @@ import {addFriend} from "../../services/friend-service";
 import {useDispatch, useSelector} from "react-redux";
 import {openUserProfile} from "../../store/contentDetailSlice";
 import {useAddFriendMutation} from "../../hooks/useAddFriendMutation";
+import {closeModal} from "../../store/modalSlice";
 
 const Title = styled.h3`
     margin-top: 0;
@@ -135,16 +136,16 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchResultState, userProf
     );
 };
 
-interface FriendAddModalProps {
-    modalClose: () => void;
-}
-
-const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
+const FriendAddModal = () => {
     const [email, setEmail] = useState<string>("");
     const [searchResultState, setSearchResultState] = useState<SearchResultStateProps>("INIT");
     const [userProfileData, setUserProfileData] = useState<UserProfileDataProps | null>(null);
     const dispatch = useDispatch();
-    const {mutate: addFriendMutate} = useAddFriendMutation(modalClose);
+    const {mutate: addFriendMutate} = useAddFriendMutation();
+
+    const handleClose = useCallback(() => {
+        dispatch(closeModal());
+    }, [dispatch]);
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -181,11 +182,11 @@ const FriendAddModal: React.FC<FriendAddModalProps> = ({ modalClose }) => {
         console.log(userProfileData);
         if(!userProfileData) return;
         dispatch(openUserProfile(userId));
-        modalClose();
+        handleClose();
     }
 
     return (
-        <BaseModal width="350px" height="350px" modalClose={modalClose}>
+        <BaseModal width="350px" height="350px" modalClose={handleClose}>
             <Title>친구 추가</Title>
             <SearchOptionWrapper>
                 <SearchOptionText>이메일로 추가</SearchOptionText>

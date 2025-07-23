@@ -8,10 +8,13 @@ import {closeDetail} from "../../store/contentDetailSlice";
 import {RootState} from "../../store";
 // import {FaUsers} from "react-icons/fa6";
 import IconButton2 from "../common/IconButton2";
-import {useMemo, useRef, useState} from "react";
+import {useCallback, useMemo, useRef, useState} from "react";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import {FaUsers} from "react-icons/fa";
 import {selectViewersByRoomId} from "../../store/chatActivitySlice";
+import {closeModal, openModal} from "../../store/modalSlice";
+import {useLeaveChatRoomMutation} from "../../hooks/useLeaveChatRoomMutation";
+import {removeChatRoom} from "../../store/chatRoomsSlice";
 
 const StyledChatRoomHeaderWrapper = styled.div`
     display: flex;
@@ -49,7 +52,6 @@ const IconWrapper = styled.div`
 
 `;
 
-// 팝오버 '빈 창' 스타일
 const StyledPopoverContainer = styled.div`
     position: absolute;
     top: calc(100% + 8px); // 버튼 바로 아래에서 8px 떨어진 위치
@@ -62,6 +64,8 @@ const StyledPopoverContainer = styled.div`
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     z-index: 100;
     padding: 8px;
+    max-height: 250px;
+    overflow-y: auto;
 `;
 
 const StyledProfileImage = styled.img`
@@ -250,16 +254,48 @@ const ChatRoomParticipantItem = () => {
 
 const ChatRoomActions = () => {
     const dispatch = useDispatch();
+    const currentChatRoom = useSelector((state: RootState) => state.chatRooms.currentChatRoom);
+    const {mutate: leaveChatRoomMutate} = useLeaveChatRoomMutation();
 
     const handleClose = () => {
         dispatch(closeDetail());
     }
 
+    const handleLeaveClick = useCallback(() => {
+        if (!currentChatRoom || !currentChatRoom.chatRoomId) return;
+        const chatRoomIdToLeave = currentChatRoom.chatRoomId;
+
+        dispatch(openModal({
+            type: 'commonConfirm',
+            props: {
+                title: "채팅방 나가기",
+                confirmText: "나가기",
+                onConfirm: () => {
+                    leaveChatRoomMutate(chatRoomIdToLeave, {
+                        onSuccess: () => {
+                            dispatch(removeChatRoom(chatRoomIdToLeave));
+                            dispatch(closeDetail());
+                            dispatch(closeModal());
+                        }
+                    })
+                },
+                cancelText: "취소",
+                // children으로 간단한 텍스트를 전달
+                children: <p>
+                    채팅방을 나가시겠습니까?
+                    <br/>
+                    나가신 후에는 대화 내용이 모두 삭제됩니다.
+                </p>
+            }
+        }));
+    },[dispatch, currentChatRoom, leaveChatRoomMutate]);
+
     return (
         <ChatRoomButtonWrapper>
             {/*TODO: IconButton2 해당 컴포넌트로 모두 리팩토링 진행하고 컴포넌트명도 변경하기, 기존 IconButton 컴포넌트 삭제 필수*/}
-            <IconButton iconName={ChatRoomSearchIcon} alt={"검색"} bgColor="transparent" hoverBgColor="#F2F2F2"/>
-            <IconButton iconName={ChatRoomExitIcon} alt={"채팅방 나가기"} bgColor="transparent" hoverBgColor="#F2F2F2"/>
+            {/*<IconButton iconName={ChatRoomSearchIcon} alt={"검색"} bgColor="transparent" hoverBgColor="#F2F2F2"/>*/}
+            <IconButton iconName={ChatRoomExitIcon} alt={"채팅방 나가기"} bgColor="transparent" hoverBgColor="#F2F2F2"
+            onClick={handleLeaveClick}/>
             <IconButton iconName={ChatRoomCloseIcon} alt={"채팅방 닫기"} bgColor="transparent" hoverBgColor="#F2F2F2"
                         onClick={handleClose}/>
         </ChatRoomButtonWrapper>

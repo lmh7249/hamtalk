@@ -1,15 +1,14 @@
 import {
-    createDirectChatRoomApi,
+    createChatRoomApi,
     findDirectChatRoomApi,
-    getChatMessageListApi, getLastReadAtListApi,
-    getMyChatRoomListApi, getOnlineParticipantsApi, getUnreadMessageCountApi,
-    updateLastReadAtApi
+    getChatMessageListApi, getChatRoomDetailApi, getLastReadAtListApi,
+    getMyChatRoomListApi, getOnlineParticipantsApi, getUnreadMessageCountApi, leaveChatRoomApi,
+    updateLastReadAtApi, verifyChatRoomApi
 } from "../api/chat";
 
 export const getMyChatRoomList = async () => {
     const response = getMyChatRoomListApi();
     return await response;
-
 }
 
 export const findDirectChatRoom = async (friendId: number) => {
@@ -28,8 +27,8 @@ export const getChatMessageList = async (chatRoomId: number) => {
 }
 
 
-export const createDirectChatRoom = async (friendId: number) =>{
-    const response = await createDirectChatRoomApi(friendId);
+export const createChatRoom = async (friendId: number[]) =>{
+    const response = await createChatRoomApi(friendId);
     return response.data;
 }
 
@@ -56,6 +55,30 @@ export const getOnlineParticipants = async (chatRoomId: number) => {
 
 export const getLastReadAtList = async (chatRoomId: number) => {
     const response = await getLastReadAtListApi(chatRoomId);
+    if(response.status === "success" && response.data) {
+        return response.data;
+    }
+    throw new Error(response.errorMessage || "");
+}
+
+export const verifyChatRoom = async (userIds: number[]) => {
+    const response = await verifyChatRoomApi(userIds);
+    if(response.status === "success" && response.data) {
+        return response.data;
+    }
+    throw new Error(response.errorMessage || "");
+}
+
+export const leaveChatRoom = async (chatRoomId: number) => {
+    const response = await leaveChatRoomApi(chatRoomId);
+    if(response.status === "success" && response.data) {
+        return response.data;
+    }
+    throw new Error(response.errorMessage || "");
+}
+
+export const getChatRoomDetail = async (chatroomId: number) => {
+    const response = await getChatRoomDetailApi(chatroomId);
     if(response.status === "success" && response.data) {
         return response.data;
     }

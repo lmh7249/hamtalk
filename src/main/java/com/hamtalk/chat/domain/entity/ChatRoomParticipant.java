@@ -19,4 +19,15 @@ public class ChatRoomParticipant extends BaseEntity{
     private Long chatRoomId;
     private Long userId;
     private LocalDateTime deletedAt;
+    private LocalDateTime lastExitAt;
+
+    public void leaveChatRoom() {
+        LocalDateTime now = LocalDateTime.now();
+        this.deletedAt = now;
+        this.lastExitAt = now;
+    }
+
+    public void rejoinChatRoom() {
+        this.deletedAt = null;
+    }
 }

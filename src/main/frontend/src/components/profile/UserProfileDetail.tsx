@@ -13,7 +13,6 @@ import {RootState} from "../../store";
 import {FaCamera} from 'react-icons/fa';
 import {FiEdit} from "react-icons/fi";
 import {updateProfileImageUrl, updateStatusMessage} from "../../store/userSlice";
-import {updateUserStatusMessageApi} from "../../api/user";
 import {useAddFriendMutation} from "../../hooks/useAddFriendMutation";
 
 const StyledUserProfileDetail = styled.div`
@@ -287,11 +286,12 @@ const UserProfileDetail = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [statusMessageInputValue, setStatusMessageInputValue] = useState<string>(myProfile.statusMessage || "");
     const maxLength = 25;
-    const {mutate: addFriendMutate} = useAddFriendMutation(() => setIsFriend(true));
+    const {mutate: addFriendMutate} = useAddFriendMutation();
 
     const handleClickEditImage = () => {
         fileInputRef.current?.click();
     }
+
 
     useEffect(() => {
         if(searchUserProfileId === undefined) return;
@@ -320,7 +320,11 @@ const UserProfileDetail = () => {
             toast.error("유효하지 않은 사용자입니다.");
             return;
         }
-        addFriendMutate(toUserId);
+        addFriendMutate(toUserId, {
+            onSuccess: () => {
+                setIsFriend(true);
+            }
+        });
     }
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

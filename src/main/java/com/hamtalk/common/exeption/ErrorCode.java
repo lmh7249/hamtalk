@@ -23,9 +23,14 @@ public enum ErrorCode {
     MISSING_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "MISSING_REFRESH_TOKEN", "리프레시 토큰이 존재하지 않습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "INVALID_REFRESH_TOKEN", "리프레시 토큰이 유효하지 않습니다."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "EXPIRED_REFRESH_TOKEN", "만료된 리프레시 토큰입니다."),
-    INVALID_TOKEN_CATEGORY(HttpStatus.BAD_REQUEST, "INVALID_TOKEN_CATEGORY", "토큰의 카테고리가 올바르지 않습니다.");
-
-
+    INVALID_TOKEN_CATEGORY(HttpStatus.BAD_REQUEST, "INVALID_TOKEN_CATEGORY", "토큰의 카테고리가 올바르지 않습니다."),
+    INVALID_PARTICIPANTS(HttpStatus.BAD_REQUEST, "INVALID_PARTICIPANTS", "참여자 목록에 존재하지 않는 사용자가 포함되어 있습니다."),
+    CHAT_ROOM_ALREADY_EXISTS(HttpStatus.CONFLICT, "CHAT_ROOM_ALREADY_EXISTS", "이미 존재하는 채팅방입니다."),
+    EMPTY_PARTICIPANTS_LIST(HttpStatus.BAD_REQUEST, "EMPTY_PARTICIPANTS_LIST", "초대할 사용자가 한 명 이상이어야 합니다."),
+    SELF_CHAT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "SELF_CHAT_NOT_ALLOWED", "자기 자신과는 채팅방을 만들 수 없습니다."),
+    PARTICIPANT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "PARTICIPANT_LIMIT_EXCEEDED", "채팅방 최대 인원을 초과했습니다."),
+    PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, "PARTICIPANT_NOT_FOUND", "채팅방 참여자를 찾을 수 없습니다."),
+    PARTICIPANT_AlREADY_LEFT(HttpStatus.CONFLICT, "PARTICIPANT_AlREADY_LEFT", "이미 나간 채팅방입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;      // 프론트가 사용할 에러 코드

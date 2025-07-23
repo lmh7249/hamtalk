@@ -116,3 +116,15 @@ export const leaveChatRoomApi = async (chatRoomId: number) => {
     }
     return await response.json();
 }
+
+export const getChatRoomDetailApi = async (chatRoomId: number) => {
+    const response = await customFetch(`/api/chat-rooms/${chatRoomId}`, {
+        method: "get"
+    })
+
+    if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errorMessage || "서버 오류가 발생했어요.");
+    }
+    return await response.json();
+}

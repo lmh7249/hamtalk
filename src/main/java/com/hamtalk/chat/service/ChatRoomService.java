@@ -148,7 +148,6 @@ public class ChatRoomService {
                         )
                         .build();
             }
-            ;
         } else if (userIds.size() > 1) {
             Optional<ChatRoomByParticipantsResponse> groupChatRoom = chatRoomRepository.findChatRoomByExactParticipants(allParticipantIds);
             if (groupChatRoom.isPresent()) {
@@ -272,10 +271,19 @@ public class ChatRoomService {
 
     @Transactional
     public String leaveChatRoom(Long myId, Long chatRoomId) {
-        ChatRoomParticipant chatRoomParticipant = chatRoomParticipantRepository.findByUserIdAndChatRoomIdAndDeletedAtIsNull(myId, chatRoomId)
+        ChatRoomParticipant chatRoomParticipant = chatRoomParticipantRepository.findByChatRoomIdAndUserId(chatRoomId, myId)
                 .orElseThrow(ParticipantNotFoundException::new);
+        if (chatRoomParticipant.getDeletedAt() != null) {
+            throw new ParticipantAlreadyLeftException();
+        }
         chatRoomParticipant.leaveChatRoom();
         return "성공적으로 채팅방을 나갔습니다.";
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRoomDetailsResponse getChatRoomById(Long myId, Long chatRoomId) {
+        chatRoomParticipantRepository.findByChatRoomIdAndUserId(chatRoomId, myId).orElseThrow(ParticipantNotFoundException::new);
+        return chatRoomRepository.findChatRoomDetailsById(chatRoomId).orElseThrow(ChatRoomNotFoundException::new);
     }
 
 

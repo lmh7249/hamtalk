@@ -74,11 +74,9 @@ public class ChatRoomController {
         return ResponseEntity.ok(ApiResponse.ok(chatRoomService.leaveChatRoom(customUserDetails.getId(), chatRoomId)));
     }
 
-
-        //    @GetMapping("/{chatRoomId}")
-//    @Operation(summary = "특정 채팅방 조회", description = "특정 채팅방을 조회합니다.")
-//    public ResponseEntity<ApiResponse<>> getChatRoomById() {
-//        return null;
-//    }
-
+    @GetMapping("/{chatRoomId}")
+    @Operation(summary = "특정 채팅방 조회", description = "존재하면 채팅방 정보 응답 객체를 전송하고, 없다면 예외를 발생합니다.")
+    public ResponseEntity<ApiResponse<ChatRoomDetailsResponse>> getChatRoomById(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long chatRoomId) {
+        return ResponseEntity.ok(ApiResponse.ok(chatRoomService.getChatRoomById(customUserDetails.getId(), chatRoomId)));
+    }
 }

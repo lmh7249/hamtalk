@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import React from "react";
-import {findDirectChatRoom} from "../../services/chat-service";
 import {openChatRoom, openUserProfile} from "../../store/contentDetailSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {formatLastMessageTime} from "../../utils/formatTime";

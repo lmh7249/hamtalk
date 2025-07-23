@@ -9,6 +9,7 @@ import com.hamtalk.chat.model.response.ChatUserStatusResponse;
 import com.hamtalk.chat.pubsub.RedisPublisher;
 import com.hamtalk.chat.repository.ChatRoomParticipantRepository;
 import com.hamtalk.chat.service.ChatMessageService;
+import com.hamtalk.chat.service.ChatRoomParticipantService;
 import com.hamtalk.chat.service.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +33,7 @@ public class ChatWebSocketController {
     private final RedisPublisher redisPublisher;
     private final RedisService redisService;
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
+    private final ChatRoomParticipantService chatRoomParticipantService;
 
     /*  TODO: 웹소켓 + Redis 전송 흐름
      * 1. 유저가 메세지 보냄 -> ChatWebSocketController 도착
@@ -48,6 +50,12 @@ public class ChatWebSocketController {
         log.info("WebSocket/Stomp Message Send");
         Long senderId = (Long) headerAccessor.getSessionAttributes().get("userId");
         log.info("User ID: {}", senderId);
+
+        // 메세지 저장 전, 메세저 보내는 사람이 나간 상태라면 해당 채팅방에 재참여하는 로직.
+        chatRoomParticipantService.validateAndRejoinParticipant(chatRoomId, senderId);
+
+        chatRoomParticipantService.rejoinOpponentIfOneOnOne(chatRoomId, senderId);
+
         ChatMessageResponse chatMessageResponse = chatMessageService.saveChatMessage(senderId, chatRoomId, chatMessageRequest);
         // 1. redis 채팅방 채널에 발행 → 채팅방 열려있으면 실시간 메시지 수신
         redisPublisher.publish("chatRoom:" + chatRoomId, chatMessageResponse);

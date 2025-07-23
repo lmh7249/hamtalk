@@ -25,7 +25,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
 
     Optional<UserProfile> findEntityByUserId(Long userId);
 
-    @Query("SELECT new com.hamtalk.chat.model.response.ChatRoomParticipantResponse(up.userId, up.nickname, up.profileImageUrl) " +
+    @Query("SELECT new com.hamtalk.chat.model.response.ChatRoomParticipantResponse(up.userId, up.nickname, up.profileImageUrl, true) " +
             "FROM UserProfile up WHERE up.userId IN :userIds")
     List<ChatRoomParticipantResponse> findParticipantInfoByUserIds(@Param("userIds") List<Long> userIds);
 

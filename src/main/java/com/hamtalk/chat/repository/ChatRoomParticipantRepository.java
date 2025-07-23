@@ -20,4 +20,9 @@ public interface ChatRoomParticipantRepository extends JpaRepository<ChatRoomPar
     List<Long> findUserIdsByChatRoomId(@Param("chatRoomId") Long chatRoomId);
 
     Optional<ChatRoomParticipant> findByUserIdAndChatRoomIdAndDeletedAtIsNull(Long userId, Long chatRoomId);
+
+    Optional<ChatRoomParticipant> findByChatRoomIdAndUserId(Long chatRoomId, Long userId);
+
+    List<ChatRoomParticipant> findByChatRoomId(Long chatRoomId);
 }
+

@@ -72,7 +72,6 @@ const ChatRoomFooter = () => {
 
         //TODO: == -> null & undefined 포함. === -> null만 포함.
         if(chatRoomId == null) {
-
             // 2. 신규 채팅방 생성(백엔드에서 해당 채팅방 존재하는지 먼저 확인).
             const response = await createChatRoom(otherParticipantIdList);
             const newChatRoomId = response.chatRoomId;

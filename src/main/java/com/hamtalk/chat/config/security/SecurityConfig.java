@@ -118,7 +118,8 @@ public class SecurityConfig {
                                 "/ws-chat/**", // 웹소켓 핸드셰이크 엔드포인트는 허용
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**", // swagger-ui 허용
-                                "/test" // EC2 배포 테스트용
+                                "/test", // EC2 배포 테스트용
+                                "/actuator/*"
                         ).permitAll()
 
                         // POST 방식 /api/users는 인증 없이 허용 (회원가입)
@@ -137,7 +138,7 @@ public class SecurityConfig {
         );
         loginFilter.setFilterProcessesUrl("/api/auth/login");  // URL 설정
 
-// 설정된 필터를 추가
+// 커스텀한 로그인필터로 변경, UsernamePasswordAuthenticationFilter -> 이건 사용 X loginFilter로 대체함.
         http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisService), LogoutFilter.class);

@@ -1,7 +1,8 @@
-import styled from "styled-components";
+import styled, {DefaultTheme, useTheme} from "styled-components";
 import ContentDetail from "./ContentDetail";
 import ContentList from "./ContentList";
 import React from "react";
+import {useMediaQuery} from "react-responsive";
 
 const StyledMainContent = styled.div`
     display: flex;
@@ -9,10 +10,19 @@ const StyledMainContent = styled.div`
 `;
 
 const MainContent = () => {
+    const defaultTheme = useTheme() as DefaultTheme;
+    const isSmallScreen = useMediaQuery({maxWidth: defaultTheme.breakpoints.md});
+
     return (
         <StyledMainContent>
-            <ContentList/>
-            <ContentDetail/>
+            {isSmallScreen ? (
+                <ContentList />
+            ) : (
+                <>
+                    <ContentList />
+                    <ContentDetail />
+                </>
+            )}
         </StyledMainContent>
     )
 }

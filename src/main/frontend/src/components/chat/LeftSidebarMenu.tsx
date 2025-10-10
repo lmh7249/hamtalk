@@ -21,10 +21,15 @@ import {logout, logoutStart} from "../../store/userSlice";
 const StyledLeftSidebarMenu = styled.div`
     flex-grow: 1;
     display: flex;
-    flex-direction: column; /* 세로 방향 배치 */
-    justify-content: space-between; /* 아이템 간 간격 조정 */
+    flex-direction: column;
+    justify-content: space-between;
     width: 100%;
-`
+
+    @media (max-width: ${props => props.theme.breakpoints.md}px) {
+        background-color: #2C2D31;
+    }
+`;
+
 const leftSidebarMenu = [
     {key: "friends", icon: FriendsIcon, label: "친구 목록"},
     {key: "chats", icon: ChatIcon, label: "채팅방 목록"},
@@ -35,8 +40,15 @@ const StyledMenuList = styled.ul`
     list-style: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
 
-`
+    @media (max-width: ${props => props.theme.breakpoints.md}px) {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+`;
+
 const StyledMenuButton = styled.button`
     display: flex;
     gap: 20px;
@@ -48,10 +60,11 @@ const StyledMenuButton = styled.button`
     width: 100%;
     padding: 10px 10px 10px 20px;
 
-    p {
-        color: white;
-        margin: 0;
-        font-size: 16px;
+    @media (max-width: ${props => props.theme.breakpoints.md}px) {
+        gap: 0;
+        margin-bottom: 0;
+        padding-right: 20px;
+        border: 2px solid red;
     }
 
     &:hover {
@@ -62,12 +75,19 @@ const StyledMenuButton = styled.button`
 const LabelWithBadge = styled.p`
     display: inline-flex;
     align-items: center;
-    gap: 8px; /* 텍스트와 뱃지 사이 여백 */
+    gap: 8px;
     margin: 0;
+    color: white;
+    font-size: 16px;
+
+    @media (max-width: ${props => props.theme.breakpoints.md}px) {
+        font-size: 0;
+    }
+
 `;
 
 const UnreadBadge = styled.span`
-    background-color: #ff6b81; /* 귀여운 핑크빛 빨강 */
+    background-color: #ff6b81;
     color: white;
     font-weight: bold;
     font-size: 12px;
@@ -78,6 +98,13 @@ const UnreadBadge = styled.span`
     align-items: center;
     justify-content: center;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: -5px;
+    right: -8px;
+`;
+
+const IconWrapper = styled.div`
+    position: relative;
 `;
 
 const LeftSidebarMenu = () => {
@@ -132,21 +159,26 @@ const LeftSidebarMenu = () => {
                         <StyledMenuButton
                             onClick={() => dispatch(setMenu({key: item.key, label: item.label}))}
                         >
-                            <img src={item.icon} alt={item.label} width={30} height={30}/>
-                            <LabelWithBadge>
-                                {item.label}
+                            <IconWrapper>
+                                <img src={item.icon} alt={item.label} width={30} height={30}/>
+
                                 {item.key === 'chats' && totalUnreadCount > 0 && (
                                     <UnreadBadge>{totalUnreadCount}</UnreadBadge>
                                 )}
+                            </IconWrapper>
+                            <LabelWithBadge>
+                                {item.label}
                             </LabelWithBadge>
                         </StyledMenuButton>
                     </li>
                 ))}
+                <li>
+                    <StyledMenuButton onClick={handleLogout}>
+                        <img src={LogoutIcon} alt="로그아웃" width={30} height={30}/>
+                        <LabelWithBadge>로그아웃</LabelWithBadge>
+                    </StyledMenuButton>
+                </li>
             </StyledMenuList>
-            <StyledMenuButton onClick={handleLogout}>
-                <img src={LogoutIcon} alt="로그아웃" width={30} height={30}/>
-                <p>로그아웃</p>
-            </StyledMenuButton>
         </StyledLeftSidebarMenu>
     )
 }

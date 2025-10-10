@@ -6,6 +6,8 @@ import AppRoutes from "./routes/AppRoutes";
 import {Provider} from "react-redux";
 import {store} from "./store";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {ThemeProvider} from "styled-components";
+import {theme} from "./styles/theme";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -18,7 +20,9 @@ root.render(
     <Provider store={store}>
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-                <AppRoutes/>
+                <ThemeProvider theme={theme}>
+                    <AppRoutes/>
+                </ThemeProvider>
             </BrowserRouter>
         </QueryClientProvider>
     </Provider>

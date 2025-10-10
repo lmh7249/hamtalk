@@ -12,8 +12,6 @@ import {getMyChatRoomList} from "../../services/chat-service";
 import SettingList from "./SettingList";
 import {setChatRooms} from "../../store/chatRoomsSlice";
 import {setKeyword} from "../../store/searchSlice";
-import {useQuery} from "@tanstack/react-query";
-import {useMyFriendsQuery} from "../../hooks/useMyFriendsQuery";
 import {openModal} from "../../store/modalSlice";
 
 const StyledContentList = styled.div`
@@ -23,6 +21,11 @@ const StyledContentList = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
+    
+    @media (max-width: ${props => props.theme.breakpoints.md}px) {
+        width: 100%;
+        min-width: 0;
+    }
 `;
 
 const StyledContentListTopState = styled.div`

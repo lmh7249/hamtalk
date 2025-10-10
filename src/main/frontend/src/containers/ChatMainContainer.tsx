@@ -1,22 +1,18 @@
-import LeftSideBar from "../components/chat/LeftSideBar";
-import MainContent from "../components/chat/MainContent";
-import styled from "styled-components";
+import styled, {DefaultTheme, useTheme} from "styled-components";
+import {useMediaQuery} from "react-responsive";
+import DesktopLayout from "./layout/DesktopLayout";
+import MobileLayout from "./layout/MobileLayout";
 
-const MainContentWrapper = styled.div`
+export const MainContentWrapper = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
 `;
 
 const ChatMainContainer = () => {
-    return (
-        <>
-            <LeftSideBar>
-            </LeftSideBar>
-            <MainContentWrapper>
-                <MainContent/>
-            </MainContentWrapper>
-        </>
-    )
+    const defaultTheme = useTheme() as DefaultTheme;
+    const isSmallScreen = useMediaQuery({maxWidth: defaultTheme.breakpoints.md});
+
+    return isSmallScreen ? <MobileLayout /> : <DesktopLayout />;
 }
 export default ChatMainContainer

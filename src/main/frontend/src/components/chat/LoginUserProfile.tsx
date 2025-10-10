@@ -12,18 +12,23 @@ import dayjs from "../../utils/dayjs";
 const StyledUserProfile = styled.div`
     height: 200px;
     width: 100%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* 연한 테두리 */
-`
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
+    
+    @media (max-width: ${props => props.theme.breakpoints.md}px) {
+        background-color: #2C2D31;
+    }
+`;
+
 const StyledUserProfileDetail = styled.div`
     display: flex;
     gap: 10px;
     padding: 10px;
     align-items: center;
-`
+`;
 
 const StyledImage = styled.img`
-    object-fit: cover; /* 이미지 비율을 유지하면서 부모 요소에 맞게 조정 */
-    border: 2px solid rgba(255, 255, 255, 0.5); /* 연한 테두리 */
+    object-fit: cover; 
+    border: 2px solid rgba(255, 255, 255, 0.5); 
     border-radius: 50%;
     width: 60px;
     height: 60px;
@@ -33,14 +38,8 @@ const StyledImage = styled.img`
 const ProfileTitle = styled.h3`
     padding: 10px 10px 10px 20px;
     margin-bottom: 0;
+    color: white;
 `;
-
-interface MyProfile {
-    nickname: string;
-    statusMessage: string;
-    email: string;
-    profileImageUrl: string;
-}
 
 const LoginUserProfile = () => {
     const myProfile = useSelector((state: RootState) => state.user);

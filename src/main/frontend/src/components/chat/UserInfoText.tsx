@@ -11,6 +11,8 @@ const StyledUserNickName = styled.div<UserInfoProps>`
     font-size: 16px;
     font-weight: bold;
     color: ${(props) => (props.$isMe ? "#fff" : "#000")};
+    
+    
 `;
 
 const StyledUserStatusMessage = styled.div<UserInfoProps>`

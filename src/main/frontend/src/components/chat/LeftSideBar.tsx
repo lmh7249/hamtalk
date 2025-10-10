@@ -16,10 +16,8 @@ const SideBar = styled.div`
 const LeftSideBar = () => {
     return (
         <SideBar>
-            <LoginUserProfile>
-            </LoginUserProfile>
-            <LeftSidebarMenu>
-            </LeftSidebarMenu>
+            <LoginUserProfile/>
+            <LeftSidebarMenu/>
         </SideBar>
     )
 

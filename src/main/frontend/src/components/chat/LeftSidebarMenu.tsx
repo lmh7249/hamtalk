@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, {DefaultTheme, useTheme} from "styled-components";
 import FriendsIcon from "../../assets/icons/friends.svg";
 import ChatIcon from "../../assets/icons/chatting-room.svg";
 import SettingIcon from "../../assets/icons/setting.svg";
@@ -17,6 +17,7 @@ import {updateLastReadAt} from "../../services/chat-service";
 import {resetChatState} from "../../store/chatRoomsSlice";
 import {clearRoomViewers, resetChatActivity} from "../../store/chatActivitySlice";
 import {logout, logoutStart} from "../../store/userSlice";
+import {useMediaQuery} from "react-responsive";
 
 const StyledLeftSidebarMenu = styled.div`
     flex-grow: 1;
@@ -64,7 +65,6 @@ const StyledMenuButton = styled.button`
         gap: 0;
         margin-bottom: 0;
         padding-right: 20px;
-        border: 2px solid red;
     }
 
     &:hover {
@@ -116,9 +116,23 @@ const LeftSidebarMenu = () => {
         chatRoomId: state.chatRooms.currentChatRoom?.chatRoomId ?? null,
         loginUserNickname: state.user.nickname ?? "알수없는 사용자"
     }));
+    const defaultTheme = useTheme() as DefaultTheme;
+    const isSmallScreen = useMediaQuery({ maxWidth: defaultTheme.breakpoints.md });
+
+
 
     useEffect(() => {
     }, [selectedMenu]);
+
+    const handleMenuClick = (menuItem: { key: string, label: string }) => {
+        // 5. 모바일 화면일 경우에만, 상세 뷰를 닫는 액션을 추가로 실행!
+        if (isSmallScreen) {
+            dispatch(closeDetail());
+        }
+
+        // 6. (공통) 원래 하던 대로 메뉴 변경 액션을 실행합니다.
+        dispatch(setMenu({ key: menuItem.key, label: menuItem.label }));
+    };
 
     const handleLogout = async () => {
         const loadingToast = toast.loading("로그아웃 중...");
@@ -157,7 +171,7 @@ const LeftSidebarMenu = () => {
                 {leftSidebarMenu.map((item, index) => (
                     <li>
                         <StyledMenuButton
-                            onClick={() => dispatch(setMenu({key: item.key, label: item.label}))}
+                            onClick={() => handleMenuClick(item)}
                         >
                             <IconWrapper>
                                 <img src={item.icon} alt={item.label} width={30} height={30}/>
